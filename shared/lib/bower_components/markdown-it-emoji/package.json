@@ -1,6 +1,6 @@
 {
   "name": "markdown-it-emoji",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Emoji plugin for markdown-it markdown parser.",
   "keywords": [
     "markdown-it-plugin",
@@ -24,9 +24,12 @@
   "scripts": {
     "test": "make test"
   },
-  "scripts": {
-    "test": "make test"
-  },
+  "files": [
+    "index.js",
+    "light.js",
+    "lib/",
+    "dist/"
+  ],
   "devDependencies": {
     "browserify": "*",
     "coveralls": "^2.11.2",
