@@ -37,7 +37,7 @@
     "commit": "75e108809a90749417e375193531f7305f647cd4"
   },
   "_source": "https://github.com/cure53/DOMPurify.git",
-  "_target": "~0.7.4",
+  "_target": "^0.7.4",
   "_originalSource": "dompurify",
   "_direct": true
 }

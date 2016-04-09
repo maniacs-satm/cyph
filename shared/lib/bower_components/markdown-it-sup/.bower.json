@@ -33,7 +33,7 @@
     "commit": "2b34a1526e88dfde5ec47fdd35dfa84f4e198abb"
   },
   "_source": "https://github.com/markdown-it/markdown-it-sup.git",
-  "_target": "~1.0.0",
+  "_target": "^1.0.0",
   "_originalSource": "markdown-it-sup",
   "_direct": true
 }

@@ -35,7 +35,7 @@
     "commit": "4d5f6af1b6efb0975dae2ac51dbe6252636724aa"
   },
   "_source": "https://github.com/markdown-it/markdown-it-emoji.git",
-  "_target": "~1.1.1",
+  "_target": "^1.1.1",
   "_originalSource": "markdown-it-emoji",
   "_direct": true
 }
