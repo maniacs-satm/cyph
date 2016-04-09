@@ -27,15 +27,15 @@
     "Makefile",
     "index*"
   ],
-  "version": "1.1.0",
-  "_release": "1.1.0",
+  "version": "1.1.1",
+  "_release": "1.1.1",
   "_resolution": {
     "type": "version",
-    "tag": "1.1.0",
-    "commit": "af9ef3315e22dfc56891c0cfa64a1a81d7ce84dc"
+    "tag": "1.1.1",
+    "commit": "4d5f6af1b6efb0975dae2ac51dbe6252636724aa"
   },
-  "_source": "git://github.com/markdown-it/markdown-it-emoji.git",
-  "_target": "~1.1.0",
+  "_source": "https://github.com/markdown-it/markdown-it-emoji.git",
+  "_target": "^1.1.1",
   "_originalSource": "markdown-it-emoji",
   "_direct": true
 }

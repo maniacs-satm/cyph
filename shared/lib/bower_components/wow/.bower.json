@@ -26,8 +26,8 @@
     "tag": "1.1.2",
     "commit": "535597ab3d6dfe3f7bfd76281c991e042fdeca25"
   },
-  "_source": "git://github.com/matthieua/WOW.git",
-  "_target": "~1.1.2",
+  "_source": "https://github.com/matthieua/WOW.git",
+  "_target": "^1.1.2",
   "_originalSource": "wow",
   "_direct": true
 }
