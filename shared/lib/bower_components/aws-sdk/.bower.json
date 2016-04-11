@@ -20,15 +20,15 @@
   ],
   "main": "dist/aws-sdk.js",
   "homepage": "https://github.com/aws/aws-sdk-js",
-  "version": "2.3.2",
-  "_release": "2.3.2",
+  "version": "2.3.3",
+  "_release": "2.3.3",
   "_resolution": {
     "type": "version",
-    "tag": "v2.3.2",
-    "commit": "5b49f61185f1b0f56569fd5cab858b5e74cbd9f4"
+    "tag": "v2.3.3",
+    "commit": "d8724e679857dc6b19867db0145f5a216eec948b"
   },
   "_source": "https://github.com/aws/aws-sdk-js.git",
-  "_target": "^2.3.2",
+  "_target": "^2.3.3",
   "_originalSource": "aws-sdk-js",
   "_direct": true
 }
