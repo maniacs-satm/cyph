@@ -4,11 +4,11 @@
     "polymer": "Polymer/polymer"
   },
   "homepage": "https://github.com/angular/angular",
-  "_release": "3b60503d2b",
+  "_release": "03627aa84d",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "3b60503d2bf9a5cbfe7b44dac637be7eb991b26a"
+    "commit": "03627aa84d90f7f1d8d62f160997b783fdf9eaa4"
   },
   "_source": "git://github.com/angular/angular.git",
   "_target": "master",
