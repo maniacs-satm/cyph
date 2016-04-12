@@ -1,17 +1,14 @@
 {
   "name": "angular2",
-  "dependencies": {
-    "polymer": "Polymer/polymer"
-  },
   "homepage": "https://github.com/angular/angular",
-  "_release": "03627aa84d",
+  "_release": "004e66a313",
   "_resolution": {
     "type": "branch",
-    "branch": "master",
-    "commit": "03627aa84d90f7f1d8d62f160997b783fdf9eaa4"
+    "branch": "builds-js",
+    "commit": "004e66a313c32683cc83ad9bb1b4d265f261610d"
   },
   "_source": "git://github.com/angular/angular.git",
-  "_target": "master",
+  "_target": "builds-js",
   "_originalSource": "angular/angular",
   "_direct": true
 }
