@@ -62,7 +62,7 @@
     "url": "https://github.com/ReactiveX/RxJS/issues"
   },
   "main": "Rx.js",
-  "name": "rxjs-es",
+  "name": "rxjs",
   "scripts-info": {
     "info": "List available script",
     "build_all": "Build all packages(ES6, CJS, AMD, Global) and generate packages",
@@ -113,7 +113,6 @@
     "esdoc": "^0.4.6",
     "eslint": "^2.4.0",
     "fs-extra": "^0.26.5",
-    "ghooks": "^1.0.3",
     "glob": "^7.0.3",
     "gm": "1.21.1",
     "google-closure-compiler": "^20160208.5.0",
