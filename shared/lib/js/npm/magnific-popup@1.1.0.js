@@ -1,0 +1,1 @@
+module.exports = require("npm:magnific-popup@1.1.0/dist/jquery.magnific-popup.js");

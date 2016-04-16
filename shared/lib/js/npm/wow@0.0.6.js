@@ -1,0 +1,1 @@
+module.exports = require("npm:wow@0.0.6/lib/main.js");

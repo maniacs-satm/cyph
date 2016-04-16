@@ -1,0 +1,6 @@
+MultipleErrors: /home/gibson/.jspm/packages/npm/jquery@1.12.3/src/intro.js:45:1: Unexpected token End of File
+/home/gibson/.jspm/packages/npm/jquery@1.12.3/src/intro.js:45:1: Unexpected token End of File
+/home/gibson/.jspm/packages/npm/jquery@1.12.3/src/intro.js:45:1: Unexpected token End of File
+
+MultipleErrors: /home/gibson/.jspm/packages/npm/jquery@1.12.3/src/outro.js:1:1: Illegal return statement
+/home/gibson/.jspm/packages/npm/jquery@1.12.3/src/outro.js:2:1: Unexpected token }

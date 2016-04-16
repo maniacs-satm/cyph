@@ -1,0 +1,1 @@
+module.exports = require("github:morr/jquery.appear@0.3.6/jquery.appear.js");

@@ -1,0 +1,89 @@
+/* */ 
+(function(process) {
+  'use strict';
+  var Ruler = require('./ruler');
+  var _rules = [['text', require('./rules_inline/text')], ['newline', require('./rules_inline/newline')], ['escape', require('./rules_inline/escape')], ['backticks', require('./rules_inline/backticks')], ['strikethrough', require('./rules_inline/strikethrough').tokenize], ['emphasis', require('./rules_inline/emphasis').tokenize], ['link', require('./rules_inline/link')], ['image', require('./rules_inline/image')], ['autolink', require('./rules_inline/autolink')], ['html_inline', require('./rules_inline/html_inline')], ['entity', require('./rules_inline/entity')]];
+  var _rules2 = [['balance_pairs', require('./rules_inline/balance_pairs')], ['strikethrough', require('./rules_inline/strikethrough').postProcess], ['emphasis', require('./rules_inline/emphasis').postProcess], ['text_collapse', require('./rules_inline/text_collapse')]];
+  function ParserInline() {
+    var i;
+    this.ruler = new Ruler();
+    for (i = 0; i < _rules.length; i++) {
+      this.ruler.push(_rules[i][0], _rules[i][1]);
+    }
+    this.ruler2 = new Ruler();
+    for (i = 0; i < _rules2.length; i++) {
+      this.ruler2.push(_rules2[i][0], _rules2[i][1]);
+    }
+  }
+  ParserInline.prototype.skipToken = function(state) {
+    var ok,
+        i,
+        pos = state.pos,
+        rules = this.ruler.getRules(''),
+        len = rules.length,
+        maxNesting = state.md.options.maxNesting,
+        cache = state.cache;
+    if (typeof cache[pos] !== 'undefined') {
+      state.pos = cache[pos];
+      return;
+    }
+    if (state.level < maxNesting) {
+      for (i = 0; i < len; i++) {
+        state.level++;
+        ok = rules[i](state, true);
+        state.level--;
+        if (ok) {
+          break;
+        }
+      }
+    } else {
+      state.pos = state.posMax;
+    }
+    if (!ok) {
+      state.pos++;
+    }
+    cache[pos] = state.pos;
+  };
+  ParserInline.prototype.tokenize = function(state) {
+    var ok,
+        i,
+        rules = this.ruler.getRules(''),
+        len = rules.length,
+        end = state.posMax,
+        maxNesting = state.md.options.maxNesting;
+    while (state.pos < end) {
+      if (state.level < maxNesting) {
+        for (i = 0; i < len; i++) {
+          ok = rules[i](state, false);
+          if (ok) {
+            break;
+          }
+        }
+      }
+      if (ok) {
+        if (state.pos >= end) {
+          break;
+        }
+        continue;
+      }
+      state.pending += state.src[state.pos++];
+    }
+    if (state.pending) {
+      state.pushPending();
+    }
+  };
+  ParserInline.prototype.parse = function(str, md, env, outTokens) {
+    var i,
+        rules,
+        len;
+    var state = new this.State(str, md, env, outTokens);
+    this.tokenize(state);
+    rules = this.ruler2.getRules('');
+    len = rules.length;
+    for (i = 0; i < len; i++) {
+      rules[i](state);
+    }
+  };
+  ParserInline.prototype.State = require('./rules_inline/state_inline');
+  module.exports = ParserInline;
+})(require('process'));

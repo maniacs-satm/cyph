@@ -1,0 +1,1 @@
+module.exports = require("npm:css@2.2.1/index");
