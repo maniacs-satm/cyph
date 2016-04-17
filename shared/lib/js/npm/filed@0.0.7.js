@@ -1,1 +1,0 @@
-module.exports = require("npm:filed@0.0.7/main");

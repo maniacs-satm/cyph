@@ -1,1 +1,0 @@
-module.exports = require("npm:mime@1.2.7/mime.js");
