@@ -1,1 +1,0 @@
-module.exports = require("npm:xml2js@0.4.15/lib/xml2js");

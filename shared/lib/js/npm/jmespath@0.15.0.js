@@ -1,1 +1,0 @@
-module.exports = require("npm:jmespath@0.15.0/jmespath.js");

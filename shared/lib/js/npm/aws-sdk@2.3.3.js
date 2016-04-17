@@ -1,1 +1,0 @@
-module.exports = require("npm:aws-sdk@2.3.3/lib/browser.js");
