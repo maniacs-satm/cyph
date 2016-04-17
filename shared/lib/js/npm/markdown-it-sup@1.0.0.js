@@ -1,1 +1,0 @@
-module.exports = require("npm:markdown-it-sup@1.0.0/index.js");
