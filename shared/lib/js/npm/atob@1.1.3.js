@@ -1,0 +1,1 @@
+module.exports = require("npm:atob@1.1.3/index");
