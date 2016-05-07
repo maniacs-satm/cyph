@@ -1,1 +1,0 @@
-module.exports = require("npm:unsemantic@1.0.1/assets/stylesheets/unsemantic-grid-responsive-tablet-no-ie7.css");

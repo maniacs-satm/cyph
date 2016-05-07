@@ -1,0 +1,1 @@
+module.exports = require("npm:unsemantic@1.1.2/assets/react/index.js");
