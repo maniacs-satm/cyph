@@ -1,1 +1,0 @@
-module.exports = require("github:twitter/twemoji@1.3.2/twemoji.npm.js");
