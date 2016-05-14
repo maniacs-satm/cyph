@@ -1,0 +1,1 @@
+module.exports = require("github:matthieua/wow@1.1.2/dist/wow.js");

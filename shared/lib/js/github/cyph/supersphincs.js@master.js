@@ -1,0 +1,1 @@
+module.exports = require("github:cyph/supersphincs.js@master/dist/supersphincs.js");
