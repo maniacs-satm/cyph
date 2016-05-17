@@ -218,5 +218,6 @@
     "reflect-metadata": "npm:reflect-metadata@0.1.2",
     "rxjs": "npm:rxjs@^5.0.0-beta.2",
     "zone.js": "npm:zone.js@^0.6.6"
-  }
+  },
+  "github:snaptortoise/konami-js@1.4.2": {}
 }
