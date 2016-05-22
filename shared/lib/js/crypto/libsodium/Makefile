@@ -24,7 +24,7 @@ all: $(MODULES_DIR)/libsodium.js $(MODULES_DIR)/libsodium-wrappers.js $(MODULES_
 
 
 $(BROWSERS_DIR)/combined/sodium.min.js.gz: $(BROWSERS_DIR)/combined/sodium.min.js
-	ln -f $(BROWSERS_DIR)/combined/sodium.min.js $(BROWSERS_DIR)/combined/sodium.min.js.tmp
+	cp -f $(BROWSERS_DIR)/combined/sodium.min.js $(BROWSERS_DIR)/combined/sodium.min.js.tmp
 	zopfli --i1000 $(BROWSERS_DIR)/combined/sodium.min.js.tmp || gzip -9 $(BROWSERS_DIR)/combined/sodium.min.js.tmp
 	rm -f $(BROWSERS_DIR)/combined/sodium.min.js.tmp
 	mv $(BROWSERS_DIR)/combined/sodium.min.js.tmp.gz $(BROWSERS_DIR)/combined/sodium.min.js.gz
@@ -51,7 +51,7 @@ $(MODULES_DIR)/libsodium-wrappers.js: $(LIBSODIUM_DIR)/js.done $(LIBSODIUM_DIR)/
 
 $(BROWSERS_SUMO_DIR)/combined/sodium.min.js.gz: $(BROWSERS_SUMO_DIR)/combined/sodium.min.js
 	@echo +++ Building sumo/combined/sodium.min.js.gz
-	ln -f $(BROWSERS_SUMO_DIR)/combined/sodium.min.js $(BROWSERS_SUMO_DIR)/combined/sodium.min.js.tmp
+	cp -f $(BROWSERS_SUMO_DIR)/combined/sodium.min.js $(BROWSERS_SUMO_DIR)/combined/sodium.min.js.tmp
 	zopfli --i1000 $(BROWSERS_SUMO_DIR)/combined/sodium.min.js.tmp || gzip -9 $(BROWSERS_SUMO_DIR)/combined/sodium.min.js.tmp
 	rm -f $(BROWSERS_SUMO_DIR)/combined/sodium.min.js.tmp
 	mv $(BROWSERS_SUMO_DIR)/combined/sodium.min.js.tmp.gz $(BROWSERS_SUMO_DIR)/combined/sodium.min.js.gz
@@ -76,7 +76,7 @@ $(MODULES_SUMO_DIR)/libsodium.js: $(LIBSODIUM_DIR)/js.done $(LIBSODIUM_DIR)/js-s
 $(MODULES_SUMO_DIR)/libsodium-wrappers.js: $(MODULES_DIR)/libsodium-wrappers.js
 	@echo +++ Building sumo/libsodium-wrappers.js
 	mkdir -p $(MODULES_SUMO_DIR)
-	ln -f $(MODULES_DIR)/libsodium-wrappers.js $(MODULES_SUMO_DIR)/libsodium-wrappers.js
+	cp -f $(MODULES_DIR)/libsodium-wrappers.js $(MODULES_SUMO_DIR)/libsodium-wrappers.js
 
 
 
