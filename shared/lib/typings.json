@@ -1,0 +1,15 @@
+{
+  "globalDependencies": {
+    "angular": "registry:dt/angular#1.5.0+20160517064839",
+    "angular-animate": "registry:dt/angular-animate#1.5.0+20160407085121",
+    "angular-material": "registry:dt/angular-material#1.0.0-rc5.0+20160412154003",
+    "cryptojs": "registry:dt/cryptojs#3.1.2+20160317120654",
+    "dompurify": "registry:dt/dompurify#0.0.0+20160316155526",
+    "es6-shim": "registry:dt/es6-shim#0.31.2+20160317120654",
+    "highlightjs": "registry:dt/highlightjs#9.1.0+20160317120654",
+    "jquery": "registry:dt/jquery#1.10.0+20160417213236",
+    "systemjs": "registry:dt/systemjs#0.18.4+20160417155658",
+    "webrtc/mediastream": "registry:dt/webrtc/mediastream#0.0.0+20160317120654",
+    "webrtc/rtcpeerconnection": "registry:dt/webrtc/rtcpeerconnection#0.0.0+20160316155526"
+  }
+}
