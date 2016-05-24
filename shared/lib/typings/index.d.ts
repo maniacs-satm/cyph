@@ -4,7 +4,6 @@
 /// <reference path="globals/cryptojs/index.d.ts" />
 /// <reference path="globals/dompurify/index.d.ts" />
 /// <reference path="globals/es6-shim/index.d.ts" />
-/// <reference path="globals/firebase/index.d.ts" />
 /// <reference path="globals/highlightjs/index.d.ts" />
 /// <reference path="globals/jquery/index.d.ts" />
 /// <reference path="globals/systemjs/index.d.ts" />
