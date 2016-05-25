@@ -1,0 +1,1 @@
+module.exports = require("npm:dompurify@0.8.0/src/purify.js");
