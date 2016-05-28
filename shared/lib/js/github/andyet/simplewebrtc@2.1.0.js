@@ -1,0 +1,1 @@
+module.exports = require("github:andyet/simplewebrtc@2.1.0/simplewebrtc.js");
