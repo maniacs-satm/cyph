@@ -1,0 +1,1 @@
+module.exports = require("github:markdown-it/markdown-it@6.0.2/index.js");

@@ -1,1 +1,1 @@
-../github/isagalaev/highlight.js@9.3.0
+../github/isagalaev/highlight.js@9.4.0

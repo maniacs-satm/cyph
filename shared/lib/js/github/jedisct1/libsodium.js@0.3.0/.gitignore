@@ -1,6 +1,0 @@
-#*#
-*.tmp
-*~
-API.md
-test/browsers/sodium.js
-test/browsers/sodium.min.js
