@@ -2,7 +2,7 @@
   "globalDependencies": {
     "angular": "registry:dt/angular#1.5.0+20160517064839",
     "angular-animate": "registry:dt/angular-animate#1.5.0+20160407085121",
-    "angular-material": "registry:dt/angular-material#1.0.0-rc5.0+20160412154003",
+    "angular-material": "registry:dt/angular-material#1.0.0-rc5.0+20160526141345",
     "cryptojs": "registry:dt/cryptojs#3.1.2+20160317120654",
     "dompurify": "registry:dt/dompurify#0.0.0+20160316155526",
     "es6-shim": "registry:dt/es6-shim#0.31.2+20160317120654",

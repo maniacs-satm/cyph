@@ -1,0 +1,1 @@
+module.exports = require("github:markdown-it/markdown-it-emoji@1.2.0/index.js");

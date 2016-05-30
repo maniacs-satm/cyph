@@ -226,7 +226,7 @@ return{_sodium_library_version_minor:Id,_sodium_hex2bin:bb,_bitshift64Lshr:Jc,_c
                                 65;
                 }
                 if (typeof aBytes === "string") {
-                        throw new Exception("input has to be an array");
+                        throw new Error("input has to be an array");
                 }
                 var nMod3 = 2,
                         sB64Enc = "";

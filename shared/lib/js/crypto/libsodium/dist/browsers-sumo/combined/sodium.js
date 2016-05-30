@@ -226,7 +226,7 @@ return{_crypto_onetimeauth_poly1305_init:bf,_crypto_hash_sha512_init:wd,_crypto_
                                 65;
                 }
                 if (typeof aBytes === "string") {
-                        throw new Exception("input has to be an array");
+                        throw new Error("input has to be an array");
                 }
                 var nMod3 = 2,
                         sB64Enc = "";
