@@ -425,6 +425,7 @@ var superSphincs	= {
 	publicKeyLength: rsa.publicKeyLength + sphincs.publicKeyLength,
 	privateKeyLength: rsa.privateKeyLength + sphincs.privateKeyLength,
 	signatureLength: rsa.signatureLength + sphincs.signatureLength,
+	hashLength: 64,
 
 	errorMessages: {
 		keyPair: 'Failed to generate SuperSPHINCS key pair.',
@@ -432,6 +433,8 @@ var superSphincs	= {
 		open: 'Failed to open SuperSPHINCS signed message.',
 		verify: 'Failed to attempt to verify SuperSPHINCS signature.'
 	},
+
+	hash: hashMessage,
 
 	keyPair: function (callback) {
 		var sphincsKeyPair;

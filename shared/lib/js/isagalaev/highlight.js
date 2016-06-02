@@ -1,1 +1,0 @@
-../github/isagalaev/highlight.js@9.4.0
