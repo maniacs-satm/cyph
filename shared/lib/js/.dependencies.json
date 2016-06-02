@@ -10,7 +10,6 @@
   },
   "github:snaptortoise/konami-js@1.4.2": {},
   "github:rubycon/isaac.js@master": {},
-  "github:buu700/microlight@0.0.1": {},
   "github:morr/jquery.appear@0.3.6": {},
   "github:braintree/braintree-web@2.24.1": {},
   "npm:symbol-observable@0.2.4": {},
@@ -222,5 +221,6 @@
     "reflect-metadata": "npm:reflect-metadata@0.1.2",
     "rxjs": "npm:rxjs@^5.0.0-beta.2",
     "zone.js": "npm:zone.js@^0.6.6"
-  }
+  },
+  "github:buu700/microlight@master": {}
 }
