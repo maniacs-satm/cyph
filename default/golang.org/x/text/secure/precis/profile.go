@@ -75,7 +75,7 @@ func (p *Profile) NewTransformer() *Transformer {
 		ts = append(ts, bidirule.New())
 	}
 
-	ts = append(ts, checker{p: p, allowed: p.Allowed()})
+	ts = append(ts, &checker{p: p, allowed: p.Allowed()})
 
 	// TODO: Add the disallow empty rule with a dummy transformer?
 
@@ -229,48 +229,91 @@ func (p *Profile) Allowed() runes.Set {
 }
 
 type checker struct {
-	p *Profile
-	transform.NopResetter
+	p       *Profile
 	allowed runes.Set
+
+	beforeBits catBitmap
+	termBits   catBitmap
+	acceptBits catBitmap
+}
+
+func (c *checker) Reset() {
+	c.beforeBits = 0
+	c.termBits = 0
+	c.acceptBits = 0
 }
 
 func (c *checker) span(src []byte, atEOF bool) (n int, err error) {
 	for n < len(src) {
 		e, sz := dpTrie.lookup(src[n:])
-		switch {
-		case sz == 0:
+		d := categoryTransitions[category(e&catMask)]
+		if sz == 0 {
 			if !atEOF {
 				return n, transform.ErrShortSrc
 			}
-			fallthrough
-		case property(e) < c.p.class.validFrom:
 			return n, errDisallowedRune
+		}
+		if property(e) < c.p.class.validFrom {
+			if d.rule == nil {
+				return n, errDisallowedRune
+			}
+			doLookAhead, err := d.rule(c.beforeBits)
+			if err != nil {
+				return n, err
+			}
+			if doLookAhead {
+				c.beforeBits &= d.keep
+				c.beforeBits |= d.set
+				// We may still have a lookahead rule which we will require to
+				// complete (by checking termBits == 0) before setting the new
+				// bits.
+				if c.termBits != 0 && (!c.checkLookahead() || c.termBits == 0) {
+					return n, err
+				}
+				c.termBits = d.term
+				c.acceptBits = d.accept
+				n += sz
+				continue
+			}
+		}
+		c.beforeBits &= d.keep
+		c.beforeBits |= d.set
+		if c.termBits != 0 && !c.checkLookahead() {
+			return n, errContext
 		}
 		n += sz
 	}
-	return n, nil
+	if m := c.beforeBits >> finalShift; c.beforeBits&m != m || c.termBits != 0 {
+		err = errContext
+	}
+	return n, err
+}
+
+func (c *checker) checkLookahead() bool {
+	switch {
+	case c.beforeBits&c.termBits != 0:
+		c.termBits = 0
+		c.acceptBits = 0
+	case c.beforeBits&c.acceptBits != 0:
+	default:
+		return false
+	}
+	return true
 }
 
 // TODO: we may get rid of this transform if transform.Chain understands
 // something like a Spanner interface.
 func (c checker) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
-	for nSrc < len(src) {
-		r, size := utf8.DecodeRune(src[nSrc:])
-		if size == 0 { // Incomplete UTF-8 encoding
-			if !atEOF {
-				return nDst, nSrc, transform.ErrShortSrc
-			}
-			size = 1
-		}
-		if c.allowed.Contains(r) {
-			if size != copy(dst[nDst:], src[nSrc:nSrc+size]) {
-				return nDst, nSrc, transform.ErrShortDst
-			}
-			nDst += size
-		} else {
-			return nDst, nSrc, errDisallowedRune
-		}
-		nSrc += size
+	short := false
+	if len(dst) < len(src) {
+		src = src[:len(dst)]
+		atEOF = false
+		short = true
 	}
-	return nDst, nSrc, nil
+	nSrc, err = c.span(src, atEOF)
+	nDst = copy(dst, src[:nSrc])
+	if short && (err == transform.ErrShortSrc || err == nil) {
+		err = transform.ErrShortDst
+	}
+	return nDst, nSrc, err
 }
