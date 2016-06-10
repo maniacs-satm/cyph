@@ -1,0 +1,1 @@
+module.exports = require("npm:babel-polyfill@6.9.1/lib/index.js");
