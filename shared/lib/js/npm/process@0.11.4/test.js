@@ -60,4 +60,29 @@ function test(ourProcess) {
       });
     });
   });
+  describe('rename globals', function(t) {
+    it('throws an error', function(done) {
+      var oldTimeout = setTimeout;
+      var oldClear = clearTimeout;
+      function cleanUp() {
+        setTimeout = oldTimeout;
+        clearTimeout = oldClear;
+      }
+      setTimeout = function() {
+        cleanUp();
+        assert.ok(false);
+        done();
+      };
+      clearTimeout = function() {
+        cleanUp();
+        assert.ok(false);
+        done();
+      };
+      ourProcess.nextTick(function() {
+        cleanUp();
+        assert.ok(true);
+        done();
+      });
+    });
+  });
 }

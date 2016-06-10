@@ -465,7 +465,19 @@ SimpleWebRTC.prototype.sendFile = function () {
 
 module.exports = SimpleWebRTC;
 
-},{"./webrtc":2,"attachmediastream":5,"mockconsole":6,"webrtcsupport":3,"wildemitter":4}],3:[function(require,module,exports){
+},{"./webrtc":2,"attachmediastream":5,"mockconsole":3,"webrtcsupport":4,"wildemitter":6}],3:[function(require,module,exports){
+var methods = "assert,count,debug,dir,dirxml,error,exception,group,groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,time,timeEnd,trace,warn".split(",");
+var l = methods.length;
+var fn = function () {};
+var mockconsole = {};
+
+while (l--) {
+    mockconsole[methods[l]] = fn;
+}
+
+module.exports = mockconsole;
+
+},{}],4:[function(require,module,exports){
 // created by @HenrikJoreteg
 var prefix;
 var version;
@@ -512,7 +524,7 @@ module.exports = {
     getUserMedia: getUserMedia
 };
 
-},{}],4:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /*
 WildEmitter.js is a slim little event emitter by @henrikjoreteg largely based
 on @visionmedia's Emitter from UI Kit.
@@ -666,18 +678,6 @@ WildEmitter.mixin = function (constructor) {
 };
 
 WildEmitter.mixin(WildEmitter);
-
-},{}],6:[function(require,module,exports){
-var methods = "assert,count,debug,dir,dirxml,error,exception,group,groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,time,timeEnd,trace,warn".split(",");
-var l = methods.length;
-var fn = function () {};
-var mockconsole = {};
-
-while (l--) {
-    mockconsole[methods[l]] = fn;
-}
-
-module.exports = mockconsole;
 
 },{}],2:[function(require,module,exports){
 var util = require('util');
@@ -840,7 +840,7 @@ WebRTC.prototype.sendDirectlyToAll = function (channel, message, payload) {
 
 module.exports = WebRTC;
 
-},{"./peer":8,"localmedia":9,"mockconsole":6,"util":7,"webrtcsupport":3,"wildemitter":4}],7:[function(require,module,exports){
+},{"./peer":8,"localmedia":9,"mockconsole":3,"util":7,"webrtcsupport":4,"wildemitter":6}],7:[function(require,module,exports){
 var events = require('events');
 
 exports.isArray = isArray;
@@ -1187,7 +1187,52 @@ exports.format = function(f) {
   return str;
 };
 
-},{"events":10}],11:[function(require,module,exports){
+},{"events":10}],5:[function(require,module,exports){
+var adapter = require('webrtc-adapter');
+module.exports = function (stream, el, options) {
+    var item;
+    var URL = window.URL;
+    var element = el;
+    var opts = {
+        autoplay: true,
+        mirror: false,
+        muted: false,
+        audio: false,
+        disableContextMenu: false
+    };
+
+    if (options) {
+        for (item in options) {
+            opts[item] = options[item];
+        }
+    }
+
+    if (!element) {
+        element = document.createElement(opts.audio ? 'audio' : 'video');
+    } else if (element.tagName.toLowerCase() === 'audio') {
+        opts.audio = true;
+    }
+
+    if (opts.disableContextMenu) {
+        element.oncontextmenu = function (e) {
+            e.preventDefault();
+        };
+    }
+
+    if (opts.autoplay) element.autoplay = 'autoplay';
+    if (opts.muted) element.muted = true;
+    if (!opts.audio && opts.mirror) {
+        ['', 'moz', 'webkit', 'o', 'ms'].forEach(function (prefix) {
+            var styleName = prefix ? prefix + 'Transform' : 'transform';
+            element.style[styleName] = 'scaleX(-1)';
+        });
+    }
+
+    element.srcObject = stream;
+    return element;
+};
+
+},{"webrtc-adapter":11}],12:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -1438,52 +1483,7 @@ EventEmitter.listenerCount = function(emitter, type) {
   return ret;
 };
 
-},{"__browserify_process":11}],5:[function(require,module,exports){
-var adapter = require('webrtc-adapter');
-module.exports = function (stream, el, options) {
-    var item;
-    var URL = window.URL;
-    var element = el;
-    var opts = {
-        autoplay: true,
-        mirror: false,
-        muted: false,
-        audio: false,
-        disableContextMenu: false
-    };
-
-    if (options) {
-        for (item in options) {
-            opts[item] = options[item];
-        }
-    }
-
-    if (!element) {
-        element = document.createElement(opts.audio ? 'audio' : 'video');
-    } else if (element.tagName.toLowerCase() === 'audio') {
-        opts.audio = true;
-    }
-
-    if (opts.disableContextMenu) {
-        element.oncontextmenu = function (e) {
-            e.preventDefault();
-        };
-    }
-
-    if (opts.autoplay) element.autoplay = 'autoplay';
-    if (opts.muted) element.muted = true;
-    if (!opts.audio && opts.mirror) {
-        ['', 'moz', 'webkit', 'o', 'ms'].forEach(function (prefix) {
-            var styleName = prefix ? prefix + 'Transform' : 'transform';
-            element.style[styleName] = 'scaleX(-1)';
-        });
-    }
-
-    element.srcObject = stream;
-    return element;
-};
-
-},{"webrtc-adapter":12}],8:[function(require,module,exports){
+},{"__browserify_process":12}],8:[function(require,module,exports){
 var util = require('util');
 var webrtc = require('webrtcsupport');
 var PeerConnection = require('rtcpeerconnection');
@@ -1772,7 +1772,7 @@ Peer.prototype.sendFile = function (file) {
 
 module.exports = Peer;
 
-},{"filetransfer":14,"rtcpeerconnection":13,"util":7,"webrtcsupport":3,"wildemitter":4}],12:[function(require,module,exports){
+},{"filetransfer":14,"rtcpeerconnection":13,"util":7,"webrtcsupport":4,"wildemitter":6}],11:[function(require,module,exports){
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
  *
@@ -1866,7 +1866,188 @@ module.exports = Peer;
   }
 })();
 
-},{"./chrome/chrome_shim":16,"./edge/edge_shim":18,"./firefox/firefox_shim":17,"./safari/safari_shim":19,"./utils":15}],9:[function(require,module,exports){
+},{"./chrome/chrome_shim":18,"./edge/edge_shim":16,"./firefox/firefox_shim":15,"./safari/safari_shim":17,"./utils":19}],17:[function(require,module,exports){
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+'use strict';
+var safariShim = {
+  // TODO: DrAlex, should be here, double check against LayoutTests
+  // shimOnTrack: function() { },
+
+  // TODO: DrAlex
+  // attachMediaStream: function(element, stream) { },
+  // reattachMediaStream: function(to, from) { },
+
+  // TODO: once the back-end for the mac port is done, add.
+  // TODO: check for webkitGTK+
+  // shimPeerConnection: function() { },
+
+  shimGetUserMedia: function() {
+    navigator.getUserMedia = navigator.webkitGetUserMedia;
+  }
+};
+
+// Expose public methods.
+module.exports = {
+  shimGetUserMedia: safariShim.shimGetUserMedia
+  // TODO
+  // shimOnTrack: safariShim.shimOnTrack,
+  // shimPeerConnection: safariShim.shimPeerConnection,
+  // attachMediaStream: safariShim.attachMediaStream,
+  // reattachMediaStream: safariShim.reattachMediaStream
+};
+
+},{}],19:[function(require,module,exports){
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+'use strict';
+
+var logDisabled_ = true;
+
+// Utility methods.
+var utils = {
+  disableLog: function(bool) {
+    if (typeof bool !== 'boolean') {
+      return new Error('Argument type: ' + typeof bool +
+          '. Please use a boolean.');
+    }
+    logDisabled_ = bool;
+    return (bool) ? 'adapter.js logging disabled' :
+        'adapter.js logging enabled';
+  },
+
+  log: function() {
+    if (typeof window === 'object') {
+      if (logDisabled_) {
+        return;
+      }
+      if (typeof console !== 'undefined' && typeof console.log === 'function') {
+        console.log.apply(console, arguments);
+      }
+    }
+  },
+
+  /**
+   * Extract browser version out of the provided user agent string.
+   *
+   * @param {!string} uastring userAgent string.
+   * @param {!string} expr Regular expression used as match criteria.
+   * @param {!number} pos position in the version string to be returned.
+   * @return {!number} browser version.
+   */
+  extractVersion: function(uastring, expr, pos) {
+    var match = uastring.match(expr);
+    return match && match.length >= pos && parseInt(match[pos], 10);
+  },
+
+  /**
+   * Browser detector.
+   *
+   * @return {object} result containing browser, version and minVersion
+   *     properties.
+   */
+  detectBrowser: function() {
+    // Returned result object.
+    var result = {};
+    result.browser = null;
+    result.version = null;
+    result.minVersion = null;
+
+    // Fail early if it's not a browser
+    if (typeof window === 'undefined' || !window.navigator) {
+      result.browser = 'Not a browser.';
+      return result;
+    }
+
+    // Firefox.
+    if (navigator.mozGetUserMedia) {
+      result.browser = 'firefox';
+      result.version = this.extractVersion(navigator.userAgent,
+          /Firefox\/([0-9]+)\./, 1);
+      result.minVersion = 31;
+
+    // all webkit-based browsers
+    } else if (navigator.webkitGetUserMedia) {
+      // Chrome, Chromium, Webview, Opera, all use the chrome shim for now
+      if (window.webkitRTCPeerConnection) {
+        result.browser = 'chrome';
+        result.version = this.extractVersion(navigator.userAgent,
+          /Chrom(e|ium)\/([0-9]+)\./, 2);
+        result.minVersion = 38;
+
+      // Safari or unknown webkit-based
+      // for the time being Safari has support for MediaStreams but not webRTC
+      } else {
+        // Safari UA substrings of interest for reference:
+        // - webkit version:           AppleWebKit/602.1.25 (also used in Op,Cr)
+        // - safari UI version:        Version/9.0.3 (unique to Safari)
+        // - safari UI webkit version: Safari/601.4.4 (also used in Op,Cr)
+        //
+        // if the webkit version and safari UI webkit versions are equals,
+        // ... this is a stable version.
+        //
+        // only the internal webkit version is important today to know if
+        // media streams are supported
+        //
+        if (navigator.userAgent.match(/Version\/(\d+).(\d+)/)) {
+          result.browser = 'safari';
+          result.version = this.extractVersion(navigator.userAgent,
+            /AppleWebKit\/([0-9]+)\./, 1);
+          result.minVersion = 602;
+
+        // unknown webkit-based browser
+        } else {
+          result.browser = 'Unsupported webkit-based browser ' +
+              'with GUM support but no WebRTC support.';
+          return result;
+        }
+      }
+
+    // Edge.
+    } else if (navigator.mediaDevices &&
+        navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) {
+      result.browser = 'edge';
+      result.version = this.extractVersion(navigator.userAgent,
+          /Edge\/(\d+).(\d+)$/, 2);
+      result.minVersion = 10547;
+
+    // Default fallthrough: not supported.
+    } else {
+      result.browser = 'Not a supported browser.';
+      return result;
+    }
+
+    // Warn if version is less than minVersion.
+    if (result.version < result.minVersion) {
+      utils.log('Browser: ' + result.browser + ' Version: ' + result.version +
+          ' < minimum supported version: ' + result.minVersion +
+          '\n some things might not work!');
+    }
+
+    return result;
+  }
+};
+
+// Export.
+module.exports = {
+  log: utils.log,
+  disableLog: utils.disableLog,
+  browserDetails: utils.detectBrowser(),
+  extractVersion: utils.extractVersion
+};
+
+},{}],9:[function(require,module,exports){
 var util = require('util');
 var hark = require('hark');
 var webrtcSupport = require('webrtcsupport');
@@ -2168,188 +2349,7 @@ Object.defineProperty(LocalMedia.prototype, 'localScreen', {
 
 module.exports = LocalMedia;
 
-},{"getscreenmedia":22,"getusermedia":21,"hark":20,"mediastream-gain":23,"mockconsole":6,"util":7,"webrtcsupport":3,"wildemitter":4}],15:[function(require,module,exports){
-/*
- *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
- *
- *  Use of this source code is governed by a BSD-style license
- *  that can be found in the LICENSE file in the root of the source
- *  tree.
- */
- /* eslint-env node */
-'use strict';
-
-var logDisabled_ = true;
-
-// Utility methods.
-var utils = {
-  disableLog: function(bool) {
-    if (typeof bool !== 'boolean') {
-      return new Error('Argument type: ' + typeof bool +
-          '. Please use a boolean.');
-    }
-    logDisabled_ = bool;
-    return (bool) ? 'adapter.js logging disabled' :
-        'adapter.js logging enabled';
-  },
-
-  log: function() {
-    if (typeof window === 'object') {
-      if (logDisabled_) {
-        return;
-      }
-      if (typeof console !== 'undefined' && typeof console.log === 'function') {
-        console.log.apply(console, arguments);
-      }
-    }
-  },
-
-  /**
-   * Extract browser version out of the provided user agent string.
-   *
-   * @param {!string} uastring userAgent string.
-   * @param {!string} expr Regular expression used as match criteria.
-   * @param {!number} pos position in the version string to be returned.
-   * @return {!number} browser version.
-   */
-  extractVersion: function(uastring, expr, pos) {
-    var match = uastring.match(expr);
-    return match && match.length >= pos && parseInt(match[pos], 10);
-  },
-
-  /**
-   * Browser detector.
-   *
-   * @return {object} result containing browser, version and minVersion
-   *     properties.
-   */
-  detectBrowser: function() {
-    // Returned result object.
-    var result = {};
-    result.browser = null;
-    result.version = null;
-    result.minVersion = null;
-
-    // Fail early if it's not a browser
-    if (typeof window === 'undefined' || !window.navigator) {
-      result.browser = 'Not a browser.';
-      return result;
-    }
-
-    // Firefox.
-    if (navigator.mozGetUserMedia) {
-      result.browser = 'firefox';
-      result.version = this.extractVersion(navigator.userAgent,
-          /Firefox\/([0-9]+)\./, 1);
-      result.minVersion = 31;
-
-    // all webkit-based browsers
-    } else if (navigator.webkitGetUserMedia) {
-      // Chrome, Chromium, Webview, Opera, all use the chrome shim for now
-      if (window.webkitRTCPeerConnection) {
-        result.browser = 'chrome';
-        result.version = this.extractVersion(navigator.userAgent,
-          /Chrom(e|ium)\/([0-9]+)\./, 2);
-        result.minVersion = 38;
-
-      // Safari or unknown webkit-based
-      // for the time being Safari has support for MediaStreams but not webRTC
-      } else {
-        // Safari UA substrings of interest for reference:
-        // - webkit version:           AppleWebKit/602.1.25 (also used in Op,Cr)
-        // - safari UI version:        Version/9.0.3 (unique to Safari)
-        // - safari UI webkit version: Safari/601.4.4 (also used in Op,Cr)
-        //
-        // if the webkit version and safari UI webkit versions are equals,
-        // ... this is a stable version.
-        //
-        // only the internal webkit version is important today to know if
-        // media streams are supported
-        //
-        if (navigator.userAgent.match(/Version\/(\d+).(\d+)/)) {
-          result.browser = 'safari';
-          result.version = this.extractVersion(navigator.userAgent,
-            /AppleWebKit\/([0-9]+)\./, 1);
-          result.minVersion = 602;
-
-        // unknown webkit-based browser
-        } else {
-          result.browser = 'Unsupported webkit-based browser ' +
-              'with GUM support but no WebRTC support.';
-          return result;
-        }
-      }
-
-    // Edge.
-    } else if (navigator.mediaDevices &&
-        navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) {
-      result.browser = 'edge';
-      result.version = this.extractVersion(navigator.userAgent,
-          /Edge\/(\d+).(\d+)$/, 2);
-      result.minVersion = 10547;
-
-    // Default fallthrough: not supported.
-    } else {
-      result.browser = 'Not a supported browser.';
-      return result;
-    }
-
-    // Warn if version is less than minVersion.
-    if (result.version < result.minVersion) {
-      utils.log('Browser: ' + result.browser + ' Version: ' + result.version +
-          ' < minimum supported version: ' + result.minVersion +
-          '\n some things might not work!');
-    }
-
-    return result;
-  }
-};
-
-// Export.
-module.exports = {
-  log: utils.log,
-  disableLog: utils.disableLog,
-  browserDetails: utils.detectBrowser(),
-  extractVersion: utils.extractVersion
-};
-
-},{}],19:[function(require,module,exports){
-/*
- *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
- *
- *  Use of this source code is governed by a BSD-style license
- *  that can be found in the LICENSE file in the root of the source
- *  tree.
- */
-'use strict';
-var safariShim = {
-  // TODO: DrAlex, should be here, double check against LayoutTests
-  // shimOnTrack: function() { },
-
-  // TODO: DrAlex
-  // attachMediaStream: function(element, stream) { },
-  // reattachMediaStream: function(to, from) { },
-
-  // TODO: once the back-end for the mac port is done, add.
-  // TODO: check for webkitGTK+
-  // shimPeerConnection: function() { },
-
-  shimGetUserMedia: function() {
-    navigator.getUserMedia = navigator.webkitGetUserMedia;
-  }
-};
-
-// Expose public methods.
-module.exports = {
-  shimGetUserMedia: safariShim.shimGetUserMedia
-  // TODO
-  // shimOnTrack: safariShim.shimOnTrack,
-  // shimPeerConnection: safariShim.shimPeerConnection,
-  // attachMediaStream: safariShim.attachMediaStream,
-  // reattachMediaStream: safariShim.reattachMediaStream
-};
-
-},{}],13:[function(require,module,exports){
+},{"getscreenmedia":20,"getusermedia":23,"hark":22,"mediastream-gain":21,"mockconsole":3,"util":7,"webrtcsupport":4,"wildemitter":6}],13:[function(require,module,exports){
 var util = require('util');
 var each = require('lodash.foreach');
 var pluck = require('lodash.pluck');
@@ -3176,7 +3176,281 @@ PeerConnection.prototype.getStats = function (cb) {
 
 module.exports = PeerConnection;
 
-},{"lodash.foreach":27,"lodash.pluck":28,"sdp-jingle-json":24,"traceablepeerconnection":25,"util":7,"webrtc-adapter":26,"wildemitter":4}],14:[function(require,module,exports){
+},{"lodash.foreach":27,"lodash.pluck":28,"sdp-jingle-json":25,"traceablepeerconnection":26,"util":7,"webrtc-adapter":24,"wildemitter":6}],15:[function(require,module,exports){
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+'use strict';
+
+var logging = require('../utils').log;
+var browserDetails = require('../utils').browserDetails;
+
+var firefoxShim = {
+  shimOnTrack: function() {
+    if (typeof window === 'object' && window.RTCPeerConnection && !('ontrack' in
+        window.RTCPeerConnection.prototype)) {
+      Object.defineProperty(window.RTCPeerConnection.prototype, 'ontrack', {
+        get: function() {
+          return this._ontrack;
+        },
+        set: function(f) {
+          if (this._ontrack) {
+            this.removeEventListener('track', this._ontrack);
+            this.removeEventListener('addstream', this._ontrackpoly);
+          }
+          this.addEventListener('track', this._ontrack = f);
+          this.addEventListener('addstream', this._ontrackpoly = function(e) {
+            e.stream.getTracks().forEach(function(track) {
+              var event = new Event('track');
+              event.track = track;
+              event.receiver = {track: track};
+              event.streams = [e.stream];
+              this.dispatchEvent(event);
+            }.bind(this));
+          }.bind(this));
+        }
+      });
+    }
+  },
+
+  shimSourceObject: function() {
+    // Firefox has supported mozSrcObject since FF22, unprefixed in 42.
+    if (typeof window === 'object') {
+      if (window.HTMLMediaElement &&
+        !('srcObject' in window.HTMLMediaElement.prototype)) {
+        // Shim the srcObject property, once, when HTMLMediaElement is found.
+        Object.defineProperty(window.HTMLMediaElement.prototype, 'srcObject', {
+          get: function() {
+            return this.mozSrcObject;
+          },
+          set: function(stream) {
+            this.mozSrcObject = stream;
+          }
+        });
+      }
+    }
+  },
+
+  shimPeerConnection: function() {
+    if (typeof window !== 'object' || !(window.RTCPeerConnection ||
+        window.mozRTCPeerConnection)) {
+      return; // probably media.peerconnection.enabled=false in about:config
+    }
+    // The RTCPeerConnection object.
+    if (!window.RTCPeerConnection) {
+      window.RTCPeerConnection = function(pcConfig, pcConstraints) {
+        if (browserDetails.version < 38) {
+          // .urls is not supported in FF < 38.
+          // create RTCIceServers with a single url.
+          if (pcConfig && pcConfig.iceServers) {
+            var newIceServers = [];
+            for (var i = 0; i < pcConfig.iceServers.length; i++) {
+              var server = pcConfig.iceServers[i];
+              if (server.hasOwnProperty('urls')) {
+                for (var j = 0; j < server.urls.length; j++) {
+                  var newServer = {
+                    url: server.urls[j]
+                  };
+                  if (server.urls[j].indexOf('turn') === 0) {
+                    newServer.username = server.username;
+                    newServer.credential = server.credential;
+                  }
+                  newIceServers.push(newServer);
+                }
+              } else {
+                newIceServers.push(pcConfig.iceServers[i]);
+              }
+            }
+            pcConfig.iceServers = newIceServers;
+          }
+        }
+        return new mozRTCPeerConnection(pcConfig, pcConstraints);
+      };
+      window.RTCPeerConnection.prototype = mozRTCPeerConnection.prototype;
+
+      // wrap static methods. Currently just generateCertificate.
+      if (mozRTCPeerConnection.generateCertificate) {
+        Object.defineProperty(window.RTCPeerConnection, 'generateCertificate', {
+          get: function() {
+            return mozRTCPeerConnection.generateCertificate;
+          }
+        });
+      }
+
+      window.RTCSessionDescription = mozRTCSessionDescription;
+      window.RTCIceCandidate = mozRTCIceCandidate;
+    }
+
+    // shim away need for obsolete RTCIceCandidate/RTCSessionDescription.
+    ['setLocalDescription', 'setRemoteDescription', 'addIceCandidate']
+        .forEach(function(method) {
+          var nativeMethod = RTCPeerConnection.prototype[method];
+          RTCPeerConnection.prototype[method] = function() {
+            arguments[0] = new ((method === 'addIceCandidate') ?
+                RTCIceCandidate : RTCSessionDescription)(arguments[0]);
+            return nativeMethod.apply(this, arguments);
+          };
+        });
+
+    // support for addIceCandidate(null)
+    var nativeAddIceCandidate =
+        RTCPeerConnection.prototype.addIceCandidate;
+    RTCPeerConnection.prototype.addIceCandidate = function() {
+      return arguments[0] === null ? Promise.resolve()
+          : nativeAddIceCandidate.apply(this, arguments);
+    };
+
+    // shim getStats with maplike support
+    var makeMapStats = function(stats) {
+      var map = new Map();
+      Object.keys(stats).forEach(function(key) {
+        map.set(key, stats[key]);
+        map[key] = stats[key];
+      });
+      return map;
+    };
+
+    var nativeGetStats = RTCPeerConnection.prototype.getStats;
+    RTCPeerConnection.prototype.getStats = function(selector, onSucc, onErr) {
+      return nativeGetStats.apply(this, [selector || null])
+        .then(function(stats) {
+          return makeMapStats(stats);
+        })
+        .then(onSucc, onErr);
+    };
+  },
+
+  shimGetUserMedia: function() {
+    // getUserMedia constraints shim.
+    var getUserMedia_ = function(constraints, onSuccess, onError) {
+      var constraintsToFF37_ = function(c) {
+        if (typeof c !== 'object' || c.require) {
+          return c;
+        }
+        var require = [];
+        Object.keys(c).forEach(function(key) {
+          if (key === 'require' || key === 'advanced' ||
+              key === 'mediaSource') {
+            return;
+          }
+          var r = c[key] = (typeof c[key] === 'object') ?
+              c[key] : {ideal: c[key]};
+          if (r.min !== undefined ||
+              r.max !== undefined || r.exact !== undefined) {
+            require.push(key);
+          }
+          if (r.exact !== undefined) {
+            if (typeof r.exact === 'number') {
+              r. min = r.max = r.exact;
+            } else {
+              c[key] = r.exact;
+            }
+            delete r.exact;
+          }
+          if (r.ideal !== undefined) {
+            c.advanced = c.advanced || [];
+            var oc = {};
+            if (typeof r.ideal === 'number') {
+              oc[key] = {min: r.ideal, max: r.ideal};
+            } else {
+              oc[key] = r.ideal;
+            }
+            c.advanced.push(oc);
+            delete r.ideal;
+            if (!Object.keys(r).length) {
+              delete c[key];
+            }
+          }
+        });
+        if (require.length) {
+          c.require = require;
+        }
+        return c;
+      };
+      constraints = JSON.parse(JSON.stringify(constraints));
+      if (browserDetails.version < 38) {
+        logging('spec: ' + JSON.stringify(constraints));
+        if (constraints.audio) {
+          constraints.audio = constraintsToFF37_(constraints.audio);
+        }
+        if (constraints.video) {
+          constraints.video = constraintsToFF37_(constraints.video);
+        }
+        logging('ff37: ' + JSON.stringify(constraints));
+      }
+      return navigator.mozGetUserMedia(constraints, onSuccess, onError);
+    };
+
+    navigator.getUserMedia = getUserMedia_;
+
+    // Returns the result of getUserMedia as a Promise.
+    var getUserMediaPromise_ = function(constraints) {
+      return new Promise(function(resolve, reject) {
+        navigator.getUserMedia(constraints, resolve, reject);
+      });
+    };
+
+    // Shim for mediaDevices on older versions.
+    if (!navigator.mediaDevices) {
+      navigator.mediaDevices = {getUserMedia: getUserMediaPromise_,
+        addEventListener: function() { },
+        removeEventListener: function() { }
+      };
+    }
+    navigator.mediaDevices.enumerateDevices =
+        navigator.mediaDevices.enumerateDevices || function() {
+          return new Promise(function(resolve) {
+            var infos = [
+              {kind: 'audioinput', deviceId: 'default', label: '', groupId: ''},
+              {kind: 'videoinput', deviceId: 'default', label: '', groupId: ''}
+            ];
+            resolve(infos);
+          });
+        };
+
+    if (browserDetails.version < 41) {
+      // Work around http://bugzil.la/1169665
+      var orgEnumerateDevices =
+          navigator.mediaDevices.enumerateDevices.bind(navigator.mediaDevices);
+      navigator.mediaDevices.enumerateDevices = function() {
+        return orgEnumerateDevices().then(undefined, function(e) {
+          if (e.name === 'NotFoundError') {
+            return [];
+          }
+          throw e;
+        });
+      };
+    }
+  },
+
+  // Attach a media stream to an element.
+  attachMediaStream: function(element, stream) {
+    logging('DEPRECATED, attachMediaStream will soon be removed.');
+    element.srcObject = stream;
+  },
+
+  reattachMediaStream: function(to, from) {
+    logging('DEPRECATED, reattachMediaStream will soon be removed.');
+    to.srcObject = from.srcObject;
+  }
+};
+
+// Expose public methods.
+module.exports = {
+  shimOnTrack: firefoxShim.shimOnTrack,
+  shimSourceObject: firefoxShim.shimSourceObject,
+  shimPeerConnection: firefoxShim.shimPeerConnection,
+  shimGetUserMedia: require('./getusermedia'),
+  attachMediaStream: firefoxShim.attachMediaStream,
+  reattachMediaStream: firefoxShim.reattachMediaStream
+};
+
+},{"../utils":19,"./getusermedia":29}],14:[function(require,module,exports){
 var WildEmitter = require('wildemitter');
 var util = require('util');
 
@@ -3264,137 +3538,7 @@ module.exports.support = typeof window !== 'undefined' && window && window.File 
 module.exports.Sender = Sender;
 module.exports.Receiver = Receiver;
 
-},{"util":7,"wildemitter":4}],21:[function(require,module,exports){
-// getUserMedia helper by @HenrikJoreteg used for navigator.getUserMedia shim
-var adapter = require('webrtc-adapter');
-
-module.exports = function (constraints, cb) {
-    var error;
-    var haveOpts = arguments.length === 2;
-    var defaultOpts = {video: true, audio: true};
-
-    var denied = 'PermissionDeniedError';
-    var altDenied = 'PERMISSION_DENIED';
-    var notSatisfied = 'ConstraintNotSatisfiedError';
-
-    // make constraints optional
-    if (!haveOpts) {
-        cb = constraints;
-        constraints = defaultOpts;
-    }
-
-    // treat lack of browser support like an error
-    if (typeof navigator === 'undefined' || !navigator.getUserMedia) {
-        // throw proper error per spec
-        error = new Error('MediaStreamError');
-        error.name = 'NotSupportedError';
-
-        // keep all callbacks async
-        return setTimeout(function () {
-            cb(error);
-        }, 0);
-    }
-
-    // normalize error handling when no media types are requested
-    if (!constraints.audio && !constraints.video) {
-        error = new Error('MediaStreamError');
-        error.name = 'NoMediaRequestedError';
-
-        // keep all callbacks async
-        return setTimeout(function () {
-            cb(error);
-        }, 0);
-    }
-
-    // testing support -- note: using the about:config pref is better
-    // for Firefox 39+, this might get removed in the future
-    if (localStorage && localStorage.useFirefoxFakeDevice === 'true') {
-        constraints.fake = true;
-    }
-
-    navigator.mediaDevices.getUserMedia(constraints)
-    .then(function (stream) {
-        cb(null, stream);
-    }).catch(function (err) {
-        var error;
-        // coerce into an error object since FF gives us a string
-        // there are only two valid names according to the spec
-        // we coerce all non-denied to "constraint not satisfied".
-        if (typeof err === 'string') {
-            error = new Error('MediaStreamError');
-            if (err === denied || err === altDenied) {
-                error.name = denied;
-            } else {
-                error.name = notSatisfied;
-            }
-        } else {
-            // if we get an error object make sure '.name' property is set
-            // according to spec: http://dev.w3.org/2011/webrtc/editor/getusermedia.html#navigatorusermediaerror-and-navigatorusermediaerrorcallback
-            error = err;
-            if (!error.name) {
-                // this is likely chrome which
-                // sets a property called "ERROR_DENIED" on the error object
-                // if so we make sure to set a name
-                if (error[denied]) {
-                    err.name = denied;
-                } else {
-                    err.name = notSatisfied;
-                }
-            }
-        }
-
-        cb(error);
-    });
-};
-
-},{"webrtc-adapter":29}],23:[function(require,module,exports){
-var support = require('webrtcsupport');
-
-
-function GainController(stream) {
-    this.support = support.webAudio && support.mediaStream;
-
-    // set our starting value
-    this.gain = 1;
-
-    if (this.support) {
-        var context = this.context = new support.AudioContext();
-        this.microphone = context.createMediaStreamSource(stream);
-        this.gainFilter = context.createGain();
-        this.destination = context.createMediaStreamDestination();
-        this.outputStream = this.destination.stream;
-        this.microphone.connect(this.gainFilter);
-        this.gainFilter.connect(this.destination);
-        stream.addTrack(this.outputStream.getAudioTracks()[0]);
-        stream.removeTrack(stream.getAudioTracks()[0]);
-    }
-    this.stream = stream;
-}
-
-// setting
-GainController.prototype.setGain = function (val) {
-    // check for support
-    if (!this.support) return;
-    this.gainFilter.gain.value = val;
-    this.gain = val;
-};
-
-GainController.prototype.getGain = function () {
-    return this.gain;
-};
-
-GainController.prototype.off = function () {
-    return this.setGain(0);
-};
-
-GainController.prototype.on = function () {
-    this.setGain(1);
-};
-
-
-module.exports = GainController;
-
-},{"webrtcsupport":30}],16:[function(require,module,exports){
+},{"util":7,"wildemitter":6}],18:[function(require,module,exports){
 
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
@@ -3679,7 +3823,137 @@ module.exports = {
   reattachMediaStream: chromeShim.reattachMediaStream
 };
 
-},{"../utils.js":15,"./getusermedia":31}],17:[function(require,module,exports){
+},{"../utils.js":19,"./getusermedia":30}],21:[function(require,module,exports){
+var support = require('webrtcsupport');
+
+
+function GainController(stream) {
+    this.support = support.webAudio && support.mediaStream;
+
+    // set our starting value
+    this.gain = 1;
+
+    if (this.support) {
+        var context = this.context = new support.AudioContext();
+        this.microphone = context.createMediaStreamSource(stream);
+        this.gainFilter = context.createGain();
+        this.destination = context.createMediaStreamDestination();
+        this.outputStream = this.destination.stream;
+        this.microphone.connect(this.gainFilter);
+        this.gainFilter.connect(this.destination);
+        stream.addTrack(this.outputStream.getAudioTracks()[0]);
+        stream.removeTrack(stream.getAudioTracks()[0]);
+    }
+    this.stream = stream;
+}
+
+// setting
+GainController.prototype.setGain = function (val) {
+    // check for support
+    if (!this.support) return;
+    this.gainFilter.gain.value = val;
+    this.gain = val;
+};
+
+GainController.prototype.getGain = function () {
+    return this.gain;
+};
+
+GainController.prototype.off = function () {
+    return this.setGain(0);
+};
+
+GainController.prototype.on = function () {
+    this.setGain(1);
+};
+
+
+module.exports = GainController;
+
+},{"webrtcsupport":31}],23:[function(require,module,exports){
+// getUserMedia helper by @HenrikJoreteg used for navigator.getUserMedia shim
+var adapter = require('webrtc-adapter');
+
+module.exports = function (constraints, cb) {
+    var error;
+    var haveOpts = arguments.length === 2;
+    var defaultOpts = {video: true, audio: true};
+
+    var denied = 'PermissionDeniedError';
+    var altDenied = 'PERMISSION_DENIED';
+    var notSatisfied = 'ConstraintNotSatisfiedError';
+
+    // make constraints optional
+    if (!haveOpts) {
+        cb = constraints;
+        constraints = defaultOpts;
+    }
+
+    // treat lack of browser support like an error
+    if (typeof navigator === 'undefined' || !navigator.getUserMedia) {
+        // throw proper error per spec
+        error = new Error('MediaStreamError');
+        error.name = 'NotSupportedError';
+
+        // keep all callbacks async
+        return setTimeout(function () {
+            cb(error);
+        }, 0);
+    }
+
+    // normalize error handling when no media types are requested
+    if (!constraints.audio && !constraints.video) {
+        error = new Error('MediaStreamError');
+        error.name = 'NoMediaRequestedError';
+
+        // keep all callbacks async
+        return setTimeout(function () {
+            cb(error);
+        }, 0);
+    }
+
+    // testing support -- note: using the about:config pref is better
+    // for Firefox 39+, this might get removed in the future
+    if (localStorage && localStorage.useFirefoxFakeDevice === 'true') {
+        constraints.fake = true;
+    }
+
+    navigator.mediaDevices.getUserMedia(constraints)
+    .then(function (stream) {
+        cb(null, stream);
+    }).catch(function (err) {
+        var error;
+        // coerce into an error object since FF gives us a string
+        // there are only two valid names according to the spec
+        // we coerce all non-denied to "constraint not satisfied".
+        if (typeof err === 'string') {
+            error = new Error('MediaStreamError');
+            if (err === denied || err === altDenied) {
+                error.name = denied;
+            } else {
+                error.name = notSatisfied;
+            }
+        } else {
+            // if we get an error object make sure '.name' property is set
+            // according to spec: http://dev.w3.org/2011/webrtc/editor/getusermedia.html#navigatorusermediaerror-and-navigatorusermediaerrorcallback
+            error = err;
+            if (!error.name) {
+                // this is likely chrome which
+                // sets a property called "ERROR_DENIED" on the error object
+                // if so we make sure to set a name
+                if (error[denied]) {
+                    err.name = denied;
+                } else {
+                    err.name = notSatisfied;
+                }
+            }
+        }
+
+        cb(error);
+    });
+};
+
+},{"webrtc-adapter":32}],33:[function(require,module,exports){
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
  *
@@ -3690,270 +3964,30 @@ module.exports = {
  /* eslint-env node */
 'use strict';
 
-var logging = require('../utils').log;
-var browserDetails = require('../utils').browserDetails;
-
-var firefoxShim = {
-  shimOnTrack: function() {
-    if (typeof window === 'object' && window.RTCPeerConnection && !('ontrack' in
-        window.RTCPeerConnection.prototype)) {
-      Object.defineProperty(window.RTCPeerConnection.prototype, 'ontrack', {
-        get: function() {
-          return this._ontrack;
-        },
-        set: function(f) {
-          if (this._ontrack) {
-            this.removeEventListener('track', this._ontrack);
-            this.removeEventListener('addstream', this._ontrackpoly);
-          }
-          this.addEventListener('track', this._ontrack = f);
-          this.addEventListener('addstream', this._ontrackpoly = function(e) {
-            e.stream.getTracks().forEach(function(track) {
-              var event = new Event('track');
-              event.track = track;
-              event.receiver = {track: track};
-              event.streams = [e.stream];
-              this.dispatchEvent(event);
-            }.bind(this));
-          }.bind(this));
-        }
-      });
-    }
-  },
-
-  shimSourceObject: function() {
-    // Firefox has supported mozSrcObject since FF22, unprefixed in 42.
-    if (typeof window === 'object') {
-      if (window.HTMLMediaElement &&
-        !('srcObject' in window.HTMLMediaElement.prototype)) {
-        // Shim the srcObject property, once, when HTMLMediaElement is found.
-        Object.defineProperty(window.HTMLMediaElement.prototype, 'srcObject', {
-          get: function() {
-            return this.mozSrcObject;
-          },
-          set: function(stream) {
-            this.mozSrcObject = stream;
-          }
-        });
-      }
-    }
-  },
-
-  shimPeerConnection: function() {
-    if (typeof window !== 'object' || !(window.RTCPeerConnection ||
-        window.mozRTCPeerConnection)) {
-      return; // probably media.peerconnection.enabled=false in about:config
-    }
-    // The RTCPeerConnection object.
-    if (!window.RTCPeerConnection) {
-      window.RTCPeerConnection = function(pcConfig, pcConstraints) {
-        if (browserDetails.version < 38) {
-          // .urls is not supported in FF < 38.
-          // create RTCIceServers with a single url.
-          if (pcConfig && pcConfig.iceServers) {
-            var newIceServers = [];
-            for (var i = 0; i < pcConfig.iceServers.length; i++) {
-              var server = pcConfig.iceServers[i];
-              if (server.hasOwnProperty('urls')) {
-                for (var j = 0; j < server.urls.length; j++) {
-                  var newServer = {
-                    url: server.urls[j]
-                  };
-                  if (server.urls[j].indexOf('turn') === 0) {
-                    newServer.username = server.username;
-                    newServer.credential = server.credential;
-                  }
-                  newIceServers.push(newServer);
-                }
-              } else {
-                newIceServers.push(pcConfig.iceServers[i]);
-              }
-            }
-            pcConfig.iceServers = newIceServers;
-          }
-        }
-        return new mozRTCPeerConnection(pcConfig, pcConstraints);
-      };
-      window.RTCPeerConnection.prototype = mozRTCPeerConnection.prototype;
-
-      // wrap static methods. Currently just generateCertificate.
-      if (mozRTCPeerConnection.generateCertificate) {
-        Object.defineProperty(window.RTCPeerConnection, 'generateCertificate', {
-          get: function() {
-            return mozRTCPeerConnection.generateCertificate;
-          }
-        });
-      }
-
-      window.RTCSessionDescription = mozRTCSessionDescription;
-      window.RTCIceCandidate = mozRTCIceCandidate;
-    }
-
-    // shim away need for obsolete RTCIceCandidate/RTCSessionDescription.
-    ['setLocalDescription', 'setRemoteDescription', 'addIceCandidate']
-        .forEach(function(method) {
-          var nativeMethod = RTCPeerConnection.prototype[method];
-          RTCPeerConnection.prototype[method] = function() {
-            arguments[0] = new ((method === 'addIceCandidate') ?
-                RTCIceCandidate : RTCSessionDescription)(arguments[0]);
-            return nativeMethod.apply(this, arguments);
-          };
-        });
-
-    // support for addIceCandidate(null)
-    var nativeAddIceCandidate =
-        RTCPeerConnection.prototype.addIceCandidate;
-    RTCPeerConnection.prototype.addIceCandidate = function() {
-      return arguments[0] === null ? Promise.resolve()
-          : nativeAddIceCandidate.apply(this, arguments);
-    };
-
-    // shim getStats with maplike support
-    var makeMapStats = function(stats) {
-      var map = new Map();
-      Object.keys(stats).forEach(function(key) {
-        map.set(key, stats[key]);
-        map[key] = stats[key];
-      });
-      return map;
-    };
-
-    var nativeGetStats = RTCPeerConnection.prototype.getStats;
-    RTCPeerConnection.prototype.getStats = function(selector, onSucc, onErr) {
-      return nativeGetStats.apply(this, [selector || null])
-        .then(function(stats) {
-          return makeMapStats(stats);
-        })
-        .then(onSucc, onErr);
-    };
-  },
-
-  shimGetUserMedia: function() {
-    // getUserMedia constraints shim.
-    var getUserMedia_ = function(constraints, onSuccess, onError) {
-      var constraintsToFF37_ = function(c) {
-        if (typeof c !== 'object' || c.require) {
-          return c;
-        }
-        var require = [];
-        Object.keys(c).forEach(function(key) {
-          if (key === 'require' || key === 'advanced' ||
-              key === 'mediaSource') {
-            return;
-          }
-          var r = c[key] = (typeof c[key] === 'object') ?
-              c[key] : {ideal: c[key]};
-          if (r.min !== undefined ||
-              r.max !== undefined || r.exact !== undefined) {
-            require.push(key);
-          }
-          if (r.exact !== undefined) {
-            if (typeof r.exact === 'number') {
-              r. min = r.max = r.exact;
-            } else {
-              c[key] = r.exact;
-            }
-            delete r.exact;
-          }
-          if (r.ideal !== undefined) {
-            c.advanced = c.advanced || [];
-            var oc = {};
-            if (typeof r.ideal === 'number') {
-              oc[key] = {min: r.ideal, max: r.ideal};
-            } else {
-              oc[key] = r.ideal;
-            }
-            c.advanced.push(oc);
-            delete r.ideal;
-            if (!Object.keys(r).length) {
-              delete c[key];
-            }
-          }
-        });
-        if (require.length) {
-          c.require = require;
-        }
-        return c;
-      };
-      constraints = JSON.parse(JSON.stringify(constraints));
-      if (browserDetails.version < 38) {
-        logging('spec: ' + JSON.stringify(constraints));
-        if (constraints.audio) {
-          constraints.audio = constraintsToFF37_(constraints.audio);
-        }
-        if (constraints.video) {
-          constraints.video = constraintsToFF37_(constraints.video);
-        }
-        logging('ff37: ' + JSON.stringify(constraints));
-      }
-      return navigator.mozGetUserMedia(constraints, onSuccess, onError);
-    };
-
-    navigator.getUserMedia = getUserMedia_;
-
-    // Returns the result of getUserMedia as a Promise.
-    var getUserMediaPromise_ = function(constraints) {
-      return new Promise(function(resolve, reject) {
-        navigator.getUserMedia(constraints, resolve, reject);
-      });
-    };
-
-    // Shim for mediaDevices on older versions.
-    if (!navigator.mediaDevices) {
-      navigator.mediaDevices = {getUserMedia: getUserMediaPromise_,
-        addEventListener: function() { },
-        removeEventListener: function() { }
-      };
-    }
-    navigator.mediaDevices.enumerateDevices =
-        navigator.mediaDevices.enumerateDevices || function() {
-          return new Promise(function(resolve) {
-            var infos = [
-              {kind: 'audioinput', deviceId: 'default', label: '', groupId: ''},
-              {kind: 'videoinput', deviceId: 'default', label: '', groupId: ''}
-            ];
-            resolve(infos);
-          });
-        };
-
-    if (browserDetails.version < 41) {
-      // Work around http://bugzil.la/1169665
-      var orgEnumerateDevices =
-          navigator.mediaDevices.enumerateDevices.bind(navigator.mediaDevices);
-      navigator.mediaDevices.enumerateDevices = function() {
-        return orgEnumerateDevices().then(undefined, function(e) {
-          if (e.name === 'NotFoundError') {
-            return [];
-          }
-          throw e;
-        });
-      };
-    }
-  },
-
-  // Attach a media stream to an element.
-  attachMediaStream: function(element, stream) {
-    logging('DEPRECATED, attachMediaStream will soon be removed.');
-    element.srcObject = stream;
-  },
-
-  reattachMediaStream: function(to, from) {
-    logging('DEPRECATED, reattachMediaStream will soon be removed.');
-    to.srcObject = from.srcObject;
-  }
-};
-
 // Expose public methods.
-module.exports = {
-  shimOnTrack: firefoxShim.shimOnTrack,
-  shimSourceObject: firefoxShim.shimSourceObject,
-  shimPeerConnection: firefoxShim.shimPeerConnection,
-  shimGetUserMedia: require('./getusermedia'),
-  attachMediaStream: firefoxShim.attachMediaStream,
-  reattachMediaStream: firefoxShim.reattachMediaStream
+module.exports = function() {
+  var shimError_ = function(e) {
+    return {
+      name: {PermissionDeniedError: 'NotAllowedError'}[e.name] || e.name,
+      message: e.message,
+      constraint: e.constraint,
+      toString: function() {
+        return this.name;
+      }
+    };
+  };
+
+  // getUserMedia error shim.
+  var origGetUserMedia = navigator.mediaDevices.getUserMedia.
+      bind(navigator.mediaDevices);
+  navigator.mediaDevices.getUserMedia = function(c) {
+    return origGetUserMedia(c).catch(function(e) {
+      return Promise.reject(shimError_(e));
+    });
+  };
 };
 
-},{"../utils":15,"./getusermedia":32}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 var toSDP = require('./lib/tosdp');
 var toJSON = require('./lib/tojson');
 
@@ -4075,7 +4109,7 @@ exports.toCandidateJSON = toJSON.toCandidateJSON;
 exports.toMediaJSON = toJSON.toMediaJSON;
 exports.toSessionJSON = toJSON.toSessionJSON;
 
-},{"./lib/tojson":33,"./lib/tosdp":34}],30:[function(require,module,exports){
+},{"./lib/tojson":35,"./lib/tosdp":34}],31:[function(require,module,exports){
 // created by @HenrikJoreteg
 var prefix;
 var version;
@@ -4127,7 +4161,101 @@ module.exports = {
     getUserMedia: getUserMedia
 };
 
-},{}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+
+'use strict';
+
+// Shimming starts here.
+(function() {
+  // Utils.
+  var logging = require('./utils').log;
+  var browserDetails = require('./utils').browserDetails;
+  // Export to the adapter global object visible in the browser.
+  module.exports.browserDetails = browserDetails;
+  module.exports.extractVersion = require('./utils').extractVersion;
+  module.exports.disableLog = require('./utils').disableLog;
+
+  // Uncomment the line below if you want logging to occur, including logging
+  // for the switch statement below. Can also be turned on in the browser via
+  // adapter.disableLog(false), but then logging from the switch statement below
+  // will not appear.
+  // require('./utils').disableLog(false);
+
+  // Browser shims.
+  var chromeShim = require('./chrome/chrome_shim') || null;
+  var edgeShim = require('./edge/edge_shim') || null;
+  var firefoxShim = require('./firefox/firefox_shim') || null;
+  var safariShim = require('./safari/safari_shim') || null;
+
+  // Shim browser if found.
+  switch (browserDetails.browser) {
+    case 'opera': // fallthrough as it uses chrome shims
+    case 'chrome':
+      if (!chromeShim || !chromeShim.shimPeerConnection) {
+        logging('Chrome shim is not included in this adapter release.');
+        return;
+      }
+      logging('adapter.js shimming chrome.');
+      // Export to the adapter global object visible in the browser.
+      module.exports.browserShim = chromeShim;
+
+      chromeShim.shimGetUserMedia();
+      chromeShim.shimMediaStream();
+      chromeShim.shimSourceObject();
+      chromeShim.shimPeerConnection();
+      chromeShim.shimOnTrack();
+      break;
+    case 'firefox':
+      if (!firefoxShim || !firefoxShim.shimPeerConnection) {
+        logging('Firefox shim is not included in this adapter release.');
+        return;
+      }
+      logging('adapter.js shimming firefox.');
+      // Export to the adapter global object visible in the browser.
+      module.exports.browserShim = firefoxShim;
+
+      firefoxShim.shimGetUserMedia();
+      firefoxShim.shimSourceObject();
+      firefoxShim.shimPeerConnection();
+      firefoxShim.shimOnTrack();
+      break;
+    case 'edge':
+      if (!edgeShim || !edgeShim.shimPeerConnection) {
+        logging('MS edge shim is not included in this adapter release.');
+        return;
+      }
+      logging('adapter.js shimming edge.');
+      // Export to the adapter global object visible in the browser.
+      module.exports.browserShim = edgeShim;
+
+      edgeShim.shimGetUserMedia();
+      edgeShim.shimPeerConnection();
+      break;
+    case 'safari':
+      if (!safariShim) {
+        logging('Safari shim is not included in this adapter release.');
+        return;
+      }
+      logging('adapter.js shimming safari.');
+      // Export to the adapter global object visible in the browser.
+      module.exports.browserShim = safariShim;
+
+      safariShim.shimGetUserMedia();
+      break;
+    default:
+      logging('Unsupported browser!');
+  }
+})();
+
+},{"./chrome/chrome_shim":37,"./edge/edge_shim":39,"./firefox/firefox_shim":38,"./safari/safari_shim":40,"./utils":36}],20:[function(require,module,exports){
 // getScreenMedia helper by @HenrikJoreteg
 var getUserMedia = require('getusermedia');
 
@@ -4295,135 +4423,7 @@ window.addEventListener('message', function (event) {
     }
 });
 
-},{"getusermedia":21}],26:[function(require,module,exports){
-/*
- *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
- *
- *  Use of this source code is governed by a BSD-style license
- *  that can be found in the LICENSE file in the root of the source
- *  tree.
- */
- /* eslint-env node */
-
-'use strict';
-
-// Shimming starts here.
-(function() {
-  // Utils.
-  var logging = require('./utils').log;
-  var browserDetails = require('./utils').browserDetails;
-  // Export to the adapter global object visible in the browser.
-  module.exports.browserDetails = browserDetails;
-  module.exports.extractVersion = require('./utils').extractVersion;
-  module.exports.disableLog = require('./utils').disableLog;
-
-  // Uncomment the line below if you want logging to occur, including logging
-  // for the switch statement below. Can also be turned on in the browser via
-  // adapter.disableLog(false), but then logging from the switch statement below
-  // will not appear.
-  // require('./utils').disableLog(false);
-
-  // Browser shims.
-  var chromeShim = require('./chrome/chrome_shim') || null;
-  var edgeShim = require('./edge/edge_shim') || null;
-  var firefoxShim = require('./firefox/firefox_shim') || null;
-  var safariShim = require('./safari/safari_shim') || null;
-
-  // Shim browser if found.
-  switch (browserDetails.browser) {
-    case 'opera': // fallthrough as it uses chrome shims
-    case 'chrome':
-      if (!chromeShim || !chromeShim.shimPeerConnection) {
-        logging('Chrome shim is not included in this adapter release.');
-        return;
-      }
-      logging('adapter.js shimming chrome.');
-      // Export to the adapter global object visible in the browser.
-      module.exports.browserShim = chromeShim;
-
-      chromeShim.shimGetUserMedia();
-      chromeShim.shimMediaStream();
-      chromeShim.shimSourceObject();
-      chromeShim.shimPeerConnection();
-      chromeShim.shimOnTrack();
-      break;
-    case 'firefox':
-      if (!firefoxShim || !firefoxShim.shimPeerConnection) {
-        logging('Firefox shim is not included in this adapter release.');
-        return;
-      }
-      logging('adapter.js shimming firefox.');
-      // Export to the adapter global object visible in the browser.
-      module.exports.browserShim = firefoxShim;
-
-      firefoxShim.shimGetUserMedia();
-      firefoxShim.shimSourceObject();
-      firefoxShim.shimPeerConnection();
-      firefoxShim.shimOnTrack();
-      break;
-    case 'edge':
-      if (!edgeShim || !edgeShim.shimPeerConnection) {
-        logging('MS edge shim is not included in this adapter release.');
-        return;
-      }
-      logging('adapter.js shimming edge.');
-      // Export to the adapter global object visible in the browser.
-      module.exports.browserShim = edgeShim;
-
-      edgeShim.shimGetUserMedia();
-      edgeShim.shimPeerConnection();
-      break;
-    case 'safari':
-      if (!safariShim) {
-        logging('Safari shim is not included in this adapter release.');
-        return;
-      }
-      logging('adapter.js shimming safari.');
-      // Export to the adapter global object visible in the browser.
-      module.exports.browserShim = safariShim;
-
-      safariShim.shimGetUserMedia();
-      break;
-    default:
-      logging('Unsupported browser!');
-  }
-})();
-
-},{"./chrome/chrome_shim":37,"./edge/edge_shim":36,"./firefox/firefox_shim":38,"./safari/safari_shim":39,"./utils":35}],40:[function(require,module,exports){
-/*
- *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
- *
- *  Use of this source code is governed by a BSD-style license
- *  that can be found in the LICENSE file in the root of the source
- *  tree.
- */
- /* eslint-env node */
-'use strict';
-
-// Expose public methods.
-module.exports = function() {
-  var shimError_ = function(e) {
-    return {
-      name: {PermissionDeniedError: 'NotAllowedError'}[e.name] || e.name,
-      message: e.message,
-      constraint: e.constraint,
-      toString: function() {
-        return this.name;
-      }
-    };
-  };
-
-  // getUserMedia error shim.
-  var origGetUserMedia = navigator.mediaDevices.getUserMedia.
-      bind(navigator.mediaDevices);
-  navigator.mediaDevices.getUserMedia = function(c) {
-    return origGetUserMedia(c).catch(function(e) {
-      return Promise.reject(shimError_(e));
-    });
-  };
-};
-
-},{}],35:[function(require,module,exports){
+},{"getusermedia":23}],36:[function(require,module,exports){
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
  *
@@ -4568,7 +4568,107 @@ module.exports = {
   extractVersion: utils.extractVersion
 };
 
-},{}],20:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+'use strict';
+var safariShim = {
+  // TODO: DrAlex, should be here, double check against LayoutTests
+  // shimOnTrack: function() { },
+
+  // TODO: DrAlex
+  // attachMediaStream: function(element, stream) { },
+  // reattachMediaStream: function(to, from) { },
+
+  // TODO: once the back-end for the mac port is done, add.
+  // TODO: check for webkitGTK+
+  // shimPeerConnection: function() { },
+
+  shimGetUserMedia: function() {
+    navigator.getUserMedia = navigator.webkitGetUserMedia;
+  }
+};
+
+// Expose public methods.
+module.exports = {
+  shimGetUserMedia: safariShim.shimGetUserMedia
+  // TODO
+  // shimOnTrack: safariShim.shimOnTrack,
+  // shimPeerConnection: safariShim.shimPeerConnection,
+  // attachMediaStream: safariShim.attachMediaStream,
+  // reattachMediaStream: safariShim.reattachMediaStream
+};
+
+},{}],27:[function(require,module,exports){
+/**
+ * lodash 3.0.3 (Custom Build) <https://lodash.com/>
+ * Build: `lodash modern modularize exports="npm" -o ./`
+ * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <https://lodash.com/license>
+ */
+var arrayEach = require('lodash._arrayeach'),
+    baseEach = require('lodash._baseeach'),
+    bindCallback = require('lodash._bindcallback'),
+    isArray = require('lodash.isarray');
+
+/**
+ * Creates a function for `_.forEach` or `_.forEachRight`.
+ *
+ * @private
+ * @param {Function} arrayFunc The function to iterate over an array.
+ * @param {Function} eachFunc The function to iterate over a collection.
+ * @returns {Function} Returns the new each function.
+ */
+function createForEach(arrayFunc, eachFunc) {
+  return function(collection, iteratee, thisArg) {
+    return (typeof iteratee == 'function' && thisArg === undefined && isArray(collection))
+      ? arrayFunc(collection, iteratee)
+      : eachFunc(collection, bindCallback(iteratee, thisArg, 3));
+  };
+}
+
+/**
+ * Iterates over elements of `collection` invoking `iteratee` for each element.
+ * The `iteratee` is bound to `thisArg` and invoked with three arguments:
+ * (value, index|key, collection). Iteratee functions may exit iteration early
+ * by explicitly returning `false`.
+ *
+ * **Note:** As with other "Collections" methods, objects with a "length" property
+ * are iterated like arrays. To avoid this behavior `_.forIn` or `_.forOwn`
+ * may be used for object iteration.
+ *
+ * @static
+ * @memberOf _
+ * @alias each
+ * @category Collection
+ * @param {Array|Object|string} collection The collection to iterate over.
+ * @param {Function} [iteratee=_.identity] The function invoked per iteration.
+ * @param {*} [thisArg] The `this` binding of `iteratee`.
+ * @returns {Array|Object|string} Returns `collection`.
+ * @example
+ *
+ * _([1, 2]).forEach(function(n) {
+ *   console.log(n);
+ * }).value();
+ * // => logs each value from left to right and returns the array
+ *
+ * _.forEach({ 'a': 1, 'b': 2 }, function(n, key) {
+ *   console.log(n, key);
+ * });
+ * // => logs each value-key pair and returns the object (iteration order is not guaranteed)
+ */
+var forEach = createForEach(arrayEach, baseEach);
+
+module.exports = forEach;
+
+},{"lodash._arrayeach":42,"lodash._baseeach":41,"lodash._bindcallback":44,"lodash.isarray":43}],22:[function(require,module,exports){
 var WildEmitter = require('wildemitter');
 
 function getMaxVolume (analyser, fftBins) {
@@ -4698,7 +4798,7 @@ module.exports = function(stream, options) {
   return harker;
 }
 
-},{"wildemitter":4}],39:[function(require,module,exports){
+},{"wildemitter":6}],30:[function(require,module,exports){
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
  *
@@ -4706,99 +4806,190 @@ module.exports = function(stream, options) {
  *  that can be found in the LICENSE file in the root of the source
  *  tree.
  */
+ /* eslint-env node */
 'use strict';
-var safariShim = {
-  // TODO: DrAlex, should be here, double check against LayoutTests
-  // shimOnTrack: function() { },
+var logging = require('../utils.js').log;
 
-  // TODO: DrAlex
-  // attachMediaStream: function(element, stream) { },
-  // reattachMediaStream: function(to, from) { },
+// Expose public methods.
+module.exports = function() {
+  var constraintsToChrome_ = function(c) {
+    if (typeof c !== 'object' || c.mandatory || c.optional) {
+      return c;
+    }
+    var cc = {};
+    Object.keys(c).forEach(function(key) {
+      if (key === 'require' || key === 'advanced' || key === 'mediaSource') {
+        return;
+      }
+      var r = (typeof c[key] === 'object') ? c[key] : {ideal: c[key]};
+      if (r.exact !== undefined && typeof r.exact === 'number') {
+        r.min = r.max = r.exact;
+      }
+      var oldname_ = function(prefix, name) {
+        if (prefix) {
+          return prefix + name.charAt(0).toUpperCase() + name.slice(1);
+        }
+        return (name === 'deviceId') ? 'sourceId' : name;
+      };
+      if (r.ideal !== undefined) {
+        cc.optional = cc.optional || [];
+        var oc = {};
+        if (typeof r.ideal === 'number') {
+          oc[oldname_('min', key)] = r.ideal;
+          cc.optional.push(oc);
+          oc = {};
+          oc[oldname_('max', key)] = r.ideal;
+          cc.optional.push(oc);
+        } else {
+          oc[oldname_('', key)] = r.ideal;
+          cc.optional.push(oc);
+        }
+      }
+      if (r.exact !== undefined && typeof r.exact !== 'number') {
+        cc.mandatory = cc.mandatory || {};
+        cc.mandatory[oldname_('', key)] = r.exact;
+      } else {
+        ['min', 'max'].forEach(function(mix) {
+          if (r[mix] !== undefined) {
+            cc.mandatory = cc.mandatory || {};
+            cc.mandatory[oldname_(mix, key)] = r[mix];
+          }
+        });
+      }
+    });
+    if (c.advanced) {
+      cc.optional = (cc.optional || []).concat(c.advanced);
+    }
+    return cc;
+  };
 
-  // TODO: once the back-end for the mac port is done, add.
-  // TODO: check for webkitGTK+
-  // shimPeerConnection: function() { },
+  var shimConstraints_ = function(constraints, func) {
+    constraints = JSON.parse(JSON.stringify(constraints));
+    if (constraints && constraints.audio) {
+      constraints.audio = constraintsToChrome_(constraints.audio);
+    }
+    if (constraints && typeof constraints.video === 'object') {
+      // Shim facingMode for mobile, where it defaults to "user".
+      var face = constraints.video.facingMode;
+      face = face && ((typeof face === 'object') ? face : {ideal: face});
 
-  shimGetUserMedia: function() {
-    navigator.getUserMedia = navigator.webkitGetUserMedia;
+      if ((face && (face.exact === 'user' || face.exact === 'environment' ||
+                    face.ideal === 'user' || face.ideal === 'environment')) &&
+          !(navigator.mediaDevices.getSupportedConstraints &&
+            navigator.mediaDevices.getSupportedConstraints().facingMode)) {
+        delete constraints.video.facingMode;
+        if (face.exact === 'environment' || face.ideal === 'environment') {
+          // Look for "back" in label, or use last cam (typically back cam).
+          return navigator.mediaDevices.enumerateDevices()
+          .then(function(devices) {
+            devices = devices.filter(function(d) {
+              return d.kind === 'videoinput';
+            });
+            var back = devices.find(function(d) {
+              return d.label.toLowerCase().indexOf('back') !== -1;
+            }) || (devices.length && devices[devices.length - 1]);
+            if (back) {
+              constraints.video.deviceId = face.exact ? {exact: back.deviceId} :
+                                                        {ideal: back.deviceId};
+            }
+            constraints.video = constraintsToChrome_(constraints.video);
+            logging('chrome: ' + JSON.stringify(constraints));
+            return func(constraints);
+          });
+        }
+      }
+      constraints.video = constraintsToChrome_(constraints.video);
+    }
+    logging('chrome: ' + JSON.stringify(constraints));
+    return func(constraints);
+  };
+
+  var shimError_ = function(e) {
+    return {
+      name: {
+        PermissionDeniedError: 'NotAllowedError',
+        ConstraintNotSatisfiedError: 'OverconstrainedError'
+      }[e.name] || e.name,
+      message: e.message,
+      constraint: e.constraintName,
+      toString: function() {
+        return this.name + (this.message && ': ') + this.message;
+      }
+    };
+  };
+
+  var getUserMedia_ = function(constraints, onSuccess, onError) {
+    shimConstraints_(constraints, function(c) {
+      navigator.webkitGetUserMedia(c, onSuccess, function(e) {
+        onError(shimError_(e));
+      });
+    });
+  };
+
+  navigator.getUserMedia = getUserMedia_;
+
+  // Returns the result of getUserMedia as a Promise.
+  var getUserMediaPromise_ = function(constraints) {
+    return new Promise(function(resolve, reject) {
+      navigator.getUserMedia(constraints, resolve, reject);
+    });
+  };
+
+  if (!navigator.mediaDevices) {
+    navigator.mediaDevices = {
+      getUserMedia: getUserMediaPromise_,
+      enumerateDevices: function() {
+        return new Promise(function(resolve) {
+          var kinds = {audio: 'audioinput', video: 'videoinput'};
+          return MediaStreamTrack.getSources(function(devices) {
+            resolve(devices.map(function(device) {
+              return {label: device.label,
+                      kind: kinds[device.kind],
+                      deviceId: device.id,
+                      groupId: ''};
+            }));
+          });
+        });
+      }
+    };
+  }
+
+  // A shim for getUserMedia method on the mediaDevices object.
+  // TODO(KaptenJansson) remove once implemented in Chrome stable.
+  if (!navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia = function(constraints) {
+      return getUserMediaPromise_(constraints);
+    };
+  } else {
+    // Even though Chrome 45 has navigator.mediaDevices and a getUserMedia
+    // function which returns a Promise, it does not accept spec-style
+    // constraints.
+    var origGetUserMedia = navigator.mediaDevices.getUserMedia.
+        bind(navigator.mediaDevices);
+    navigator.mediaDevices.getUserMedia = function(cs) {
+      return shimConstraints_(cs, function(c) {
+        return origGetUserMedia(c).catch(function(e) {
+          return Promise.reject(shimError_(e));
+        });
+      });
+    };
+  }
+
+  // Dummy devicechange event methods.
+  // TODO(KaptenJansson) remove once implemented in Chrome stable.
+  if (typeof navigator.mediaDevices.addEventListener === 'undefined') {
+    navigator.mediaDevices.addEventListener = function() {
+      logging('Dummy mediaDevices.addEventListener called.');
+    };
+  }
+  if (typeof navigator.mediaDevices.removeEventListener === 'undefined') {
+    navigator.mediaDevices.removeEventListener = function() {
+      logging('Dummy mediaDevices.removeEventListener called.');
+    };
   }
 };
 
-// Expose public methods.
-module.exports = {
-  shimGetUserMedia: safariShim.shimGetUserMedia
-  // TODO
-  // shimOnTrack: safariShim.shimOnTrack,
-  // shimPeerConnection: safariShim.shimPeerConnection,
-  // attachMediaStream: safariShim.attachMediaStream,
-  // reattachMediaStream: safariShim.reattachMediaStream
-};
-
-},{}],27:[function(require,module,exports){
-/**
- * lodash 3.0.3 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-var arrayEach = require('lodash._arrayeach'),
-    baseEach = require('lodash._baseeach'),
-    bindCallback = require('lodash._bindcallback'),
-    isArray = require('lodash.isarray');
-
-/**
- * Creates a function for `_.forEach` or `_.forEachRight`.
- *
- * @private
- * @param {Function} arrayFunc The function to iterate over an array.
- * @param {Function} eachFunc The function to iterate over a collection.
- * @returns {Function} Returns the new each function.
- */
-function createForEach(arrayFunc, eachFunc) {
-  return function(collection, iteratee, thisArg) {
-    return (typeof iteratee == 'function' && thisArg === undefined && isArray(collection))
-      ? arrayFunc(collection, iteratee)
-      : eachFunc(collection, bindCallback(iteratee, thisArg, 3));
-  };
-}
-
-/**
- * Iterates over elements of `collection` invoking `iteratee` for each element.
- * The `iteratee` is bound to `thisArg` and invoked with three arguments:
- * (value, index|key, collection). Iteratee functions may exit iteration early
- * by explicitly returning `false`.
- *
- * **Note:** As with other "Collections" methods, objects with a "length" property
- * are iterated like arrays. To avoid this behavior `_.forIn` or `_.forOwn`
- * may be used for object iteration.
- *
- * @static
- * @memberOf _
- * @alias each
- * @category Collection
- * @param {Array|Object|string} collection The collection to iterate over.
- * @param {Function} [iteratee=_.identity] The function invoked per iteration.
- * @param {*} [thisArg] The `this` binding of `iteratee`.
- * @returns {Array|Object|string} Returns `collection`.
- * @example
- *
- * _([1, 2]).forEach(function(n) {
- *   console.log(n);
- * }).value();
- * // => logs each value from left to right and returns the array
- *
- * _.forEach({ 'a': 1, 'b': 2 }, function(n, key) {
- *   console.log(n, key);
- * });
- * // => logs each value-key pair and returns the object (iteration order is not guaranteed)
- */
-var forEach = createForEach(arrayEach, baseEach);
-
-module.exports = forEach;
-
-},{"lodash._arrayeach":42,"lodash._baseeach":41,"lodash._bindcallback":44,"lodash.isarray":43}],28:[function(require,module,exports){
+},{"../utils.js":19}],28:[function(require,module,exports){
 /**
  * lodash 3.1.2 (Custom Build) <https://lodash.com/>
  * Build: `lodash modern modularize exports="npm" -o ./`
@@ -4957,7 +5148,152 @@ function property(path) {
 
 module.exports = pluck;
 
-},{"lodash._baseget":45,"lodash._topath":47,"lodash.isarray":48,"lodash.map":46}],29:[function(require,module,exports){
+},{"lodash._baseget":48,"lodash._topath":46,"lodash.isarray":47,"lodash.map":45}],29:[function(require,module,exports){
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+'use strict';
+
+var logging = require('../utils').log;
+var browserDetails = require('../utils').browserDetails;
+
+// Expose public methods.
+module.exports = function() {
+  var shimError_ = function(e) {
+    return {
+      name: {
+        SecurityError: 'NotAllowedError',
+        PermissionDeniedError: 'NotAllowedError'
+      }[e.name] || e.name,
+      message: {
+        'The operation is insecure.': 'The request is not allowed by the ' +
+        'user agent or the platform in the current context.'
+      }[e.message] || e.message,
+      constraint: e.constraint,
+      toString: function() {
+        return this.name + (this.message && ': ') + this.message;
+      }
+    };
+  };
+
+  // getUserMedia constraints shim.
+  var getUserMedia_ = function(constraints, onSuccess, onError) {
+    var constraintsToFF37_ = function(c) {
+      if (typeof c !== 'object' || c.require) {
+        return c;
+      }
+      var require = [];
+      Object.keys(c).forEach(function(key) {
+        if (key === 'require' || key === 'advanced' || key === 'mediaSource') {
+          return;
+        }
+        var r = c[key] = (typeof c[key] === 'object') ?
+            c[key] : {ideal: c[key]};
+        if (r.min !== undefined ||
+            r.max !== undefined || r.exact !== undefined) {
+          require.push(key);
+        }
+        if (r.exact !== undefined) {
+          if (typeof r.exact === 'number') {
+            r. min = r.max = r.exact;
+          } else {
+            c[key] = r.exact;
+          }
+          delete r.exact;
+        }
+        if (r.ideal !== undefined) {
+          c.advanced = c.advanced || [];
+          var oc = {};
+          if (typeof r.ideal === 'number') {
+            oc[key] = {min: r.ideal, max: r.ideal};
+          } else {
+            oc[key] = r.ideal;
+          }
+          c.advanced.push(oc);
+          delete r.ideal;
+          if (!Object.keys(r).length) {
+            delete c[key];
+          }
+        }
+      });
+      if (require.length) {
+        c.require = require;
+      }
+      return c;
+    };
+    constraints = JSON.parse(JSON.stringify(constraints));
+    if (browserDetails.version < 38) {
+      logging('spec: ' + JSON.stringify(constraints));
+      if (constraints.audio) {
+        constraints.audio = constraintsToFF37_(constraints.audio);
+      }
+      if (constraints.video) {
+        constraints.video = constraintsToFF37_(constraints.video);
+      }
+      logging('ff37: ' + JSON.stringify(constraints));
+    }
+    return navigator.mozGetUserMedia(constraints, onSuccess, function(e) {
+      onError(shimError_(e));
+    });
+  };
+
+  navigator.getUserMedia = getUserMedia_;
+
+  // Returns the result of getUserMedia as a Promise.
+  var getUserMediaPromise_ = function(constraints) {
+    return new Promise(function(resolve, reject) {
+      navigator.getUserMedia(constraints, resolve, reject);
+    });
+  };
+
+  // Shim for mediaDevices on older versions.
+  if (!navigator.mediaDevices) {
+    navigator.mediaDevices = {getUserMedia: getUserMediaPromise_,
+      addEventListener: function() { },
+      removeEventListener: function() { }
+    };
+  }
+  navigator.mediaDevices.enumerateDevices =
+      navigator.mediaDevices.enumerateDevices || function() {
+        return new Promise(function(resolve) {
+          var infos = [
+            {kind: 'audioinput', deviceId: 'default', label: '', groupId: ''},
+            {kind: 'videoinput', deviceId: 'default', label: '', groupId: ''}
+          ];
+          resolve(infos);
+        });
+      };
+
+  if (browserDetails.version < 41) {
+    // Work around http://bugzil.la/1169665
+    var orgEnumerateDevices =
+        navigator.mediaDevices.enumerateDevices.bind(navigator.mediaDevices);
+    navigator.mediaDevices.enumerateDevices = function() {
+      return orgEnumerateDevices().then(undefined, function(e) {
+        if (e.name === 'NotFoundError') {
+          return [];
+        }
+        throw e;
+      });
+    };
+  }
+  if (browserDetails.version < 49) {
+    var origGetUserMedia = navigator.mediaDevices.getUserMedia.
+        bind(navigator.mediaDevices);
+    navigator.mediaDevices.getUserMedia = function(c) {
+      return origGetUserMedia(c).catch(function(e) {
+        return Promise.reject(shimError_(e));
+      });
+    };
+  }
+};
+
+},{"../utils":19}],32:[function(require,module,exports){
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
  *
@@ -5051,231 +5387,7 @@ module.exports = pluck;
   }
 })();
 
-},{"./chrome/chrome_shim":50,"./edge/edge_shim":51,"./firefox/firefox_shim":52,"./safari/safari_shim":53,"./utils":49}],33:[function(require,module,exports){
-var SENDERS = require('./senders');
-var parsers = require('./parsers');
-var idCounter = Math.random();
-
-
-exports._setIdCounter = function (counter) {
-    idCounter = counter;
-};
-
-exports.toSessionJSON = function (sdp, opts) {
-    var i;
-    var creators = opts.creators || [];
-    var role = opts.role || 'initiator';
-    var direction = opts.direction || 'outgoing';
-
-
-    // Divide the SDP into session and media sections.
-    var media = sdp.split('\r\nm=');
-    for (i = 1; i < media.length; i++) {
-        media[i] = 'm=' + media[i];
-        if (i !== media.length - 1) {
-            media[i] += '\r\n';
-        }
-    }
-    var session = media.shift() + '\r\n';
-    var sessionLines = parsers.lines(session);
-    var parsed = {};
-
-    var contents = [];
-    for (i = 0; i < media.length; i++) {
-        contents.push(exports.toMediaJSON(media[i], session, {
-            role: role,
-            direction: direction,
-            creator: creators[i] || 'initiator'
-        }));
-    }
-    parsed.contents = contents;
-
-    var groupLines = parsers.findLines('a=group:', sessionLines);
-    if (groupLines.length) {
-        parsed.groups = parsers.groups(groupLines);
-    }
-
-    return parsed;
-};
-
-exports.toMediaJSON = function (media, session, opts) {
-    var creator = opts.creator || 'initiator';
-    var role = opts.role || 'initiator';
-    var direction = opts.direction || 'outgoing';
-
-    var lines = parsers.lines(media);
-    var sessionLines = parsers.lines(session);
-    var mline = parsers.mline(lines[0]);
-
-    var content = {
-        creator: creator,
-        name: mline.media,
-        description: {
-            descType: 'rtp',
-            media: mline.media,
-            payloads: [],
-            encryption: [],
-            feedback: [],
-            headerExtensions: []
-        },
-        transport: {
-            transType: 'iceUdp',
-            candidates: [],
-            fingerprints: []
-        }
-    };
-    if (mline.media == 'application') {
-        // FIXME: the description is most likely to be independent
-        // of the SDP and should be processed by other parts of the library
-        content.description = {
-            descType: 'datachannel'
-        };
-        content.transport.sctp = [];
-    }
-    var desc = content.description;
-    var trans = content.transport;
-
-    // If we have a mid, use that for the content name instead.
-    var mid = parsers.findLine('a=mid:', lines);
-    if (mid) {
-        content.name = mid.substr(6);
-    }
-
-    if (parsers.findLine('a=sendrecv', lines, sessionLines)) {
-        content.senders = 'both';
-    } else if (parsers.findLine('a=sendonly', lines, sessionLines)) {
-        content.senders = SENDERS[role][direction].sendonly;
-    } else if (parsers.findLine('a=recvonly', lines, sessionLines)) {
-        content.senders = SENDERS[role][direction].recvonly;
-    } else if (parsers.findLine('a=inactive', lines, sessionLines)) {
-        content.senders = 'none';
-    }
-
-    if (desc.descType == 'rtp') {
-        var bandwidth = parsers.findLine('b=', lines);
-        if (bandwidth) {
-            desc.bandwidth = parsers.bandwidth(bandwidth);
-        }
-
-        var ssrc = parsers.findLine('a=ssrc:', lines);
-        if (ssrc) {
-            desc.ssrc = ssrc.substr(7).split(' ')[0];
-        }
-
-        var rtpmapLines = parsers.findLines('a=rtpmap:', lines);
-        rtpmapLines.forEach(function (line) {
-            var payload = parsers.rtpmap(line);
-            payload.parameters = [];
-            payload.feedback = [];
-
-            var fmtpLines = parsers.findLines('a=fmtp:' + payload.id, lines);
-            // There should only be one fmtp line per payload
-            fmtpLines.forEach(function (line) {
-                payload.parameters = parsers.fmtp(line);
-            });
-
-            var fbLines = parsers.findLines('a=rtcp-fb:' + payload.id, lines);
-            fbLines.forEach(function (line) {
-                payload.feedback.push(parsers.rtcpfb(line));
-            });
-
-            desc.payloads.push(payload);
-        });
-
-        var cryptoLines = parsers.findLines('a=crypto:', lines, sessionLines);
-        cryptoLines.forEach(function (line) {
-            desc.encryption.push(parsers.crypto(line));
-        });
-
-        if (parsers.findLine('a=rtcp-mux', lines)) {
-            desc.mux = true;
-        }
-
-        var fbLines = parsers.findLines('a=rtcp-fb:*', lines);
-        fbLines.forEach(function (line) {
-            desc.feedback.push(parsers.rtcpfb(line));
-        });
-
-        var extLines = parsers.findLines('a=extmap:', lines);
-        extLines.forEach(function (line) {
-            var ext = parsers.extmap(line);
-
-            ext.senders = SENDERS[role][direction][ext.senders];
-
-            desc.headerExtensions.push(ext);
-        });
-
-        var ssrcGroupLines = parsers.findLines('a=ssrc-group:', lines);
-        desc.sourceGroups = parsers.sourceGroups(ssrcGroupLines || []);
-
-        var ssrcLines = parsers.findLines('a=ssrc:', lines);
-        var sources = desc.sources = parsers.sources(ssrcLines || []);
-
-        var msidLine = parsers.findLine('a=msid:', lines);
-        if (msidLine) {
-            var msid = parsers.msid(msidLine);
-            ['msid', 'mslabel', 'label'].forEach(function (key) {
-                for (var i = 0; i < sources.length; i++) {
-                    var found = false;
-                    for (var j = 0; j < sources[i].parameters.length; j++) {
-                        if (sources[i].parameters[j].key === key) {
-                            found = true;
-                        }
-                    }
-                    if (!found) {
-                        sources[i].parameters.push({ key: key, value: msid[key] });
-                    }
-                }
-            });
-        }
-
-        if (parsers.findLine('a=x-google-flag:conference', lines, sessionLines)) {
-            desc.googConferenceFlag = true;
-        }
-    }
-
-    // transport specific attributes
-    var fingerprintLines = parsers.findLines('a=fingerprint:', lines, sessionLines);
-    var setup = parsers.findLine('a=setup:', lines, sessionLines);
-    fingerprintLines.forEach(function (line) {
-        var fp = parsers.fingerprint(line);
-        if (setup) {
-            fp.setup = setup.substr(8);
-        }
-        trans.fingerprints.push(fp);
-    });
-
-    var ufragLine = parsers.findLine('a=ice-ufrag:', lines, sessionLines);
-    var pwdLine = parsers.findLine('a=ice-pwd:', lines, sessionLines);
-    if (ufragLine && pwdLine) {
-        trans.ufrag = ufragLine.substr(12);
-        trans.pwd = pwdLine.substr(10);
-        trans.candidates = [];
-
-        var candidateLines = parsers.findLines('a=candidate:', lines, sessionLines);
-        candidateLines.forEach(function (line) {
-            trans.candidates.push(exports.toCandidateJSON(line));
-        });
-    }
-
-    if (desc.descType == 'datachannel') {
-        var sctpmapLines = parsers.findLines('a=sctpmap:', lines);
-        sctpmapLines.forEach(function (line) {
-            var sctp = parsers.sctpmap(line);
-            trans.sctp.push(sctp);
-        });
-    }
-
-    return content;
-};
-
-exports.toCandidateJSON = function (line) {
-    var candidate = parsers.candidate(line.split('\r\n')[0]);
-    candidate.id = (idCounter++).toString(36).substr(0, 12);
-    return candidate;
-};
-
-},{"./parsers":55,"./senders":54}],34:[function(require,module,exports){
+},{"./chrome/chrome_shim":50,"./edge/edge_shim":53,"./firefox/firefox_shim":52,"./safari/safari_shim":51,"./utils":49}],34:[function(require,module,exports){
 var SENDERS = require('./senders');
 
 
@@ -5514,198 +5626,231 @@ exports.toCandidateSDP = function (candidate) {
     return 'a=candidate:' + sdp.join(' ');
 };
 
-},{"./senders":54}],31:[function(require,module,exports){
-/*
- *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
- *
- *  Use of this source code is governed by a BSD-style license
- *  that can be found in the LICENSE file in the root of the source
- *  tree.
- */
- /* eslint-env node */
-'use strict';
-var logging = require('../utils.js').log;
+},{"./senders":54}],35:[function(require,module,exports){
+var SENDERS = require('./senders');
+var parsers = require('./parsers');
+var idCounter = Math.random();
 
-// Expose public methods.
-module.exports = function() {
-  var constraintsToChrome_ = function(c) {
-    if (typeof c !== 'object' || c.mandatory || c.optional) {
-      return c;
-    }
-    var cc = {};
-    Object.keys(c).forEach(function(key) {
-      if (key === 'require' || key === 'advanced' || key === 'mediaSource') {
-        return;
-      }
-      var r = (typeof c[key] === 'object') ? c[key] : {ideal: c[key]};
-      if (r.exact !== undefined && typeof r.exact === 'number') {
-        r.min = r.max = r.exact;
-      }
-      var oldname_ = function(prefix, name) {
-        if (prefix) {
-          return prefix + name.charAt(0).toUpperCase() + name.slice(1);
-        }
-        return (name === 'deviceId') ? 'sourceId' : name;
-      };
-      if (r.ideal !== undefined) {
-        cc.optional = cc.optional || [];
-        var oc = {};
-        if (typeof r.ideal === 'number') {
-          oc[oldname_('min', key)] = r.ideal;
-          cc.optional.push(oc);
-          oc = {};
-          oc[oldname_('max', key)] = r.ideal;
-          cc.optional.push(oc);
-        } else {
-          oc[oldname_('', key)] = r.ideal;
-          cc.optional.push(oc);
-        }
-      }
-      if (r.exact !== undefined && typeof r.exact !== 'number') {
-        cc.mandatory = cc.mandatory || {};
-        cc.mandatory[oldname_('', key)] = r.exact;
-      } else {
-        ['min', 'max'].forEach(function(mix) {
-          if (r[mix] !== undefined) {
-            cc.mandatory = cc.mandatory || {};
-            cc.mandatory[oldname_(mix, key)] = r[mix];
-          }
-        });
-      }
-    });
-    if (c.advanced) {
-      cc.optional = (cc.optional || []).concat(c.advanced);
-    }
-    return cc;
-  };
 
-  var shimConstraints_ = function(constraints, func) {
-    constraints = JSON.parse(JSON.stringify(constraints));
-    if (constraints && constraints.audio) {
-      constraints.audio = constraintsToChrome_(constraints.audio);
-    }
-    if (constraints && typeof constraints.video === 'object') {
-      // Shim facingMode for mobile, where it defaults to "user".
-      var face = constraints.video.facingMode;
-      face = face && ((typeof face === 'object') ? face : {ideal: face});
-
-      if ((face && (face.exact === 'user' || face.exact === 'environment' ||
-                    face.ideal === 'user' || face.ideal === 'environment')) &&
-          !(navigator.mediaDevices.getSupportedConstraints &&
-            navigator.mediaDevices.getSupportedConstraints().facingMode)) {
-        delete constraints.video.facingMode;
-        if (face.exact === 'environment' || face.ideal === 'environment') {
-          // Look for "back" in label, or use last cam (typically back cam).
-          return navigator.mediaDevices.enumerateDevices()
-          .then(function(devices) {
-            devices = devices.filter(function(d) {
-              return d.kind === 'videoinput';
-            });
-            var back = devices.find(function(d) {
-              return d.label.toLowerCase().indexOf('back') !== -1;
-            }) || (devices.length && devices[devices.length - 1]);
-            if (back) {
-              constraints.video.deviceId = face.exact ? {exact: back.deviceId} :
-                                                        {ideal: back.deviceId};
-            }
-            constraints.video = constraintsToChrome_(constraints.video);
-            logging('chrome: ' + JSON.stringify(constraints));
-            return func(constraints);
-          });
-        }
-      }
-      constraints.video = constraintsToChrome_(constraints.video);
-    }
-    logging('chrome: ' + JSON.stringify(constraints));
-    return func(constraints);
-  };
-
-  var shimError_ = function(e) {
-    return {
-      name: {
-        PermissionDeniedError: 'NotAllowedError',
-        ConstraintNotSatisfiedError: 'OverconstrainedError'
-      }[e.name] || e.name,
-      message: e.message,
-      constraint: e.constraintName,
-      toString: function() {
-        return this.name + (this.message && ': ') + this.message;
-      }
-    };
-  };
-
-  var getUserMedia_ = function(constraints, onSuccess, onError) {
-    shimConstraints_(constraints, function(c) {
-      navigator.webkitGetUserMedia(c, onSuccess, function(e) {
-        onError(shimError_(e));
-      });
-    });
-  };
-
-  navigator.getUserMedia = getUserMedia_;
-
-  // Returns the result of getUserMedia as a Promise.
-  var getUserMediaPromise_ = function(constraints) {
-    return new Promise(function(resolve, reject) {
-      navigator.getUserMedia(constraints, resolve, reject);
-    });
-  };
-
-  if (!navigator.mediaDevices) {
-    navigator.mediaDevices = {
-      getUserMedia: getUserMediaPromise_,
-      enumerateDevices: function() {
-        return new Promise(function(resolve) {
-          var kinds = {audio: 'audioinput', video: 'videoinput'};
-          return MediaStreamTrack.getSources(function(devices) {
-            resolve(devices.map(function(device) {
-              return {label: device.label,
-                      kind: kinds[device.kind],
-                      deviceId: device.id,
-                      groupId: ''};
-            }));
-          });
-        });
-      }
-    };
-  }
-
-  // A shim for getUserMedia method on the mediaDevices object.
-  // TODO(KaptenJansson) remove once implemented in Chrome stable.
-  if (!navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia = function(constraints) {
-      return getUserMediaPromise_(constraints);
-    };
-  } else {
-    // Even though Chrome 45 has navigator.mediaDevices and a getUserMedia
-    // function which returns a Promise, it does not accept spec-style
-    // constraints.
-    var origGetUserMedia = navigator.mediaDevices.getUserMedia.
-        bind(navigator.mediaDevices);
-    navigator.mediaDevices.getUserMedia = function(cs) {
-      return shimConstraints_(cs, function(c) {
-        return origGetUserMedia(c).catch(function(e) {
-          return Promise.reject(shimError_(e));
-        });
-      });
-    };
-  }
-
-  // Dummy devicechange event methods.
-  // TODO(KaptenJansson) remove once implemented in Chrome stable.
-  if (typeof navigator.mediaDevices.addEventListener === 'undefined') {
-    navigator.mediaDevices.addEventListener = function() {
-      logging('Dummy mediaDevices.addEventListener called.');
-    };
-  }
-  if (typeof navigator.mediaDevices.removeEventListener === 'undefined') {
-    navigator.mediaDevices.removeEventListener = function() {
-      logging('Dummy mediaDevices.removeEventListener called.');
-    };
-  }
+exports._setIdCounter = function (counter) {
+    idCounter = counter;
 };
 
-},{"../utils.js":15}],42:[function(require,module,exports){
+exports.toSessionJSON = function (sdp, opts) {
+    var i;
+    var creators = opts.creators || [];
+    var role = opts.role || 'initiator';
+    var direction = opts.direction || 'outgoing';
+
+
+    // Divide the SDP into session and media sections.
+    var media = sdp.split('\r\nm=');
+    for (i = 1; i < media.length; i++) {
+        media[i] = 'm=' + media[i];
+        if (i !== media.length - 1) {
+            media[i] += '\r\n';
+        }
+    }
+    var session = media.shift() + '\r\n';
+    var sessionLines = parsers.lines(session);
+    var parsed = {};
+
+    var contents = [];
+    for (i = 0; i < media.length; i++) {
+        contents.push(exports.toMediaJSON(media[i], session, {
+            role: role,
+            direction: direction,
+            creator: creators[i] || 'initiator'
+        }));
+    }
+    parsed.contents = contents;
+
+    var groupLines = parsers.findLines('a=group:', sessionLines);
+    if (groupLines.length) {
+        parsed.groups = parsers.groups(groupLines);
+    }
+
+    return parsed;
+};
+
+exports.toMediaJSON = function (media, session, opts) {
+    var creator = opts.creator || 'initiator';
+    var role = opts.role || 'initiator';
+    var direction = opts.direction || 'outgoing';
+
+    var lines = parsers.lines(media);
+    var sessionLines = parsers.lines(session);
+    var mline = parsers.mline(lines[0]);
+
+    var content = {
+        creator: creator,
+        name: mline.media,
+        description: {
+            descType: 'rtp',
+            media: mline.media,
+            payloads: [],
+            encryption: [],
+            feedback: [],
+            headerExtensions: []
+        },
+        transport: {
+            transType: 'iceUdp',
+            candidates: [],
+            fingerprints: []
+        }
+    };
+    if (mline.media == 'application') {
+        // FIXME: the description is most likely to be independent
+        // of the SDP and should be processed by other parts of the library
+        content.description = {
+            descType: 'datachannel'
+        };
+        content.transport.sctp = [];
+    }
+    var desc = content.description;
+    var trans = content.transport;
+
+    // If we have a mid, use that for the content name instead.
+    var mid = parsers.findLine('a=mid:', lines);
+    if (mid) {
+        content.name = mid.substr(6);
+    }
+
+    if (parsers.findLine('a=sendrecv', lines, sessionLines)) {
+        content.senders = 'both';
+    } else if (parsers.findLine('a=sendonly', lines, sessionLines)) {
+        content.senders = SENDERS[role][direction].sendonly;
+    } else if (parsers.findLine('a=recvonly', lines, sessionLines)) {
+        content.senders = SENDERS[role][direction].recvonly;
+    } else if (parsers.findLine('a=inactive', lines, sessionLines)) {
+        content.senders = 'none';
+    }
+
+    if (desc.descType == 'rtp') {
+        var bandwidth = parsers.findLine('b=', lines);
+        if (bandwidth) {
+            desc.bandwidth = parsers.bandwidth(bandwidth);
+        }
+
+        var ssrc = parsers.findLine('a=ssrc:', lines);
+        if (ssrc) {
+            desc.ssrc = ssrc.substr(7).split(' ')[0];
+        }
+
+        var rtpmapLines = parsers.findLines('a=rtpmap:', lines);
+        rtpmapLines.forEach(function (line) {
+            var payload = parsers.rtpmap(line);
+            payload.parameters = [];
+            payload.feedback = [];
+
+            var fmtpLines = parsers.findLines('a=fmtp:' + payload.id, lines);
+            // There should only be one fmtp line per payload
+            fmtpLines.forEach(function (line) {
+                payload.parameters = parsers.fmtp(line);
+            });
+
+            var fbLines = parsers.findLines('a=rtcp-fb:' + payload.id, lines);
+            fbLines.forEach(function (line) {
+                payload.feedback.push(parsers.rtcpfb(line));
+            });
+
+            desc.payloads.push(payload);
+        });
+
+        var cryptoLines = parsers.findLines('a=crypto:', lines, sessionLines);
+        cryptoLines.forEach(function (line) {
+            desc.encryption.push(parsers.crypto(line));
+        });
+
+        if (parsers.findLine('a=rtcp-mux', lines)) {
+            desc.mux = true;
+        }
+
+        var fbLines = parsers.findLines('a=rtcp-fb:*', lines);
+        fbLines.forEach(function (line) {
+            desc.feedback.push(parsers.rtcpfb(line));
+        });
+
+        var extLines = parsers.findLines('a=extmap:', lines);
+        extLines.forEach(function (line) {
+            var ext = parsers.extmap(line);
+
+            ext.senders = SENDERS[role][direction][ext.senders];
+
+            desc.headerExtensions.push(ext);
+        });
+
+        var ssrcGroupLines = parsers.findLines('a=ssrc-group:', lines);
+        desc.sourceGroups = parsers.sourceGroups(ssrcGroupLines || []);
+
+        var ssrcLines = parsers.findLines('a=ssrc:', lines);
+        var sources = desc.sources = parsers.sources(ssrcLines || []);
+
+        var msidLine = parsers.findLine('a=msid:', lines);
+        if (msidLine) {
+            var msid = parsers.msid(msidLine);
+            ['msid', 'mslabel', 'label'].forEach(function (key) {
+                for (var i = 0; i < sources.length; i++) {
+                    var found = false;
+                    for (var j = 0; j < sources[i].parameters.length; j++) {
+                        if (sources[i].parameters[j].key === key) {
+                            found = true;
+                        }
+                    }
+                    if (!found) {
+                        sources[i].parameters.push({ key: key, value: msid[key] });
+                    }
+                }
+            });
+        }
+
+        if (parsers.findLine('a=x-google-flag:conference', lines, sessionLines)) {
+            desc.googConferenceFlag = true;
+        }
+    }
+
+    // transport specific attributes
+    var fingerprintLines = parsers.findLines('a=fingerprint:', lines, sessionLines);
+    var setup = parsers.findLine('a=setup:', lines, sessionLines);
+    fingerprintLines.forEach(function (line) {
+        var fp = parsers.fingerprint(line);
+        if (setup) {
+            fp.setup = setup.substr(8);
+        }
+        trans.fingerprints.push(fp);
+    });
+
+    var ufragLine = parsers.findLine('a=ice-ufrag:', lines, sessionLines);
+    var pwdLine = parsers.findLine('a=ice-pwd:', lines, sessionLines);
+    if (ufragLine && pwdLine) {
+        trans.ufrag = ufragLine.substr(12);
+        trans.pwd = pwdLine.substr(10);
+        trans.candidates = [];
+
+        var candidateLines = parsers.findLines('a=candidate:', lines, sessionLines);
+        candidateLines.forEach(function (line) {
+            trans.candidates.push(exports.toCandidateJSON(line));
+        });
+    }
+
+    if (desc.descType == 'datachannel') {
+        var sctpmapLines = parsers.findLines('a=sctpmap:', lines);
+        sctpmapLines.forEach(function (line) {
+            var sctp = parsers.sctpmap(line);
+            trans.sctp.push(sctp);
+        });
+    }
+
+    return content;
+};
+
+exports.toCandidateJSON = function (line) {
+    var candidate = parsers.candidate(line.split('\r\n')[0]);
+    candidate.id = (idCounter++).toString(36).substr(0, 12);
+    return candidate;
+};
+
+},{"./parsers":55,"./senders":54}],42:[function(require,module,exports){
 /**
  * lodash 3.0.0 (Custom Build) <https://lodash.com/>
  * Build: `lodash modern modularize exports="npm" -o ./`
@@ -5987,228 +6132,7 @@ function identity(value) {
 
 module.exports = bindCallback;
 
-},{}],45:[function(require,module,exports){
-/**
- * lodash 3.7.2 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-
-/**
- * The base implementation of `get` without support for string paths
- * and default values.
- *
- * @private
- * @param {Object} object The object to query.
- * @param {Array} path The path of the property to get.
- * @param {string} [pathKey] The key representation of path.
- * @returns {*} Returns the resolved value.
- */
-function baseGet(object, path, pathKey) {
-  if (object == null) {
-    return;
-  }
-  if (pathKey !== undefined && pathKey in toObject(object)) {
-    path = [pathKey];
-  }
-  var index = 0,
-      length = path.length;
-
-  while (object != null && index < length) {
-    object = object[path[index++]];
-  }
-  return (index && index == length) ? object : undefined;
-}
-
-/**
- * Converts `value` to an object if it's not one.
- *
- * @private
- * @param {*} value The value to process.
- * @returns {Object} Returns the object.
- */
-function toObject(value) {
-  return isObject(value) ? value : Object(value);
-}
-
-/**
- * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
- * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(1);
- * // => false
- */
-function isObject(value) {
-  // Avoid a V8 JIT bug in Chrome 19-20.
-  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
-  var type = typeof value;
-  return !!value && (type == 'object' || type == 'function');
-}
-
-module.exports = baseGet;
-
-},{}],32:[function(require,module,exports){
-/*
- *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
- *
- *  Use of this source code is governed by a BSD-style license
- *  that can be found in the LICENSE file in the root of the source
- *  tree.
- */
- /* eslint-env node */
-'use strict';
-
-var logging = require('../utils').log;
-var browserDetails = require('../utils').browserDetails;
-
-// Expose public methods.
-module.exports = function() {
-  var shimError_ = function(e) {
-    return {
-      name: {
-        SecurityError: 'NotAllowedError',
-        PermissionDeniedError: 'NotAllowedError'
-      }[e.name] || e.name,
-      message: {
-        'The operation is insecure.': 'The request is not allowed by the ' +
-        'user agent or the platform in the current context.'
-      }[e.message] || e.message,
-      constraint: e.constraint,
-      toString: function() {
-        return this.name + (this.message && ': ') + this.message;
-      }
-    };
-  };
-
-  // getUserMedia constraints shim.
-  var getUserMedia_ = function(constraints, onSuccess, onError) {
-    var constraintsToFF37_ = function(c) {
-      if (typeof c !== 'object' || c.require) {
-        return c;
-      }
-      var require = [];
-      Object.keys(c).forEach(function(key) {
-        if (key === 'require' || key === 'advanced' || key === 'mediaSource') {
-          return;
-        }
-        var r = c[key] = (typeof c[key] === 'object') ?
-            c[key] : {ideal: c[key]};
-        if (r.min !== undefined ||
-            r.max !== undefined || r.exact !== undefined) {
-          require.push(key);
-        }
-        if (r.exact !== undefined) {
-          if (typeof r.exact === 'number') {
-            r. min = r.max = r.exact;
-          } else {
-            c[key] = r.exact;
-          }
-          delete r.exact;
-        }
-        if (r.ideal !== undefined) {
-          c.advanced = c.advanced || [];
-          var oc = {};
-          if (typeof r.ideal === 'number') {
-            oc[key] = {min: r.ideal, max: r.ideal};
-          } else {
-            oc[key] = r.ideal;
-          }
-          c.advanced.push(oc);
-          delete r.ideal;
-          if (!Object.keys(r).length) {
-            delete c[key];
-          }
-        }
-      });
-      if (require.length) {
-        c.require = require;
-      }
-      return c;
-    };
-    constraints = JSON.parse(JSON.stringify(constraints));
-    if (browserDetails.version < 38) {
-      logging('spec: ' + JSON.stringify(constraints));
-      if (constraints.audio) {
-        constraints.audio = constraintsToFF37_(constraints.audio);
-      }
-      if (constraints.video) {
-        constraints.video = constraintsToFF37_(constraints.video);
-      }
-      logging('ff37: ' + JSON.stringify(constraints));
-    }
-    return navigator.mozGetUserMedia(constraints, onSuccess, function(e) {
-      onError(shimError_(e));
-    });
-  };
-
-  navigator.getUserMedia = getUserMedia_;
-
-  // Returns the result of getUserMedia as a Promise.
-  var getUserMediaPromise_ = function(constraints) {
-    return new Promise(function(resolve, reject) {
-      navigator.getUserMedia(constraints, resolve, reject);
-    });
-  };
-
-  // Shim for mediaDevices on older versions.
-  if (!navigator.mediaDevices) {
-    navigator.mediaDevices = {getUserMedia: getUserMediaPromise_,
-      addEventListener: function() { },
-      removeEventListener: function() { }
-    };
-  }
-  navigator.mediaDevices.enumerateDevices =
-      navigator.mediaDevices.enumerateDevices || function() {
-        return new Promise(function(resolve) {
-          var infos = [
-            {kind: 'audioinput', deviceId: 'default', label: '', groupId: ''},
-            {kind: 'videoinput', deviceId: 'default', label: '', groupId: ''}
-          ];
-          resolve(infos);
-        });
-      };
-
-  if (browserDetails.version < 41) {
-    // Work around http://bugzil.la/1169665
-    var orgEnumerateDevices =
-        navigator.mediaDevices.enumerateDevices.bind(navigator.mediaDevices);
-    navigator.mediaDevices.enumerateDevices = function() {
-      return orgEnumerateDevices().then(undefined, function(e) {
-        if (e.name === 'NotFoundError') {
-          return [];
-        }
-        throw e;
-      });
-    };
-  }
-  if (browserDetails.version < 49) {
-    var origGetUserMedia = navigator.mediaDevices.getUserMedia.
-        bind(navigator.mediaDevices);
-    navigator.mediaDevices.getUserMedia = function(c) {
-      return origGetUserMedia(c).catch(function(e) {
-        return Promise.reject(shimError_(e));
-      });
-    };
-  }
-};
-
-},{"../utils":15}],48:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 /**
  * lodash 3.0.4 (Custom Build) <https://lodash.com/>
  * Build: `lodash modern modularize exports="npm" -o ./`
@@ -6390,6 +6314,82 @@ function isNative(value) {
 
 module.exports = isArray;
 
+},{}],48:[function(require,module,exports){
+/**
+ * lodash 3.7.2 (Custom Build) <https://lodash.com/>
+ * Build: `lodash modern modularize exports="npm" -o ./`
+ * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <https://lodash.com/license>
+ */
+
+/**
+ * The base implementation of `get` without support for string paths
+ * and default values.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @param {Array} path The path of the property to get.
+ * @param {string} [pathKey] The key representation of path.
+ * @returns {*} Returns the resolved value.
+ */
+function baseGet(object, path, pathKey) {
+  if (object == null) {
+    return;
+  }
+  if (pathKey !== undefined && pathKey in toObject(object)) {
+    path = [pathKey];
+  }
+  var index = 0,
+      length = path.length;
+
+  while (object != null && index < length) {
+    object = object[path[index++]];
+  }
+  return (index && index == length) ? object : undefined;
+}
+
+/**
+ * Converts `value` to an object if it's not one.
+ *
+ * @private
+ * @param {*} value The value to process.
+ * @returns {Object} Returns the object.
+ */
+function toObject(value) {
+  return isObject(value) ? value : Object(value);
+}
+
+/**
+ * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
+ * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+ *
+ * @static
+ * @memberOf _
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+ * @example
+ *
+ * _.isObject({});
+ * // => true
+ *
+ * _.isObject([1, 2, 3]);
+ * // => true
+ *
+ * _.isObject(1);
+ * // => false
+ */
+function isObject(value) {
+  // Avoid a V8 JIT bug in Chrome 19-20.
+  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
+  var type = typeof value;
+  return !!value && (type == 'object' || type == 'function');
+}
+
+module.exports = baseGet;
+
 },{}],49:[function(require,module,exports){
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
@@ -6535,7 +6535,7 @@ module.exports = {
   extractVersion: utils.extractVersion
 };
 
-},{}],53:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
  *
@@ -6571,600 +6571,7 @@ module.exports = {
   // reattachMediaStream: safariShim.reattachMediaStream
 };
 
-},{}],55:[function(require,module,exports){
-exports.lines = function (sdp) {
-    return sdp.split('\r\n').filter(function (line) {
-        return line.length > 0;
-    });
-};
-
-exports.findLine = function (prefix, mediaLines, sessionLines) {
-    var prefixLength = prefix.length;
-    for (var i = 0; i < mediaLines.length; i++) {
-        if (mediaLines[i].substr(0, prefixLength) === prefix) {
-            return mediaLines[i];
-        }
-    }
-    // Continue searching in parent session section
-    if (!sessionLines) {
-        return false;
-    }
-
-    for (var j = 0; j < sessionLines.length; j++) {
-        if (sessionLines[j].substr(0, prefixLength) === prefix) {
-            return sessionLines[j];
-        }
-    }
-
-    return false;
-};
-
-exports.findLines = function (prefix, mediaLines, sessionLines) {
-    var results = [];
-    var prefixLength = prefix.length;
-    for (var i = 0; i < mediaLines.length; i++) {
-        if (mediaLines[i].substr(0, prefixLength) === prefix) {
-            results.push(mediaLines[i]);
-        }
-    }
-    if (results.length || !sessionLines) {
-        return results;
-    }
-    for (var j = 0; j < sessionLines.length; j++) {
-        if (sessionLines[j].substr(0, prefixLength) === prefix) {
-            results.push(sessionLines[j]);
-        }
-    }
-    return results;
-};
-
-exports.mline = function (line) {
-    var parts = line.substr(2).split(' ');
-    var parsed = {
-        media: parts[0],
-        port: parts[1],
-        proto: parts[2],
-        formats: []
-    };
-    for (var i = 3; i < parts.length; i++) {
-        if (parts[i]) {
-            parsed.formats.push(parts[i]);
-        }
-    }
-    return parsed;
-};
-
-exports.rtpmap = function (line) {
-    var parts = line.substr(9).split(' ');
-    var parsed = {
-        id: parts.shift()
-    };
-
-    parts = parts[0].split('/');
-
-    parsed.name = parts[0];
-    parsed.clockrate = parts[1];
-    parsed.channels = parts.length == 3 ? parts[2] : '1';
-    return parsed;
-};
-
-exports.sctpmap = function (line) {
-    // based on -05 draft
-    var parts = line.substr(10).split(' ');
-    var parsed = {
-        number: parts.shift(),
-        protocol: parts.shift(),
-        streams: parts.shift()
-    };
-    return parsed;
-};
-
-
-exports.fmtp = function (line) {
-    var kv, key, value;
-    var parts = line.substr(line.indexOf(' ') + 1).split(';');
-    var parsed = [];
-    for (var i = 0; i < parts.length; i++) {
-        kv = parts[i].split('=');
-        key = kv[0].trim();
-        value = kv[1];
-        if (key && value) {
-            parsed.push({key: key, value: value});
-        } else if (key) {
-            parsed.push({key: '', value: key});
-        }
-    }
-    return parsed;
-};
-
-exports.crypto = function (line) {
-    var parts = line.substr(9).split(' ');
-    var parsed = {
-        tag: parts[0],
-        cipherSuite: parts[1],
-        keyParams: parts[2],
-        sessionParams: parts.slice(3).join(' ')
-    };
-    return parsed;
-};
-
-exports.fingerprint = function (line) {
-    var parts = line.substr(14).split(' ');
-    return {
-        hash: parts[0],
-        value: parts[1]
-    };
-};
-
-exports.extmap = function (line) {
-    var parts = line.substr(9).split(' ');
-    var parsed = {};
-
-    var idpart = parts.shift();
-    var sp = idpart.indexOf('/');
-    if (sp >= 0) {
-        parsed.id = idpart.substr(0, sp);
-        parsed.senders = idpart.substr(sp + 1);
-    } else {
-        parsed.id = idpart;
-        parsed.senders = 'sendrecv';
-    }
-
-    parsed.uri = parts.shift() || '';
-
-    return parsed;
-};
-
-exports.rtcpfb = function (line) {
-    var parts = line.substr(10).split(' ');
-    var parsed = {};
-    parsed.id = parts.shift();
-    parsed.type = parts.shift();
-    if (parsed.type === 'trr-int') {
-        parsed.value = parts.shift();
-    } else {
-        parsed.subtype = parts.shift() || '';
-    }
-    parsed.parameters = parts;
-    return parsed;
-};
-
-exports.candidate = function (line) {
-    var parts;
-    if (line.indexOf('a=candidate:') === 0) {
-        parts = line.substring(12).split(' ');
-    } else { // no a=candidate
-        parts = line.substring(10).split(' ');
-    }
-
-    var candidate = {
-        foundation: parts[0],
-        component: parts[1],
-        protocol: parts[2].toLowerCase(),
-        priority: parts[3],
-        ip: parts[4],
-        port: parts[5],
-        // skip parts[6] == 'typ'
-        type: parts[7],
-        generation: '0'
-    };
-
-    for (var i = 8; i < parts.length; i += 2) {
-        if (parts[i] === 'raddr') {
-            candidate.relAddr = parts[i + 1];
-        } else if (parts[i] === 'rport') {
-            candidate.relPort = parts[i + 1];
-        } else if (parts[i] === 'generation') {
-            candidate.generation = parts[i + 1];
-        } else if (parts[i] === 'tcptype') {
-            candidate.tcpType = parts[i + 1];
-        }
-    }
-
-    candidate.network = '1';
-
-    return candidate;
-};
-
-exports.sourceGroups = function (lines) {
-    var parsed = [];
-    for (var i = 0; i < lines.length; i++) {
-        var parts = lines[i].substr(13).split(' ');
-        parsed.push({
-            semantics: parts.shift(),
-            sources: parts
-        });
-    }
-    return parsed;
-};
-
-exports.sources = function (lines) {
-    // http://tools.ietf.org/html/rfc5576
-    var parsed = [];
-    var sources = {};
-    for (var i = 0; i < lines.length; i++) {
-        var parts = lines[i].substr(7).split(' ');
-        var ssrc = parts.shift();
-
-        if (!sources[ssrc]) {
-            var source = {
-                ssrc: ssrc,
-                parameters: []
-            };
-            parsed.push(source);
-
-            // Keep an index
-            sources[ssrc] = source;
-        }
-
-        parts = parts.join(' ').split(':');
-        var attribute = parts.shift();
-        var value = parts.join(':') || null;
-
-        sources[ssrc].parameters.push({
-            key: attribute,
-            value: value
-        });
-    }
-
-    return parsed;
-};
-
-exports.groups = function (lines) {
-    // http://tools.ietf.org/html/rfc5888
-    var parsed = [];
-    var parts;
-    for (var i = 0; i < lines.length; i++) {
-        parts = lines[i].substr(8).split(' ');
-        parsed.push({
-            semantics: parts.shift(),
-            contents: parts
-        });
-    }
-    return parsed;
-};
-
-exports.bandwidth = function (line) {
-    var parts = line.substr(2).split(':');
-    var parsed = {};
-    parsed.type = parts.shift();
-    parsed.bandwidth = parts.shift();
-    return parsed;
-};
-
-exports.msid = function (line) {
-    var data = line.substr(7);
-    var parts = data.split(' ');
-    return {
-        msid: data,
-        mslabel: parts[0],
-        label: parts[1]
-    };
-};
-
-},{}],54:[function(require,module,exports){
-module.exports = {
-    initiator: {
-        incoming: {
-            initiator: 'recvonly',
-            responder: 'sendonly',
-            both: 'sendrecv',
-            none: 'inactive',
-            recvonly: 'initiator',
-            sendonly: 'responder',
-            sendrecv: 'both',
-            inactive: 'none'
-        },
-        outgoing: {
-            initiator: 'sendonly',
-            responder: 'recvonly',
-            both: 'sendrecv',
-            none: 'inactive',
-            recvonly: 'responder',
-            sendonly: 'initiator',
-            sendrecv: 'both',
-            inactive: 'none'
-        }
-    },
-    responder: {
-        incoming: {
-            initiator: 'sendonly',
-            responder: 'recvonly',
-            both: 'sendrecv',
-            none: 'inactive',
-            recvonly: 'responder',
-            sendonly: 'initiator',
-            sendrecv: 'both',
-            inactive: 'none'
-        },
-        outgoing: {
-            initiator: 'recvonly',
-            responder: 'sendonly',
-            both: 'sendrecv',
-            none: 'inactive',
-            recvonly: 'initiator',
-            sendonly: 'responder',
-            sendrecv: 'both',
-            inactive: 'none'
-        }
-    }
-};
-
-},{}],38:[function(require,module,exports){
-/*
- *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
- *
- *  Use of this source code is governed by a BSD-style license
- *  that can be found in the LICENSE file in the root of the source
- *  tree.
- */
- /* eslint-env node */
-'use strict';
-
-var logging = require('../utils').log;
-var browserDetails = require('../utils').browserDetails;
-
-var firefoxShim = {
-  shimOnTrack: function() {
-    if (typeof window === 'object' && window.RTCPeerConnection && !('ontrack' in
-        window.RTCPeerConnection.prototype)) {
-      Object.defineProperty(window.RTCPeerConnection.prototype, 'ontrack', {
-        get: function() {
-          return this._ontrack;
-        },
-        set: function(f) {
-          if (this._ontrack) {
-            this.removeEventListener('track', this._ontrack);
-            this.removeEventListener('addstream', this._ontrackpoly);
-          }
-          this.addEventListener('track', this._ontrack = f);
-          this.addEventListener('addstream', this._ontrackpoly = function(e) {
-            e.stream.getTracks().forEach(function(track) {
-              var event = new Event('track');
-              event.track = track;
-              event.receiver = {track: track};
-              event.streams = [e.stream];
-              this.dispatchEvent(event);
-            }.bind(this));
-          }.bind(this));
-        }
-      });
-    }
-  },
-
-  shimSourceObject: function() {
-    // Firefox has supported mozSrcObject since FF22, unprefixed in 42.
-    if (typeof window === 'object') {
-      if (window.HTMLMediaElement &&
-        !('srcObject' in window.HTMLMediaElement.prototype)) {
-        // Shim the srcObject property, once, when HTMLMediaElement is found.
-        Object.defineProperty(window.HTMLMediaElement.prototype, 'srcObject', {
-          get: function() {
-            return this.mozSrcObject;
-          },
-          set: function(stream) {
-            this.mozSrcObject = stream;
-          }
-        });
-      }
-    }
-  },
-
-  shimPeerConnection: function() {
-    if (typeof window !== 'object' || !(window.RTCPeerConnection ||
-        window.mozRTCPeerConnection)) {
-      return; // probably media.peerconnection.enabled=false in about:config
-    }
-    // The RTCPeerConnection object.
-    if (!window.RTCPeerConnection) {
-      window.RTCPeerConnection = function(pcConfig, pcConstraints) {
-        if (browserDetails.version < 38) {
-          // .urls is not supported in FF < 38.
-          // create RTCIceServers with a single url.
-          if (pcConfig && pcConfig.iceServers) {
-            var newIceServers = [];
-            for (var i = 0; i < pcConfig.iceServers.length; i++) {
-              var server = pcConfig.iceServers[i];
-              if (server.hasOwnProperty('urls')) {
-                for (var j = 0; j < server.urls.length; j++) {
-                  var newServer = {
-                    url: server.urls[j]
-                  };
-                  if (server.urls[j].indexOf('turn') === 0) {
-                    newServer.username = server.username;
-                    newServer.credential = server.credential;
-                  }
-                  newIceServers.push(newServer);
-                }
-              } else {
-                newIceServers.push(pcConfig.iceServers[i]);
-              }
-            }
-            pcConfig.iceServers = newIceServers;
-          }
-        }
-        return new mozRTCPeerConnection(pcConfig, pcConstraints);
-      };
-      window.RTCPeerConnection.prototype = mozRTCPeerConnection.prototype;
-
-      // wrap static methods. Currently just generateCertificate.
-      if (mozRTCPeerConnection.generateCertificate) {
-        Object.defineProperty(window.RTCPeerConnection, 'generateCertificate', {
-          get: function() {
-            return mozRTCPeerConnection.generateCertificate;
-          }
-        });
-      }
-
-      window.RTCSessionDescription = mozRTCSessionDescription;
-      window.RTCIceCandidate = mozRTCIceCandidate;
-    }
-
-    // shim away need for obsolete RTCIceCandidate/RTCSessionDescription.
-    ['setLocalDescription', 'setRemoteDescription', 'addIceCandidate']
-        .forEach(function(method) {
-          var nativeMethod = RTCPeerConnection.prototype[method];
-          RTCPeerConnection.prototype[method] = function() {
-            arguments[0] = new ((method === 'addIceCandidate') ?
-                RTCIceCandidate : RTCSessionDescription)(arguments[0]);
-            return nativeMethod.apply(this, arguments);
-          };
-        });
-
-    // support for addIceCandidate(null)
-    var nativeAddIceCandidate =
-        RTCPeerConnection.prototype.addIceCandidate;
-    RTCPeerConnection.prototype.addIceCandidate = function() {
-      return arguments[0] === null ? Promise.resolve()
-          : nativeAddIceCandidate.apply(this, arguments);
-    };
-
-    // shim getStats with maplike support
-    var makeMapStats = function(stats) {
-      var map = new Map();
-      Object.keys(stats).forEach(function(key) {
-        map.set(key, stats[key]);
-        map[key] = stats[key];
-      });
-      return map;
-    };
-
-    var nativeGetStats = RTCPeerConnection.prototype.getStats;
-    RTCPeerConnection.prototype.getStats = function(selector, onSucc, onErr) {
-      return nativeGetStats.apply(this, [selector || null])
-        .then(function(stats) {
-          return makeMapStats(stats);
-        })
-        .then(onSucc, onErr);
-    };
-  },
-
-  shimGetUserMedia: function() {
-    // getUserMedia constraints shim.
-    var getUserMedia_ = function(constraints, onSuccess, onError) {
-      var constraintsToFF37_ = function(c) {
-        if (typeof c !== 'object' || c.require) {
-          return c;
-        }
-        var require = [];
-        Object.keys(c).forEach(function(key) {
-          if (key === 'require' || key === 'advanced' ||
-              key === 'mediaSource') {
-            return;
-          }
-          var r = c[key] = (typeof c[key] === 'object') ?
-              c[key] : {ideal: c[key]};
-          if (r.min !== undefined ||
-              r.max !== undefined || r.exact !== undefined) {
-            require.push(key);
-          }
-          if (r.exact !== undefined) {
-            if (typeof r.exact === 'number') {
-              r. min = r.max = r.exact;
-            } else {
-              c[key] = r.exact;
-            }
-            delete r.exact;
-          }
-          if (r.ideal !== undefined) {
-            c.advanced = c.advanced || [];
-            var oc = {};
-            if (typeof r.ideal === 'number') {
-              oc[key] = {min: r.ideal, max: r.ideal};
-            } else {
-              oc[key] = r.ideal;
-            }
-            c.advanced.push(oc);
-            delete r.ideal;
-            if (!Object.keys(r).length) {
-              delete c[key];
-            }
-          }
-        });
-        if (require.length) {
-          c.require = require;
-        }
-        return c;
-      };
-      constraints = JSON.parse(JSON.stringify(constraints));
-      if (browserDetails.version < 38) {
-        logging('spec: ' + JSON.stringify(constraints));
-        if (constraints.audio) {
-          constraints.audio = constraintsToFF37_(constraints.audio);
-        }
-        if (constraints.video) {
-          constraints.video = constraintsToFF37_(constraints.video);
-        }
-        logging('ff37: ' + JSON.stringify(constraints));
-      }
-      return navigator.mozGetUserMedia(constraints, onSuccess, onError);
-    };
-
-    navigator.getUserMedia = getUserMedia_;
-
-    // Returns the result of getUserMedia as a Promise.
-    var getUserMediaPromise_ = function(constraints) {
-      return new Promise(function(resolve, reject) {
-        navigator.getUserMedia(constraints, resolve, reject);
-      });
-    };
-
-    // Shim for mediaDevices on older versions.
-    if (!navigator.mediaDevices) {
-      navigator.mediaDevices = {getUserMedia: getUserMediaPromise_,
-        addEventListener: function() { },
-        removeEventListener: function() { }
-      };
-    }
-    navigator.mediaDevices.enumerateDevices =
-        navigator.mediaDevices.enumerateDevices || function() {
-          return new Promise(function(resolve) {
-            var infos = [
-              {kind: 'audioinput', deviceId: 'default', label: '', groupId: ''},
-              {kind: 'videoinput', deviceId: 'default', label: '', groupId: ''}
-            ];
-            resolve(infos);
-          });
-        };
-
-    if (browserDetails.version < 41) {
-      // Work around http://bugzil.la/1169665
-      var orgEnumerateDevices =
-          navigator.mediaDevices.enumerateDevices.bind(navigator.mediaDevices);
-      navigator.mediaDevices.enumerateDevices = function() {
-        return orgEnumerateDevices().then(undefined, function(e) {
-          if (e.name === 'NotFoundError') {
-            return [];
-          }
-          throw e;
-        });
-      };
-    }
-  },
-
-  // Attach a media stream to an element.
-  attachMediaStream: function(element, stream) {
-    logging('DEPRECATED, attachMediaStream will soon be removed.');
-    element.srcObject = stream;
-  },
-
-  reattachMediaStream: function(to, from) {
-    logging('DEPRECATED, reattachMediaStream will soon be removed.');
-    to.srcObject = from.srcObject;
-  }
-};
-
-// Expose public methods.
-module.exports = {
-  shimOnTrack: firefoxShim.shimOnTrack,
-  shimSourceObject: firefoxShim.shimSourceObject,
-  shimPeerConnection: firefoxShim.shimPeerConnection,
-  shimGetUserMedia: require('./getusermedia'),
-  attachMediaStream: firefoxShim.attachMediaStream,
-  reattachMediaStream: firefoxShim.reattachMediaStream
-};
-
-},{"../utils":35,"./getusermedia":56}],37:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
@@ -7449,7 +6856,600 @@ module.exports = {
   reattachMediaStream: chromeShim.reattachMediaStream
 };
 
-},{"../utils.js":35,"./getusermedia":57}],25:[function(require,module,exports){
+},{"../utils.js":36,"./getusermedia":56}],54:[function(require,module,exports){
+module.exports = {
+    initiator: {
+        incoming: {
+            initiator: 'recvonly',
+            responder: 'sendonly',
+            both: 'sendrecv',
+            none: 'inactive',
+            recvonly: 'initiator',
+            sendonly: 'responder',
+            sendrecv: 'both',
+            inactive: 'none'
+        },
+        outgoing: {
+            initiator: 'sendonly',
+            responder: 'recvonly',
+            both: 'sendrecv',
+            none: 'inactive',
+            recvonly: 'responder',
+            sendonly: 'initiator',
+            sendrecv: 'both',
+            inactive: 'none'
+        }
+    },
+    responder: {
+        incoming: {
+            initiator: 'sendonly',
+            responder: 'recvonly',
+            both: 'sendrecv',
+            none: 'inactive',
+            recvonly: 'responder',
+            sendonly: 'initiator',
+            sendrecv: 'both',
+            inactive: 'none'
+        },
+        outgoing: {
+            initiator: 'recvonly',
+            responder: 'sendonly',
+            both: 'sendrecv',
+            none: 'inactive',
+            recvonly: 'initiator',
+            sendonly: 'responder',
+            sendrecv: 'both',
+            inactive: 'none'
+        }
+    }
+};
+
+},{}],55:[function(require,module,exports){
+exports.lines = function (sdp) {
+    return sdp.split('\r\n').filter(function (line) {
+        return line.length > 0;
+    });
+};
+
+exports.findLine = function (prefix, mediaLines, sessionLines) {
+    var prefixLength = prefix.length;
+    for (var i = 0; i < mediaLines.length; i++) {
+        if (mediaLines[i].substr(0, prefixLength) === prefix) {
+            return mediaLines[i];
+        }
+    }
+    // Continue searching in parent session section
+    if (!sessionLines) {
+        return false;
+    }
+
+    for (var j = 0; j < sessionLines.length; j++) {
+        if (sessionLines[j].substr(0, prefixLength) === prefix) {
+            return sessionLines[j];
+        }
+    }
+
+    return false;
+};
+
+exports.findLines = function (prefix, mediaLines, sessionLines) {
+    var results = [];
+    var prefixLength = prefix.length;
+    for (var i = 0; i < mediaLines.length; i++) {
+        if (mediaLines[i].substr(0, prefixLength) === prefix) {
+            results.push(mediaLines[i]);
+        }
+    }
+    if (results.length || !sessionLines) {
+        return results;
+    }
+    for (var j = 0; j < sessionLines.length; j++) {
+        if (sessionLines[j].substr(0, prefixLength) === prefix) {
+            results.push(sessionLines[j]);
+        }
+    }
+    return results;
+};
+
+exports.mline = function (line) {
+    var parts = line.substr(2).split(' ');
+    var parsed = {
+        media: parts[0],
+        port: parts[1],
+        proto: parts[2],
+        formats: []
+    };
+    for (var i = 3; i < parts.length; i++) {
+        if (parts[i]) {
+            parsed.formats.push(parts[i]);
+        }
+    }
+    return parsed;
+};
+
+exports.rtpmap = function (line) {
+    var parts = line.substr(9).split(' ');
+    var parsed = {
+        id: parts.shift()
+    };
+
+    parts = parts[0].split('/');
+
+    parsed.name = parts[0];
+    parsed.clockrate = parts[1];
+    parsed.channels = parts.length == 3 ? parts[2] : '1';
+    return parsed;
+};
+
+exports.sctpmap = function (line) {
+    // based on -05 draft
+    var parts = line.substr(10).split(' ');
+    var parsed = {
+        number: parts.shift(),
+        protocol: parts.shift(),
+        streams: parts.shift()
+    };
+    return parsed;
+};
+
+
+exports.fmtp = function (line) {
+    var kv, key, value;
+    var parts = line.substr(line.indexOf(' ') + 1).split(';');
+    var parsed = [];
+    for (var i = 0; i < parts.length; i++) {
+        kv = parts[i].split('=');
+        key = kv[0].trim();
+        value = kv[1];
+        if (key && value) {
+            parsed.push({key: key, value: value});
+        } else if (key) {
+            parsed.push({key: '', value: key});
+        }
+    }
+    return parsed;
+};
+
+exports.crypto = function (line) {
+    var parts = line.substr(9).split(' ');
+    var parsed = {
+        tag: parts[0],
+        cipherSuite: parts[1],
+        keyParams: parts[2],
+        sessionParams: parts.slice(3).join(' ')
+    };
+    return parsed;
+};
+
+exports.fingerprint = function (line) {
+    var parts = line.substr(14).split(' ');
+    return {
+        hash: parts[0],
+        value: parts[1]
+    };
+};
+
+exports.extmap = function (line) {
+    var parts = line.substr(9).split(' ');
+    var parsed = {};
+
+    var idpart = parts.shift();
+    var sp = idpart.indexOf('/');
+    if (sp >= 0) {
+        parsed.id = idpart.substr(0, sp);
+        parsed.senders = idpart.substr(sp + 1);
+    } else {
+        parsed.id = idpart;
+        parsed.senders = 'sendrecv';
+    }
+
+    parsed.uri = parts.shift() || '';
+
+    return parsed;
+};
+
+exports.rtcpfb = function (line) {
+    var parts = line.substr(10).split(' ');
+    var parsed = {};
+    parsed.id = parts.shift();
+    parsed.type = parts.shift();
+    if (parsed.type === 'trr-int') {
+        parsed.value = parts.shift();
+    } else {
+        parsed.subtype = parts.shift() || '';
+    }
+    parsed.parameters = parts;
+    return parsed;
+};
+
+exports.candidate = function (line) {
+    var parts;
+    if (line.indexOf('a=candidate:') === 0) {
+        parts = line.substring(12).split(' ');
+    } else { // no a=candidate
+        parts = line.substring(10).split(' ');
+    }
+
+    var candidate = {
+        foundation: parts[0],
+        component: parts[1],
+        protocol: parts[2].toLowerCase(),
+        priority: parts[3],
+        ip: parts[4],
+        port: parts[5],
+        // skip parts[6] == 'typ'
+        type: parts[7],
+        generation: '0'
+    };
+
+    for (var i = 8; i < parts.length; i += 2) {
+        if (parts[i] === 'raddr') {
+            candidate.relAddr = parts[i + 1];
+        } else if (parts[i] === 'rport') {
+            candidate.relPort = parts[i + 1];
+        } else if (parts[i] === 'generation') {
+            candidate.generation = parts[i + 1];
+        } else if (parts[i] === 'tcptype') {
+            candidate.tcpType = parts[i + 1];
+        }
+    }
+
+    candidate.network = '1';
+
+    return candidate;
+};
+
+exports.sourceGroups = function (lines) {
+    var parsed = [];
+    for (var i = 0; i < lines.length; i++) {
+        var parts = lines[i].substr(13).split(' ');
+        parsed.push({
+            semantics: parts.shift(),
+            sources: parts
+        });
+    }
+    return parsed;
+};
+
+exports.sources = function (lines) {
+    // http://tools.ietf.org/html/rfc5576
+    var parsed = [];
+    var sources = {};
+    for (var i = 0; i < lines.length; i++) {
+        var parts = lines[i].substr(7).split(' ');
+        var ssrc = parts.shift();
+
+        if (!sources[ssrc]) {
+            var source = {
+                ssrc: ssrc,
+                parameters: []
+            };
+            parsed.push(source);
+
+            // Keep an index
+            sources[ssrc] = source;
+        }
+
+        parts = parts.join(' ').split(':');
+        var attribute = parts.shift();
+        var value = parts.join(':') || null;
+
+        sources[ssrc].parameters.push({
+            key: attribute,
+            value: value
+        });
+    }
+
+    return parsed;
+};
+
+exports.groups = function (lines) {
+    // http://tools.ietf.org/html/rfc5888
+    var parsed = [];
+    var parts;
+    for (var i = 0; i < lines.length; i++) {
+        parts = lines[i].substr(8).split(' ');
+        parsed.push({
+            semantics: parts.shift(),
+            contents: parts
+        });
+    }
+    return parsed;
+};
+
+exports.bandwidth = function (line) {
+    var parts = line.substr(2).split(':');
+    var parsed = {};
+    parsed.type = parts.shift();
+    parsed.bandwidth = parts.shift();
+    return parsed;
+};
+
+exports.msid = function (line) {
+    var data = line.substr(7);
+    var parts = data.split(' ');
+    return {
+        msid: data,
+        mslabel: parts[0],
+        label: parts[1]
+    };
+};
+
+},{}],38:[function(require,module,exports){
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+'use strict';
+
+var logging = require('../utils').log;
+var browserDetails = require('../utils').browserDetails;
+
+var firefoxShim = {
+  shimOnTrack: function() {
+    if (typeof window === 'object' && window.RTCPeerConnection && !('ontrack' in
+        window.RTCPeerConnection.prototype)) {
+      Object.defineProperty(window.RTCPeerConnection.prototype, 'ontrack', {
+        get: function() {
+          return this._ontrack;
+        },
+        set: function(f) {
+          if (this._ontrack) {
+            this.removeEventListener('track', this._ontrack);
+            this.removeEventListener('addstream', this._ontrackpoly);
+          }
+          this.addEventListener('track', this._ontrack = f);
+          this.addEventListener('addstream', this._ontrackpoly = function(e) {
+            e.stream.getTracks().forEach(function(track) {
+              var event = new Event('track');
+              event.track = track;
+              event.receiver = {track: track};
+              event.streams = [e.stream];
+              this.dispatchEvent(event);
+            }.bind(this));
+          }.bind(this));
+        }
+      });
+    }
+  },
+
+  shimSourceObject: function() {
+    // Firefox has supported mozSrcObject since FF22, unprefixed in 42.
+    if (typeof window === 'object') {
+      if (window.HTMLMediaElement &&
+        !('srcObject' in window.HTMLMediaElement.prototype)) {
+        // Shim the srcObject property, once, when HTMLMediaElement is found.
+        Object.defineProperty(window.HTMLMediaElement.prototype, 'srcObject', {
+          get: function() {
+            return this.mozSrcObject;
+          },
+          set: function(stream) {
+            this.mozSrcObject = stream;
+          }
+        });
+      }
+    }
+  },
+
+  shimPeerConnection: function() {
+    if (typeof window !== 'object' || !(window.RTCPeerConnection ||
+        window.mozRTCPeerConnection)) {
+      return; // probably media.peerconnection.enabled=false in about:config
+    }
+    // The RTCPeerConnection object.
+    if (!window.RTCPeerConnection) {
+      window.RTCPeerConnection = function(pcConfig, pcConstraints) {
+        if (browserDetails.version < 38) {
+          // .urls is not supported in FF < 38.
+          // create RTCIceServers with a single url.
+          if (pcConfig && pcConfig.iceServers) {
+            var newIceServers = [];
+            for (var i = 0; i < pcConfig.iceServers.length; i++) {
+              var server = pcConfig.iceServers[i];
+              if (server.hasOwnProperty('urls')) {
+                for (var j = 0; j < server.urls.length; j++) {
+                  var newServer = {
+                    url: server.urls[j]
+                  };
+                  if (server.urls[j].indexOf('turn') === 0) {
+                    newServer.username = server.username;
+                    newServer.credential = server.credential;
+                  }
+                  newIceServers.push(newServer);
+                }
+              } else {
+                newIceServers.push(pcConfig.iceServers[i]);
+              }
+            }
+            pcConfig.iceServers = newIceServers;
+          }
+        }
+        return new mozRTCPeerConnection(pcConfig, pcConstraints);
+      };
+      window.RTCPeerConnection.prototype = mozRTCPeerConnection.prototype;
+
+      // wrap static methods. Currently just generateCertificate.
+      if (mozRTCPeerConnection.generateCertificate) {
+        Object.defineProperty(window.RTCPeerConnection, 'generateCertificate', {
+          get: function() {
+            return mozRTCPeerConnection.generateCertificate;
+          }
+        });
+      }
+
+      window.RTCSessionDescription = mozRTCSessionDescription;
+      window.RTCIceCandidate = mozRTCIceCandidate;
+    }
+
+    // shim away need for obsolete RTCIceCandidate/RTCSessionDescription.
+    ['setLocalDescription', 'setRemoteDescription', 'addIceCandidate']
+        .forEach(function(method) {
+          var nativeMethod = RTCPeerConnection.prototype[method];
+          RTCPeerConnection.prototype[method] = function() {
+            arguments[0] = new ((method === 'addIceCandidate') ?
+                RTCIceCandidate : RTCSessionDescription)(arguments[0]);
+            return nativeMethod.apply(this, arguments);
+          };
+        });
+
+    // support for addIceCandidate(null)
+    var nativeAddIceCandidate =
+        RTCPeerConnection.prototype.addIceCandidate;
+    RTCPeerConnection.prototype.addIceCandidate = function() {
+      return arguments[0] === null ? Promise.resolve()
+          : nativeAddIceCandidate.apply(this, arguments);
+    };
+
+    // shim getStats with maplike support
+    var makeMapStats = function(stats) {
+      var map = new Map();
+      Object.keys(stats).forEach(function(key) {
+        map.set(key, stats[key]);
+        map[key] = stats[key];
+      });
+      return map;
+    };
+
+    var nativeGetStats = RTCPeerConnection.prototype.getStats;
+    RTCPeerConnection.prototype.getStats = function(selector, onSucc, onErr) {
+      return nativeGetStats.apply(this, [selector || null])
+        .then(function(stats) {
+          return makeMapStats(stats);
+        })
+        .then(onSucc, onErr);
+    };
+  },
+
+  shimGetUserMedia: function() {
+    // getUserMedia constraints shim.
+    var getUserMedia_ = function(constraints, onSuccess, onError) {
+      var constraintsToFF37_ = function(c) {
+        if (typeof c !== 'object' || c.require) {
+          return c;
+        }
+        var require = [];
+        Object.keys(c).forEach(function(key) {
+          if (key === 'require' || key === 'advanced' ||
+              key === 'mediaSource') {
+            return;
+          }
+          var r = c[key] = (typeof c[key] === 'object') ?
+              c[key] : {ideal: c[key]};
+          if (r.min !== undefined ||
+              r.max !== undefined || r.exact !== undefined) {
+            require.push(key);
+          }
+          if (r.exact !== undefined) {
+            if (typeof r.exact === 'number') {
+              r. min = r.max = r.exact;
+            } else {
+              c[key] = r.exact;
+            }
+            delete r.exact;
+          }
+          if (r.ideal !== undefined) {
+            c.advanced = c.advanced || [];
+            var oc = {};
+            if (typeof r.ideal === 'number') {
+              oc[key] = {min: r.ideal, max: r.ideal};
+            } else {
+              oc[key] = r.ideal;
+            }
+            c.advanced.push(oc);
+            delete r.ideal;
+            if (!Object.keys(r).length) {
+              delete c[key];
+            }
+          }
+        });
+        if (require.length) {
+          c.require = require;
+        }
+        return c;
+      };
+      constraints = JSON.parse(JSON.stringify(constraints));
+      if (browserDetails.version < 38) {
+        logging('spec: ' + JSON.stringify(constraints));
+        if (constraints.audio) {
+          constraints.audio = constraintsToFF37_(constraints.audio);
+        }
+        if (constraints.video) {
+          constraints.video = constraintsToFF37_(constraints.video);
+        }
+        logging('ff37: ' + JSON.stringify(constraints));
+      }
+      return navigator.mozGetUserMedia(constraints, onSuccess, onError);
+    };
+
+    navigator.getUserMedia = getUserMedia_;
+
+    // Returns the result of getUserMedia as a Promise.
+    var getUserMediaPromise_ = function(constraints) {
+      return new Promise(function(resolve, reject) {
+        navigator.getUserMedia(constraints, resolve, reject);
+      });
+    };
+
+    // Shim for mediaDevices on older versions.
+    if (!navigator.mediaDevices) {
+      navigator.mediaDevices = {getUserMedia: getUserMediaPromise_,
+        addEventListener: function() { },
+        removeEventListener: function() { }
+      };
+    }
+    navigator.mediaDevices.enumerateDevices =
+        navigator.mediaDevices.enumerateDevices || function() {
+          return new Promise(function(resolve) {
+            var infos = [
+              {kind: 'audioinput', deviceId: 'default', label: '', groupId: ''},
+              {kind: 'videoinput', deviceId: 'default', label: '', groupId: ''}
+            ];
+            resolve(infos);
+          });
+        };
+
+    if (browserDetails.version < 41) {
+      // Work around http://bugzil.la/1169665
+      var orgEnumerateDevices =
+          navigator.mediaDevices.enumerateDevices.bind(navigator.mediaDevices);
+      navigator.mediaDevices.enumerateDevices = function() {
+        return orgEnumerateDevices().then(undefined, function(e) {
+          if (e.name === 'NotFoundError') {
+            return [];
+          }
+          throw e;
+        });
+      };
+    }
+  },
+
+  // Attach a media stream to an element.
+  attachMediaStream: function(element, stream) {
+    logging('DEPRECATED, attachMediaStream will soon be removed.');
+    element.srcObject = stream;
+  },
+
+  reattachMediaStream: function(to, from) {
+    logging('DEPRECATED, reattachMediaStream will soon be removed.');
+    to.srcObject = from.srcObject;
+  }
+};
+
+// Expose public methods.
+module.exports = {
+  shimOnTrack: firefoxShim.shimOnTrack,
+  shimSourceObject: firefoxShim.shimSourceObject,
+  shimPeerConnection: firefoxShim.shimPeerConnection,
+  shimGetUserMedia: require('./getusermedia'),
+  attachMediaStream: firefoxShim.attachMediaStream,
+  reattachMediaStream: firefoxShim.reattachMediaStream
+};
+
+},{"../utils":36,"./getusermedia":57}],26:[function(require,module,exports){
 // based on https://github.com/ESTOS/strophe.jingle/
 // adds wildemitter support
 var util = require('util');
@@ -7670,41 +7670,7 @@ TraceablePeerConnection.prototype.getStats = function () {
 
 module.exports = TraceablePeerConnection;
 
-},{"util":7,"webrtc-adapter":26,"wildemitter":4}],58:[function(require,module,exports){
-/*
- *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
- *
- *  Use of this source code is governed by a BSD-style license
- *  that can be found in the LICENSE file in the root of the source
- *  tree.
- */
- /* eslint-env node */
-'use strict';
-
-// Expose public methods.
-module.exports = function() {
-  var shimError_ = function(e) {
-    return {
-      name: {PermissionDeniedError: 'NotAllowedError'}[e.name] || e.name,
-      message: e.message,
-      constraint: e.constraint,
-      toString: function() {
-        return this.name;
-      }
-    };
-  };
-
-  // getUserMedia error shim.
-  var origGetUserMedia = navigator.mediaDevices.getUserMedia.
-      bind(navigator.mediaDevices);
-  navigator.mediaDevices.getUserMedia = function(c) {
-    return origGetUserMedia(c).catch(function(e) {
-      return Promise.reject(shimError_(e));
-    });
-  };
-};
-
-},{}],18:[function(require,module,exports){
+},{"util":7,"webrtc-adapter":24,"wildemitter":6}],16:[function(require,module,exports){
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
  *
@@ -8708,7 +8674,534 @@ module.exports = {
   reattachMediaStream: edgeShim.reattachMediaStream
 };
 
-},{"../utils":15,"./getusermedia":40,"sdp":59}],50:[function(require,module,exports){
+},{"../utils":19,"./getusermedia":33,"sdp":58}],59:[function(require,module,exports){
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+'use strict';
+
+// Expose public methods.
+module.exports = function() {
+  var shimError_ = function(e) {
+    return {
+      name: {PermissionDeniedError: 'NotAllowedError'}[e.name] || e.name,
+      message: e.message,
+      constraint: e.constraint,
+      toString: function() {
+        return this.name;
+      }
+    };
+  };
+
+  // getUserMedia error shim.
+  var origGetUserMedia = navigator.mediaDevices.getUserMedia.
+      bind(navigator.mediaDevices);
+  navigator.mediaDevices.getUserMedia = function(c) {
+    return origGetUserMedia(c).catch(function(e) {
+      return Promise.reject(shimError_(e));
+    });
+  };
+};
+
+},{}],58:[function(require,module,exports){
+ /* eslint-env node */
+'use strict';
+
+// SDP helpers.
+var SDPUtils = {};
+
+// Generate an alphanumeric identifier for cname or mids.
+// TODO: use UUIDs instead? https://gist.github.com/jed/982883
+SDPUtils.generateIdentifier = function() {
+  return Math.random().toString(36).substr(2, 10);
+};
+
+// The RTCP CNAME used by all peerconnections from the same JS.
+SDPUtils.localCName = SDPUtils.generateIdentifier();
+
+// Splits SDP into lines, dealing with both CRLF and LF.
+SDPUtils.splitLines = function(blob) {
+  return blob.trim().split('\n').map(function(line) {
+    return line.trim();
+  });
+};
+// Splits SDP into sessionpart and mediasections. Ensures CRLF.
+SDPUtils.splitSections = function(blob) {
+  var parts = blob.split('\nm=');
+  return parts.map(function(part, index) {
+    return (index > 0 ? 'm=' + part : part).trim() + '\r\n';
+  });
+};
+
+// Returns lines that start with a certain prefix.
+SDPUtils.matchPrefix = function(blob, prefix) {
+  return SDPUtils.splitLines(blob).filter(function(line) {
+    return line.indexOf(prefix) === 0;
+  });
+};
+
+// Parses an ICE candidate line. Sample input:
+// candidate:702786350 2 udp 41819902 8.8.8.8 60769 typ relay raddr 8.8.8.8
+// rport 55996"
+SDPUtils.parseCandidate = function(line) {
+  var parts;
+  // Parse both variants.
+  if (line.indexOf('a=candidate:') === 0) {
+    parts = line.substring(12).split(' ');
+  } else {
+    parts = line.substring(10).split(' ');
+  }
+
+  var candidate = {
+    foundation: parts[0],
+    component: parts[1],
+    protocol: parts[2].toLowerCase(),
+    priority: parseInt(parts[3], 10),
+    ip: parts[4],
+    port: parseInt(parts[5], 10),
+    // skip parts[6] == 'typ'
+    type: parts[7]
+  };
+
+  for (var i = 8; i < parts.length; i += 2) {
+    switch (parts[i]) {
+      case 'raddr':
+        candidate.relatedAddress = parts[i + 1];
+        break;
+      case 'rport':
+        candidate.relatedPort = parseInt(parts[i + 1], 10);
+        break;
+      case 'tcptype':
+        candidate.tcpType = parts[i + 1];
+        break;
+      default: // Unknown extensions are silently ignored.
+        break;
+    }
+  }
+  return candidate;
+};
+
+// Translates a candidate object into SDP candidate attribute.
+SDPUtils.writeCandidate = function(candidate) {
+  var sdp = [];
+  sdp.push(candidate.foundation);
+  sdp.push(candidate.component);
+  sdp.push(candidate.protocol.toUpperCase());
+  sdp.push(candidate.priority);
+  sdp.push(candidate.ip);
+  sdp.push(candidate.port);
+
+  var type = candidate.type;
+  sdp.push('typ');
+  sdp.push(type);
+  if (type !== 'host' && candidate.relatedAddress &&
+      candidate.relatedPort) {
+    sdp.push('raddr');
+    sdp.push(candidate.relatedAddress); // was: relAddr
+    sdp.push('rport');
+    sdp.push(candidate.relatedPort); // was: relPort
+  }
+  if (candidate.tcpType && candidate.protocol.toLowerCase() === 'tcp') {
+    sdp.push('tcptype');
+    sdp.push(candidate.tcpType);
+  }
+  return 'candidate:' + sdp.join(' ');
+};
+
+// Parses an rtpmap line, returns RTCRtpCoddecParameters. Sample input:
+// a=rtpmap:111 opus/48000/2
+SDPUtils.parseRtpMap = function(line) {
+  var parts = line.substr(9).split(' ');
+  var parsed = {
+    payloadType: parseInt(parts.shift(), 10) // was: id
+  };
+
+  parts = parts[0].split('/');
+
+  parsed.name = parts[0];
+  parsed.clockRate = parseInt(parts[1], 10); // was: clockrate
+  // was: channels
+  parsed.numChannels = parts.length === 3 ? parseInt(parts[2], 10) : 1;
+  return parsed;
+};
+
+// Generate an a=rtpmap line from RTCRtpCodecCapability or
+// RTCRtpCodecParameters.
+SDPUtils.writeRtpMap = function(codec) {
+  var pt = codec.payloadType;
+  if (codec.preferredPayloadType !== undefined) {
+    pt = codec.preferredPayloadType;
+  }
+  return 'a=rtpmap:' + pt + ' ' + codec.name + '/' + codec.clockRate +
+      (codec.numChannels !== 1 ? '/' + codec.numChannels : '') + '\r\n';
+};
+
+// Parses an a=extmap line (headerextension from RFC 5285). Sample input:
+// a=extmap:2 urn:ietf:params:rtp-hdrext:toffset
+SDPUtils.parseExtmap = function(line) {
+  var parts = line.substr(9).split(' ');
+  return {
+    id: parseInt(parts[0], 10),
+    uri: parts[1]
+  };
+};
+
+// Generates a=extmap line from RTCRtpHeaderExtensionParameters or
+// RTCRtpHeaderExtension.
+SDPUtils.writeExtmap = function(headerExtension) {
+  return 'a=extmap:' + (headerExtension.id || headerExtension.preferredId) +
+       ' ' + headerExtension.uri + '\r\n';
+};
+
+// Parses an ftmp line, returns dictionary. Sample input:
+// a=fmtp:96 vbr=on;cng=on
+// Also deals with vbr=on; cng=on
+SDPUtils.parseFmtp = function(line) {
+  var parsed = {};
+  var kv;
+  var parts = line.substr(line.indexOf(' ') + 1).split(';');
+  for (var j = 0; j < parts.length; j++) {
+    kv = parts[j].trim().split('=');
+    parsed[kv[0].trim()] = kv[1];
+  }
+  return parsed;
+};
+
+// Generates an a=ftmp line from RTCRtpCodecCapability or RTCRtpCodecParameters.
+SDPUtils.writeFmtp = function(codec) {
+  var line = '';
+  var pt = codec.payloadType;
+  if (codec.preferredPayloadType !== undefined) {
+    pt = codec.preferredPayloadType;
+  }
+  if (codec.parameters && Object.keys(codec.parameters).length) {
+    var params = [];
+    Object.keys(codec.parameters).forEach(function(param) {
+      params.push(param + '=' + codec.parameters[param]);
+    });
+    line += 'a=fmtp:' + pt + ' ' + params.join(';') + '\r\n';
+  }
+  return line;
+};
+
+// Parses an rtcp-fb line, returns RTCPRtcpFeedback object. Sample input:
+// a=rtcp-fb:98 nack rpsi
+SDPUtils.parseRtcpFb = function(line) {
+  var parts = line.substr(line.indexOf(' ') + 1).split(' ');
+  return {
+    type: parts.shift(),
+    parameter: parts.join(' ')
+  };
+};
+// Generate a=rtcp-fb lines from RTCRtpCodecCapability or RTCRtpCodecParameters.
+SDPUtils.writeRtcpFb = function(codec) {
+  var lines = '';
+  var pt = codec.payloadType;
+  if (codec.preferredPayloadType !== undefined) {
+    pt = codec.preferredPayloadType;
+  }
+  if (codec.rtcpFeedback && codec.rtcpFeedback.length) {
+    // FIXME: special handling for trr-int?
+    codec.rtcpFeedback.forEach(function(fb) {
+      lines += 'a=rtcp-fb:' + pt + ' ' + fb.type +
+      (fb.parameter && fb.parameter.length ? ' ' + fb.parameter : '') +
+          '\r\n';
+    });
+  }
+  return lines;
+};
+
+// Parses an RFC 5576 ssrc media attribute. Sample input:
+// a=ssrc:3735928559 cname:something
+SDPUtils.parseSsrcMedia = function(line) {
+  var sp = line.indexOf(' ');
+  var parts = {
+    ssrc: parseInt(line.substr(7, sp - 7), 10)
+  };
+  var colon = line.indexOf(':', sp);
+  if (colon > -1) {
+    parts.attribute = line.substr(sp + 1, colon - sp - 1);
+    parts.value = line.substr(colon + 1);
+  } else {
+    parts.attribute = line.substr(sp + 1);
+  }
+  return parts;
+};
+
+// Extracts DTLS parameters from SDP media section or sessionpart.
+// FIXME: for consistency with other functions this should only
+//   get the fingerprint line as input. See also getIceParameters.
+SDPUtils.getDtlsParameters = function(mediaSection, sessionpart) {
+  var lines = SDPUtils.splitLines(mediaSection);
+  // Search in session part, too.
+  lines = lines.concat(SDPUtils.splitLines(sessionpart));
+  var fpLine = lines.filter(function(line) {
+    return line.indexOf('a=fingerprint:') === 0;
+  })[0].substr(14);
+  // Note: a=setup line is ignored since we use the 'auto' role.
+  var dtlsParameters = {
+    role: 'auto',
+    fingerprints: [{
+      algorithm: fpLine.split(' ')[0],
+      value: fpLine.split(' ')[1]
+    }]
+  };
+  return dtlsParameters;
+};
+
+// Serializes DTLS parameters to SDP.
+SDPUtils.writeDtlsParameters = function(params, setupType) {
+  var sdp = 'a=setup:' + setupType + '\r\n';
+  params.fingerprints.forEach(function(fp) {
+    sdp += 'a=fingerprint:' + fp.algorithm + ' ' + fp.value + '\r\n';
+  });
+  return sdp;
+};
+// Parses ICE information from SDP media section or sessionpart.
+// FIXME: for consistency with other functions this should only
+//   get the ice-ufrag and ice-pwd lines as input.
+SDPUtils.getIceParameters = function(mediaSection, sessionpart) {
+  var lines = SDPUtils.splitLines(mediaSection);
+  // Search in session part, too.
+  lines = lines.concat(SDPUtils.splitLines(sessionpart));
+  var iceParameters = {
+    usernameFragment: lines.filter(function(line) {
+      return line.indexOf('a=ice-ufrag:') === 0;
+    })[0].substr(12),
+    password: lines.filter(function(line) {
+      return line.indexOf('a=ice-pwd:') === 0;
+    })[0].substr(10)
+  };
+  return iceParameters;
+};
+
+// Serializes ICE parameters to SDP.
+SDPUtils.writeIceParameters = function(params) {
+  return 'a=ice-ufrag:' + params.usernameFragment + '\r\n' +
+      'a=ice-pwd:' + params.password + '\r\n';
+};
+
+// Parses the SDP media section and returns RTCRtpParameters.
+SDPUtils.parseRtpParameters = function(mediaSection) {
+  var description = {
+    codecs: [],
+    headerExtensions: [],
+    fecMechanisms: [],
+    rtcp: []
+  };
+  var lines = SDPUtils.splitLines(mediaSection);
+  var mline = lines[0].split(' ');
+  for (var i = 3; i < mline.length; i++) { // find all codecs from mline[3..]
+    var pt = mline[i];
+    var rtpmapline = SDPUtils.matchPrefix(
+        mediaSection, 'a=rtpmap:' + pt + ' ')[0];
+    if (rtpmapline) {
+      var codec = SDPUtils.parseRtpMap(rtpmapline);
+      var fmtps = SDPUtils.matchPrefix(
+          mediaSection, 'a=fmtp:' + pt + ' ');
+      // Only the first a=fmtp:<pt> is considered.
+      codec.parameters = fmtps.length ? SDPUtils.parseFmtp(fmtps[0]) : {};
+      codec.rtcpFeedback = SDPUtils.matchPrefix(
+          mediaSection, 'a=rtcp-fb:' + pt + ' ')
+        .map(SDPUtils.parseRtcpFb);
+      description.codecs.push(codec);
+      // parse FEC mechanisms from rtpmap lines.
+      switch (codec.name.toUpperCase()) {
+        case 'RED':
+        case 'ULPFEC':
+          description.fecMechanisms.push(codec.name.toUpperCase());
+          break;
+        default: // only RED and ULPFEC are recognized as FEC mechanisms.
+          break;
+      }
+    }
+  }
+  SDPUtils.matchPrefix(mediaSection, 'a=extmap:').forEach(function(line) {
+    description.headerExtensions.push(SDPUtils.parseExtmap(line));
+  });
+  // FIXME: parse rtcp.
+  return description;
+};
+
+// Generates parts of the SDP media section describing the capabilities /
+// parameters.
+SDPUtils.writeRtpDescription = function(kind, caps) {
+  var sdp = '';
+
+  // Build the mline.
+  sdp += 'm=' + kind + ' ';
+  sdp += caps.codecs.length > 0 ? '9' : '0'; // reject if no codecs.
+  sdp += ' UDP/TLS/RTP/SAVPF ';
+  sdp += caps.codecs.map(function(codec) {
+    if (codec.preferredPayloadType !== undefined) {
+      return codec.preferredPayloadType;
+    }
+    return codec.payloadType;
+  }).join(' ') + '\r\n';
+
+  sdp += 'c=IN IP4 0.0.0.0\r\n';
+  sdp += 'a=rtcp:9 IN IP4 0.0.0.0\r\n';
+
+  // Add a=rtpmap lines for each codec. Also fmtp and rtcp-fb.
+  caps.codecs.forEach(function(codec) {
+    sdp += SDPUtils.writeRtpMap(codec);
+    sdp += SDPUtils.writeFmtp(codec);
+    sdp += SDPUtils.writeRtcpFb(codec);
+  });
+  // FIXME: add headerExtensions, fecMechanismş and rtcp.
+  sdp += 'a=rtcp-mux\r\n';
+  return sdp;
+};
+
+// Parses the SDP media section and returns an array of
+// RTCRtpEncodingParameters.
+SDPUtils.parseRtpEncodingParameters = function(mediaSection) {
+  var encodingParameters = [];
+  var description = SDPUtils.parseRtpParameters(mediaSection);
+  var hasRed = description.fecMechanisms.indexOf('RED') !== -1;
+  var hasUlpfec = description.fecMechanisms.indexOf('ULPFEC') !== -1;
+
+  // filter a=ssrc:... cname:, ignore PlanB-msid
+  var ssrcs = SDPUtils.matchPrefix(mediaSection, 'a=ssrc:')
+  .map(function(line) {
+    return SDPUtils.parseSsrcMedia(line);
+  })
+  .filter(function(parts) {
+    return parts.attribute === 'cname';
+  });
+  var primarySsrc = ssrcs.length > 0 && ssrcs[0].ssrc;
+  var secondarySsrc;
+
+  var flows = SDPUtils.matchPrefix(mediaSection, 'a=ssrc-group:FID')
+  .map(function(line) {
+    var parts = line.split(' ');
+    parts.shift();
+    return parts.map(function(part) {
+      return parseInt(part, 10);
+    });
+  });
+  if (flows.length > 0 && flows[0].length > 1 && flows[0][0] === primarySsrc) {
+    secondarySsrc = flows[0][1];
+  }
+
+  description.codecs.forEach(function(codec) {
+    if (codec.name.toUpperCase() === 'RTX' && codec.parameters.apt) {
+      var encParam = {
+        ssrc: primarySsrc,
+        codecPayloadType: parseInt(codec.parameters.apt, 10),
+        rtx: {
+          payloadType: codec.payloadType,
+          ssrc: secondarySsrc
+        }
+      };
+      encodingParameters.push(encParam);
+      if (hasRed) {
+        encParam = JSON.parse(JSON.stringify(encParam));
+        encParam.fec = {
+          ssrc: secondarySsrc,
+          mechanism: hasUlpfec ? 'red+ulpfec' : 'red'
+        };
+        encodingParameters.push(encParam);
+      }
+    }
+  });
+  if (encodingParameters.length === 0 && primarySsrc) {
+    encodingParameters.push({
+      ssrc: primarySsrc
+    });
+  }
+
+  // we support both b=AS and b=TIAS but interpret AS as TIAS.
+  var bandwidth = SDPUtils.matchPrefix(mediaSection, 'b=');
+  if (bandwidth.length) {
+    if (bandwidth[0].indexOf('b=TIAS:') === 0) {
+      bandwidth = parseInt(bandwidth[0].substr(7), 10);
+    } else if (bandwidth[0].indexOf('b=AS:') === 0) {
+      bandwidth = parseInt(bandwidth[0].substr(5), 10);
+    }
+    encodingParameters.forEach(function(params) {
+      params.maxBitrate = bandwidth;
+    });
+  }
+  return encodingParameters;
+};
+
+SDPUtils.writeSessionBoilerplate = function() {
+  // FIXME: sess-id should be an NTP timestamp.
+  return 'v=0\r\n' +
+      'o=thisisadapterortc 8169639915646943137 2 IN IP4 127.0.0.1\r\n' +
+      's=-\r\n' +
+      't=0 0\r\n';
+};
+
+SDPUtils.writeMediaSection = function(transceiver, caps, type, stream) {
+  var sdp = SDPUtils.writeRtpDescription(transceiver.kind, caps);
+
+  // Map ICE parameters (ufrag, pwd) to SDP.
+  sdp += SDPUtils.writeIceParameters(
+      transceiver.iceGatherer.getLocalParameters());
+
+  // Map DTLS parameters to SDP.
+  sdp += SDPUtils.writeDtlsParameters(
+      transceiver.dtlsTransport.getLocalParameters(),
+      type === 'offer' ? 'actpass' : 'active');
+
+  sdp += 'a=mid:' + transceiver.mid + '\r\n';
+
+  if (transceiver.rtpSender && transceiver.rtpReceiver) {
+    sdp += 'a=sendrecv\r\n';
+  } else if (transceiver.rtpSender) {
+    sdp += 'a=sendonly\r\n';
+  } else if (transceiver.rtpReceiver) {
+    sdp += 'a=recvonly\r\n';
+  } else {
+    sdp += 'a=inactive\r\n';
+  }
+
+  // FIXME: for RTX there might be multiple SSRCs. Not implemented in Edge yet.
+  if (transceiver.rtpSender) {
+    var msid = 'msid:' + stream.id + ' ' +
+        transceiver.rtpSender.track.id + '\r\n';
+    sdp += 'a=' + msid;
+    sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].ssrc +
+        ' ' + msid;
+  }
+  // FIXME: this should be written by writeRtpDescription.
+  sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].ssrc +
+      ' cname:' + SDPUtils.localCName + '\r\n';
+  return sdp;
+};
+
+// Gets the direction from the mediaSection or the sessionpart.
+SDPUtils.getDirection = function(mediaSection, sessionpart) {
+  // Look for sendrecv, sendonly, recvonly, inactive, default to sendrecv.
+  var lines = SDPUtils.splitLines(mediaSection);
+  for (var i = 0; i < lines.length; i++) {
+    switch (lines[i]) {
+      case 'a=sendrecv':
+      case 'a=sendonly':
+      case 'a=recvonly':
+      case 'a=inactive':
+        return lines[i].substr(2);
+      default:
+        // FIXME: What should happen here?
+    }
+  }
+  if (sessionpart) {
+    return SDPUtils.getDirection(sessionpart);
+  }
+  return 'sendrecv';
+};
+
+// Expose public methods.
+module.exports = SDPUtils;
+
+},{}],50:[function(require,module,exports){
 
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
@@ -9450,534 +9943,7 @@ function isObject(value) {
 
 module.exports = baseEach;
 
-},{"lodash.keys":62}],59:[function(require,module,exports){
- /* eslint-env node */
-'use strict';
-
-// SDP helpers.
-var SDPUtils = {};
-
-// Generate an alphanumeric identifier for cname or mids.
-// TODO: use UUIDs instead? https://gist.github.com/jed/982883
-SDPUtils.generateIdentifier = function() {
-  return Math.random().toString(36).substr(2, 10);
-};
-
-// The RTCP CNAME used by all peerconnections from the same JS.
-SDPUtils.localCName = SDPUtils.generateIdentifier();
-
-// Splits SDP into lines, dealing with both CRLF and LF.
-SDPUtils.splitLines = function(blob) {
-  return blob.trim().split('\n').map(function(line) {
-    return line.trim();
-  });
-};
-// Splits SDP into sessionpart and mediasections. Ensures CRLF.
-SDPUtils.splitSections = function(blob) {
-  var parts = blob.split('\nm=');
-  return parts.map(function(part, index) {
-    return (index > 0 ? 'm=' + part : part).trim() + '\r\n';
-  });
-};
-
-// Returns lines that start with a certain prefix.
-SDPUtils.matchPrefix = function(blob, prefix) {
-  return SDPUtils.splitLines(blob).filter(function(line) {
-    return line.indexOf(prefix) === 0;
-  });
-};
-
-// Parses an ICE candidate line. Sample input:
-// candidate:702786350 2 udp 41819902 8.8.8.8 60769 typ relay raddr 8.8.8.8
-// rport 55996"
-SDPUtils.parseCandidate = function(line) {
-  var parts;
-  // Parse both variants.
-  if (line.indexOf('a=candidate:') === 0) {
-    parts = line.substring(12).split(' ');
-  } else {
-    parts = line.substring(10).split(' ');
-  }
-
-  var candidate = {
-    foundation: parts[0],
-    component: parts[1],
-    protocol: parts[2].toLowerCase(),
-    priority: parseInt(parts[3], 10),
-    ip: parts[4],
-    port: parseInt(parts[5], 10),
-    // skip parts[6] == 'typ'
-    type: parts[7]
-  };
-
-  for (var i = 8; i < parts.length; i += 2) {
-    switch (parts[i]) {
-      case 'raddr':
-        candidate.relatedAddress = parts[i + 1];
-        break;
-      case 'rport':
-        candidate.relatedPort = parseInt(parts[i + 1], 10);
-        break;
-      case 'tcptype':
-        candidate.tcpType = parts[i + 1];
-        break;
-      default: // Unknown extensions are silently ignored.
-        break;
-    }
-  }
-  return candidate;
-};
-
-// Translates a candidate object into SDP candidate attribute.
-SDPUtils.writeCandidate = function(candidate) {
-  var sdp = [];
-  sdp.push(candidate.foundation);
-  sdp.push(candidate.component);
-  sdp.push(candidate.protocol.toUpperCase());
-  sdp.push(candidate.priority);
-  sdp.push(candidate.ip);
-  sdp.push(candidate.port);
-
-  var type = candidate.type;
-  sdp.push('typ');
-  sdp.push(type);
-  if (type !== 'host' && candidate.relatedAddress &&
-      candidate.relatedPort) {
-    sdp.push('raddr');
-    sdp.push(candidate.relatedAddress); // was: relAddr
-    sdp.push('rport');
-    sdp.push(candidate.relatedPort); // was: relPort
-  }
-  if (candidate.tcpType && candidate.protocol.toLowerCase() === 'tcp') {
-    sdp.push('tcptype');
-    sdp.push(candidate.tcpType);
-  }
-  return 'candidate:' + sdp.join(' ');
-};
-
-// Parses an rtpmap line, returns RTCRtpCoddecParameters. Sample input:
-// a=rtpmap:111 opus/48000/2
-SDPUtils.parseRtpMap = function(line) {
-  var parts = line.substr(9).split(' ');
-  var parsed = {
-    payloadType: parseInt(parts.shift(), 10) // was: id
-  };
-
-  parts = parts[0].split('/');
-
-  parsed.name = parts[0];
-  parsed.clockRate = parseInt(parts[1], 10); // was: clockrate
-  // was: channels
-  parsed.numChannels = parts.length === 3 ? parseInt(parts[2], 10) : 1;
-  return parsed;
-};
-
-// Generate an a=rtpmap line from RTCRtpCodecCapability or
-// RTCRtpCodecParameters.
-SDPUtils.writeRtpMap = function(codec) {
-  var pt = codec.payloadType;
-  if (codec.preferredPayloadType !== undefined) {
-    pt = codec.preferredPayloadType;
-  }
-  return 'a=rtpmap:' + pt + ' ' + codec.name + '/' + codec.clockRate +
-      (codec.numChannels !== 1 ? '/' + codec.numChannels : '') + '\r\n';
-};
-
-// Parses an a=extmap line (headerextension from RFC 5285). Sample input:
-// a=extmap:2 urn:ietf:params:rtp-hdrext:toffset
-SDPUtils.parseExtmap = function(line) {
-  var parts = line.substr(9).split(' ');
-  return {
-    id: parseInt(parts[0], 10),
-    uri: parts[1]
-  };
-};
-
-// Generates a=extmap line from RTCRtpHeaderExtensionParameters or
-// RTCRtpHeaderExtension.
-SDPUtils.writeExtmap = function(headerExtension) {
-  return 'a=extmap:' + (headerExtension.id || headerExtension.preferredId) +
-       ' ' + headerExtension.uri + '\r\n';
-};
-
-// Parses an ftmp line, returns dictionary. Sample input:
-// a=fmtp:96 vbr=on;cng=on
-// Also deals with vbr=on; cng=on
-SDPUtils.parseFmtp = function(line) {
-  var parsed = {};
-  var kv;
-  var parts = line.substr(line.indexOf(' ') + 1).split(';');
-  for (var j = 0; j < parts.length; j++) {
-    kv = parts[j].trim().split('=');
-    parsed[kv[0].trim()] = kv[1];
-  }
-  return parsed;
-};
-
-// Generates an a=ftmp line from RTCRtpCodecCapability or RTCRtpCodecParameters.
-SDPUtils.writeFmtp = function(codec) {
-  var line = '';
-  var pt = codec.payloadType;
-  if (codec.preferredPayloadType !== undefined) {
-    pt = codec.preferredPayloadType;
-  }
-  if (codec.parameters && Object.keys(codec.parameters).length) {
-    var params = [];
-    Object.keys(codec.parameters).forEach(function(param) {
-      params.push(param + '=' + codec.parameters[param]);
-    });
-    line += 'a=fmtp:' + pt + ' ' + params.join(';') + '\r\n';
-  }
-  return line;
-};
-
-// Parses an rtcp-fb line, returns RTCPRtcpFeedback object. Sample input:
-// a=rtcp-fb:98 nack rpsi
-SDPUtils.parseRtcpFb = function(line) {
-  var parts = line.substr(line.indexOf(' ') + 1).split(' ');
-  return {
-    type: parts.shift(),
-    parameter: parts.join(' ')
-  };
-};
-// Generate a=rtcp-fb lines from RTCRtpCodecCapability or RTCRtpCodecParameters.
-SDPUtils.writeRtcpFb = function(codec) {
-  var lines = '';
-  var pt = codec.payloadType;
-  if (codec.preferredPayloadType !== undefined) {
-    pt = codec.preferredPayloadType;
-  }
-  if (codec.rtcpFeedback && codec.rtcpFeedback.length) {
-    // FIXME: special handling for trr-int?
-    codec.rtcpFeedback.forEach(function(fb) {
-      lines += 'a=rtcp-fb:' + pt + ' ' + fb.type +
-      (fb.parameter && fb.parameter.length ? ' ' + fb.parameter : '') +
-          '\r\n';
-    });
-  }
-  return lines;
-};
-
-// Parses an RFC 5576 ssrc media attribute. Sample input:
-// a=ssrc:3735928559 cname:something
-SDPUtils.parseSsrcMedia = function(line) {
-  var sp = line.indexOf(' ');
-  var parts = {
-    ssrc: parseInt(line.substr(7, sp - 7), 10)
-  };
-  var colon = line.indexOf(':', sp);
-  if (colon > -1) {
-    parts.attribute = line.substr(sp + 1, colon - sp - 1);
-    parts.value = line.substr(colon + 1);
-  } else {
-    parts.attribute = line.substr(sp + 1);
-  }
-  return parts;
-};
-
-// Extracts DTLS parameters from SDP media section or sessionpart.
-// FIXME: for consistency with other functions this should only
-//   get the fingerprint line as input. See also getIceParameters.
-SDPUtils.getDtlsParameters = function(mediaSection, sessionpart) {
-  var lines = SDPUtils.splitLines(mediaSection);
-  // Search in session part, too.
-  lines = lines.concat(SDPUtils.splitLines(sessionpart));
-  var fpLine = lines.filter(function(line) {
-    return line.indexOf('a=fingerprint:') === 0;
-  })[0].substr(14);
-  // Note: a=setup line is ignored since we use the 'auto' role.
-  var dtlsParameters = {
-    role: 'auto',
-    fingerprints: [{
-      algorithm: fpLine.split(' ')[0],
-      value: fpLine.split(' ')[1]
-    }]
-  };
-  return dtlsParameters;
-};
-
-// Serializes DTLS parameters to SDP.
-SDPUtils.writeDtlsParameters = function(params, setupType) {
-  var sdp = 'a=setup:' + setupType + '\r\n';
-  params.fingerprints.forEach(function(fp) {
-    sdp += 'a=fingerprint:' + fp.algorithm + ' ' + fp.value + '\r\n';
-  });
-  return sdp;
-};
-// Parses ICE information from SDP media section or sessionpart.
-// FIXME: for consistency with other functions this should only
-//   get the ice-ufrag and ice-pwd lines as input.
-SDPUtils.getIceParameters = function(mediaSection, sessionpart) {
-  var lines = SDPUtils.splitLines(mediaSection);
-  // Search in session part, too.
-  lines = lines.concat(SDPUtils.splitLines(sessionpart));
-  var iceParameters = {
-    usernameFragment: lines.filter(function(line) {
-      return line.indexOf('a=ice-ufrag:') === 0;
-    })[0].substr(12),
-    password: lines.filter(function(line) {
-      return line.indexOf('a=ice-pwd:') === 0;
-    })[0].substr(10)
-  };
-  return iceParameters;
-};
-
-// Serializes ICE parameters to SDP.
-SDPUtils.writeIceParameters = function(params) {
-  return 'a=ice-ufrag:' + params.usernameFragment + '\r\n' +
-      'a=ice-pwd:' + params.password + '\r\n';
-};
-
-// Parses the SDP media section and returns RTCRtpParameters.
-SDPUtils.parseRtpParameters = function(mediaSection) {
-  var description = {
-    codecs: [],
-    headerExtensions: [],
-    fecMechanisms: [],
-    rtcp: []
-  };
-  var lines = SDPUtils.splitLines(mediaSection);
-  var mline = lines[0].split(' ');
-  for (var i = 3; i < mline.length; i++) { // find all codecs from mline[3..]
-    var pt = mline[i];
-    var rtpmapline = SDPUtils.matchPrefix(
-        mediaSection, 'a=rtpmap:' + pt + ' ')[0];
-    if (rtpmapline) {
-      var codec = SDPUtils.parseRtpMap(rtpmapline);
-      var fmtps = SDPUtils.matchPrefix(
-          mediaSection, 'a=fmtp:' + pt + ' ');
-      // Only the first a=fmtp:<pt> is considered.
-      codec.parameters = fmtps.length ? SDPUtils.parseFmtp(fmtps[0]) : {};
-      codec.rtcpFeedback = SDPUtils.matchPrefix(
-          mediaSection, 'a=rtcp-fb:' + pt + ' ')
-        .map(SDPUtils.parseRtcpFb);
-      description.codecs.push(codec);
-      // parse FEC mechanisms from rtpmap lines.
-      switch (codec.name.toUpperCase()) {
-        case 'RED':
-        case 'ULPFEC':
-          description.fecMechanisms.push(codec.name.toUpperCase());
-          break;
-        default: // only RED and ULPFEC are recognized as FEC mechanisms.
-          break;
-      }
-    }
-  }
-  SDPUtils.matchPrefix(mediaSection, 'a=extmap:').forEach(function(line) {
-    description.headerExtensions.push(SDPUtils.parseExtmap(line));
-  });
-  // FIXME: parse rtcp.
-  return description;
-};
-
-// Generates parts of the SDP media section describing the capabilities /
-// parameters.
-SDPUtils.writeRtpDescription = function(kind, caps) {
-  var sdp = '';
-
-  // Build the mline.
-  sdp += 'm=' + kind + ' ';
-  sdp += caps.codecs.length > 0 ? '9' : '0'; // reject if no codecs.
-  sdp += ' UDP/TLS/RTP/SAVPF ';
-  sdp += caps.codecs.map(function(codec) {
-    if (codec.preferredPayloadType !== undefined) {
-      return codec.preferredPayloadType;
-    }
-    return codec.payloadType;
-  }).join(' ') + '\r\n';
-
-  sdp += 'c=IN IP4 0.0.0.0\r\n';
-  sdp += 'a=rtcp:9 IN IP4 0.0.0.0\r\n';
-
-  // Add a=rtpmap lines for each codec. Also fmtp and rtcp-fb.
-  caps.codecs.forEach(function(codec) {
-    sdp += SDPUtils.writeRtpMap(codec);
-    sdp += SDPUtils.writeFmtp(codec);
-    sdp += SDPUtils.writeRtcpFb(codec);
-  });
-  // FIXME: add headerExtensions, fecMechanismş and rtcp.
-  sdp += 'a=rtcp-mux\r\n';
-  return sdp;
-};
-
-// Parses the SDP media section and returns an array of
-// RTCRtpEncodingParameters.
-SDPUtils.parseRtpEncodingParameters = function(mediaSection) {
-  var encodingParameters = [];
-  var description = SDPUtils.parseRtpParameters(mediaSection);
-  var hasRed = description.fecMechanisms.indexOf('RED') !== -1;
-  var hasUlpfec = description.fecMechanisms.indexOf('ULPFEC') !== -1;
-
-  // filter a=ssrc:... cname:, ignore PlanB-msid
-  var ssrcs = SDPUtils.matchPrefix(mediaSection, 'a=ssrc:')
-  .map(function(line) {
-    return SDPUtils.parseSsrcMedia(line);
-  })
-  .filter(function(parts) {
-    return parts.attribute === 'cname';
-  });
-  var primarySsrc = ssrcs.length > 0 && ssrcs[0].ssrc;
-  var secondarySsrc;
-
-  var flows = SDPUtils.matchPrefix(mediaSection, 'a=ssrc-group:FID')
-  .map(function(line) {
-    var parts = line.split(' ');
-    parts.shift();
-    return parts.map(function(part) {
-      return parseInt(part, 10);
-    });
-  });
-  if (flows.length > 0 && flows[0].length > 1 && flows[0][0] === primarySsrc) {
-    secondarySsrc = flows[0][1];
-  }
-
-  description.codecs.forEach(function(codec) {
-    if (codec.name.toUpperCase() === 'RTX' && codec.parameters.apt) {
-      var encParam = {
-        ssrc: primarySsrc,
-        codecPayloadType: parseInt(codec.parameters.apt, 10),
-        rtx: {
-          payloadType: codec.payloadType,
-          ssrc: secondarySsrc
-        }
-      };
-      encodingParameters.push(encParam);
-      if (hasRed) {
-        encParam = JSON.parse(JSON.stringify(encParam));
-        encParam.fec = {
-          ssrc: secondarySsrc,
-          mechanism: hasUlpfec ? 'red+ulpfec' : 'red'
-        };
-        encodingParameters.push(encParam);
-      }
-    }
-  });
-  if (encodingParameters.length === 0 && primarySsrc) {
-    encodingParameters.push({
-      ssrc: primarySsrc
-    });
-  }
-
-  // we support both b=AS and b=TIAS but interpret AS as TIAS.
-  var bandwidth = SDPUtils.matchPrefix(mediaSection, 'b=');
-  if (bandwidth.length) {
-    if (bandwidth[0].indexOf('b=TIAS:') === 0) {
-      bandwidth = parseInt(bandwidth[0].substr(7), 10);
-    } else if (bandwidth[0].indexOf('b=AS:') === 0) {
-      bandwidth = parseInt(bandwidth[0].substr(5), 10);
-    }
-    encodingParameters.forEach(function(params) {
-      params.maxBitrate = bandwidth;
-    });
-  }
-  return encodingParameters;
-};
-
-SDPUtils.writeSessionBoilerplate = function() {
-  // FIXME: sess-id should be an NTP timestamp.
-  return 'v=0\r\n' +
-      'o=thisisadapterortc 8169639915646943137 2 IN IP4 127.0.0.1\r\n' +
-      's=-\r\n' +
-      't=0 0\r\n';
-};
-
-SDPUtils.writeMediaSection = function(transceiver, caps, type, stream) {
-  var sdp = SDPUtils.writeRtpDescription(transceiver.kind, caps);
-
-  // Map ICE parameters (ufrag, pwd) to SDP.
-  sdp += SDPUtils.writeIceParameters(
-      transceiver.iceGatherer.getLocalParameters());
-
-  // Map DTLS parameters to SDP.
-  sdp += SDPUtils.writeDtlsParameters(
-      transceiver.dtlsTransport.getLocalParameters(),
-      type === 'offer' ? 'actpass' : 'active');
-
-  sdp += 'a=mid:' + transceiver.mid + '\r\n';
-
-  if (transceiver.rtpSender && transceiver.rtpReceiver) {
-    sdp += 'a=sendrecv\r\n';
-  } else if (transceiver.rtpSender) {
-    sdp += 'a=sendonly\r\n';
-  } else if (transceiver.rtpReceiver) {
-    sdp += 'a=recvonly\r\n';
-  } else {
-    sdp += 'a=inactive\r\n';
-  }
-
-  // FIXME: for RTX there might be multiple SSRCs. Not implemented in Edge yet.
-  if (transceiver.rtpSender) {
-    var msid = 'msid:' + stream.id + ' ' +
-        transceiver.rtpSender.track.id + '\r\n';
-    sdp += 'a=' + msid;
-    sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].ssrc +
-        ' ' + msid;
-  }
-  // FIXME: this should be written by writeRtpDescription.
-  sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].ssrc +
-      ' cname:' + SDPUtils.localCName + '\r\n';
-  return sdp;
-};
-
-// Gets the direction from the mediaSection or the sessionpart.
-SDPUtils.getDirection = function(mediaSection, sessionpart) {
-  // Look for sendrecv, sendonly, recvonly, inactive, default to sendrecv.
-  var lines = SDPUtils.splitLines(mediaSection);
-  for (var i = 0; i < lines.length; i++) {
-    switch (lines[i]) {
-      case 'a=sendrecv':
-      case 'a=sendonly':
-      case 'a=recvonly':
-      case 'a=inactive':
-        return lines[i].substr(2);
-      default:
-        // FIXME: What should happen here?
-    }
-  }
-  if (sessionpart) {
-    return SDPUtils.getDirection(sessionpart);
-  }
-  return 'sendrecv';
-};
-
-// Expose public methods.
-module.exports = SDPUtils;
-
-},{}],63:[function(require,module,exports){
-/*
- *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
- *
- *  Use of this source code is governed by a BSD-style license
- *  that can be found in the LICENSE file in the root of the source
- *  tree.
- */
- /* eslint-env node */
-'use strict';
-
-// Expose public methods.
-module.exports = function() {
-  var shimError_ = function(e) {
-    return {
-      name: {PermissionDeniedError: 'NotAllowedError'}[e.name] || e.name,
-      message: e.message,
-      constraint: e.constraint,
-      toString: function() {
-        return this.name;
-      }
-    };
-  };
-
-  // getUserMedia error shim.
-  var origGetUserMedia = navigator.mediaDevices.getUserMedia.
-      bind(navigator.mediaDevices);
-  navigator.mediaDevices.getUserMedia = function(c) {
-    return origGetUserMedia(c).catch(function(e) {
-      return Promise.reject(shimError_(e));
-    });
-  };
-};
-
-},{}],57:[function(require,module,exports){
+},{"lodash.keys":62}],56:[function(require,module,exports){
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
  *
@@ -10168,7 +10134,41 @@ module.exports = function() {
   }
 };
 
-},{"../utils.js":35}],56:[function(require,module,exports){
+},{"../utils.js":36}],63:[function(require,module,exports){
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+'use strict';
+
+// Expose public methods.
+module.exports = function() {
+  var shimError_ = function(e) {
+    return {
+      name: {PermissionDeniedError: 'NotAllowedError'}[e.name] || e.name,
+      message: e.message,
+      constraint: e.constraint,
+      toString: function() {
+        return this.name;
+      }
+    };
+  };
+
+  // getUserMedia error shim.
+  var origGetUserMedia = navigator.mediaDevices.getUserMedia.
+      bind(navigator.mediaDevices);
+  navigator.mediaDevices.getUserMedia = function(c) {
+    return origGetUserMedia(c).catch(function(e) {
+      return Promise.reject(shimError_(e));
+    });
+  };
+};
+
+},{}],57:[function(require,module,exports){
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
  *
@@ -10313,7 +10313,7 @@ module.exports = function() {
   }
 };
 
-},{"../utils":35}],64:[function(require,module,exports){
+},{"../utils":36}],64:[function(require,module,exports){
 /**
  * lodash 3.0.0 (Custom Build) <https://lodash.com/>
  * Build: `lodash modern modularize exports="npm" -o ./`
@@ -10345,7 +10345,7 @@ function arrayMap(array, iteratee) {
 
 module.exports = arrayMap;
 
-},{}],47:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 /**
  * lodash 3.8.1 (Custom Build) <https://lodash.com/>
  * Build: `lodash modern modularize exports="npm" -o ./`
@@ -10394,7 +10394,7 @@ function toPath(value) {
 
 module.exports = toPath;
 
-},{"lodash.isarray":48}],46:[function(require,module,exports){
+},{"lodash.isarray":47}],45:[function(require,module,exports){
 /**
  * lodash 3.1.4 (Custom Build) <https://lodash.com/>
  * Build: `lodash modern modularize exports="npm" -o ./`
@@ -10546,7 +10546,7 @@ function map(collection, iteratee, thisArg) {
 
 module.exports = map;
 
-},{"lodash._arraymap":64,"lodash._basecallback":65,"lodash._baseeach":66,"lodash.isarray":48}],60:[function(require,module,exports){
+},{"lodash._arraymap":64,"lodash._basecallback":65,"lodash._baseeach":66,"lodash.isarray":47}],60:[function(require,module,exports){
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
  *
@@ -10737,152 +10737,7 @@ module.exports = function() {
   }
 };
 
-},{"../utils.js":49}],61:[function(require,module,exports){
-/*
- *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
- *
- *  Use of this source code is governed by a BSD-style license
- *  that can be found in the LICENSE file in the root of the source
- *  tree.
- */
- /* eslint-env node */
-'use strict';
-
-var logging = require('../utils').log;
-var browserDetails = require('../utils').browserDetails;
-
-// Expose public methods.
-module.exports = function() {
-  var shimError_ = function(e) {
-    return {
-      name: {
-        SecurityError: 'NotAllowedError',
-        PermissionDeniedError: 'NotAllowedError'
-      }[e.name] || e.name,
-      message: {
-        'The operation is insecure.': 'The request is not allowed by the ' +
-        'user agent or the platform in the current context.'
-      }[e.message] || e.message,
-      constraint: e.constraint,
-      toString: function() {
-        return this.name + (this.message && ': ') + this.message;
-      }
-    };
-  };
-
-  // getUserMedia constraints shim.
-  var getUserMedia_ = function(constraints, onSuccess, onError) {
-    var constraintsToFF37_ = function(c) {
-      if (typeof c !== 'object' || c.require) {
-        return c;
-      }
-      var require = [];
-      Object.keys(c).forEach(function(key) {
-        if (key === 'require' || key === 'advanced' || key === 'mediaSource') {
-          return;
-        }
-        var r = c[key] = (typeof c[key] === 'object') ?
-            c[key] : {ideal: c[key]};
-        if (r.min !== undefined ||
-            r.max !== undefined || r.exact !== undefined) {
-          require.push(key);
-        }
-        if (r.exact !== undefined) {
-          if (typeof r.exact === 'number') {
-            r. min = r.max = r.exact;
-          } else {
-            c[key] = r.exact;
-          }
-          delete r.exact;
-        }
-        if (r.ideal !== undefined) {
-          c.advanced = c.advanced || [];
-          var oc = {};
-          if (typeof r.ideal === 'number') {
-            oc[key] = {min: r.ideal, max: r.ideal};
-          } else {
-            oc[key] = r.ideal;
-          }
-          c.advanced.push(oc);
-          delete r.ideal;
-          if (!Object.keys(r).length) {
-            delete c[key];
-          }
-        }
-      });
-      if (require.length) {
-        c.require = require;
-      }
-      return c;
-    };
-    constraints = JSON.parse(JSON.stringify(constraints));
-    if (browserDetails.version < 38) {
-      logging('spec: ' + JSON.stringify(constraints));
-      if (constraints.audio) {
-        constraints.audio = constraintsToFF37_(constraints.audio);
-      }
-      if (constraints.video) {
-        constraints.video = constraintsToFF37_(constraints.video);
-      }
-      logging('ff37: ' + JSON.stringify(constraints));
-    }
-    return navigator.mozGetUserMedia(constraints, onSuccess, function(e) {
-      onError(shimError_(e));
-    });
-  };
-
-  navigator.getUserMedia = getUserMedia_;
-
-  // Returns the result of getUserMedia as a Promise.
-  var getUserMediaPromise_ = function(constraints) {
-    return new Promise(function(resolve, reject) {
-      navigator.getUserMedia(constraints, resolve, reject);
-    });
-  };
-
-  // Shim for mediaDevices on older versions.
-  if (!navigator.mediaDevices) {
-    navigator.mediaDevices = {getUserMedia: getUserMediaPromise_,
-      addEventListener: function() { },
-      removeEventListener: function() { }
-    };
-  }
-  navigator.mediaDevices.enumerateDevices =
-      navigator.mediaDevices.enumerateDevices || function() {
-        return new Promise(function(resolve) {
-          var infos = [
-            {kind: 'audioinput', deviceId: 'default', label: '', groupId: ''},
-            {kind: 'videoinput', deviceId: 'default', label: '', groupId: ''}
-          ];
-          resolve(infos);
-        });
-      };
-
-  if (browserDetails.version < 41) {
-    // Work around http://bugzil.la/1169665
-    var orgEnumerateDevices =
-        navigator.mediaDevices.enumerateDevices.bind(navigator.mediaDevices);
-    navigator.mediaDevices.enumerateDevices = function() {
-      return orgEnumerateDevices().then(undefined, function(e) {
-        if (e.name === 'NotFoundError') {
-          return [];
-        }
-        throw e;
-      });
-    };
-  }
-  if (browserDetails.version < 49) {
-    var origGetUserMedia = navigator.mediaDevices.getUserMedia.
-        bind(navigator.mediaDevices);
-    navigator.mediaDevices.getUserMedia = function(c) {
-      return origGetUserMedia(c).catch(function(e) {
-        return Promise.reject(shimError_(e));
-      });
-    };
-  }
-};
-
-},{"../utils":49}],36:[function(require,module,exports){
+},{"../utils.js":49}],39:[function(require,module,exports){
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
  *
@@ -11886,7 +11741,152 @@ module.exports = {
   reattachMediaStream: edgeShim.reattachMediaStream
 };
 
-},{"../utils":35,"./getusermedia":58,"sdp":67}],67:[function(require,module,exports){
+},{"../utils":36,"./getusermedia":59,"sdp":67}],61:[function(require,module,exports){
+/*
+ *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree.
+ */
+ /* eslint-env node */
+'use strict';
+
+var logging = require('../utils').log;
+var browserDetails = require('../utils').browserDetails;
+
+// Expose public methods.
+module.exports = function() {
+  var shimError_ = function(e) {
+    return {
+      name: {
+        SecurityError: 'NotAllowedError',
+        PermissionDeniedError: 'NotAllowedError'
+      }[e.name] || e.name,
+      message: {
+        'The operation is insecure.': 'The request is not allowed by the ' +
+        'user agent or the platform in the current context.'
+      }[e.message] || e.message,
+      constraint: e.constraint,
+      toString: function() {
+        return this.name + (this.message && ': ') + this.message;
+      }
+    };
+  };
+
+  // getUserMedia constraints shim.
+  var getUserMedia_ = function(constraints, onSuccess, onError) {
+    var constraintsToFF37_ = function(c) {
+      if (typeof c !== 'object' || c.require) {
+        return c;
+      }
+      var require = [];
+      Object.keys(c).forEach(function(key) {
+        if (key === 'require' || key === 'advanced' || key === 'mediaSource') {
+          return;
+        }
+        var r = c[key] = (typeof c[key] === 'object') ?
+            c[key] : {ideal: c[key]};
+        if (r.min !== undefined ||
+            r.max !== undefined || r.exact !== undefined) {
+          require.push(key);
+        }
+        if (r.exact !== undefined) {
+          if (typeof r.exact === 'number') {
+            r. min = r.max = r.exact;
+          } else {
+            c[key] = r.exact;
+          }
+          delete r.exact;
+        }
+        if (r.ideal !== undefined) {
+          c.advanced = c.advanced || [];
+          var oc = {};
+          if (typeof r.ideal === 'number') {
+            oc[key] = {min: r.ideal, max: r.ideal};
+          } else {
+            oc[key] = r.ideal;
+          }
+          c.advanced.push(oc);
+          delete r.ideal;
+          if (!Object.keys(r).length) {
+            delete c[key];
+          }
+        }
+      });
+      if (require.length) {
+        c.require = require;
+      }
+      return c;
+    };
+    constraints = JSON.parse(JSON.stringify(constraints));
+    if (browserDetails.version < 38) {
+      logging('spec: ' + JSON.stringify(constraints));
+      if (constraints.audio) {
+        constraints.audio = constraintsToFF37_(constraints.audio);
+      }
+      if (constraints.video) {
+        constraints.video = constraintsToFF37_(constraints.video);
+      }
+      logging('ff37: ' + JSON.stringify(constraints));
+    }
+    return navigator.mozGetUserMedia(constraints, onSuccess, function(e) {
+      onError(shimError_(e));
+    });
+  };
+
+  navigator.getUserMedia = getUserMedia_;
+
+  // Returns the result of getUserMedia as a Promise.
+  var getUserMediaPromise_ = function(constraints) {
+    return new Promise(function(resolve, reject) {
+      navigator.getUserMedia(constraints, resolve, reject);
+    });
+  };
+
+  // Shim for mediaDevices on older versions.
+  if (!navigator.mediaDevices) {
+    navigator.mediaDevices = {getUserMedia: getUserMediaPromise_,
+      addEventListener: function() { },
+      removeEventListener: function() { }
+    };
+  }
+  navigator.mediaDevices.enumerateDevices =
+      navigator.mediaDevices.enumerateDevices || function() {
+        return new Promise(function(resolve) {
+          var infos = [
+            {kind: 'audioinput', deviceId: 'default', label: '', groupId: ''},
+            {kind: 'videoinput', deviceId: 'default', label: '', groupId: ''}
+          ];
+          resolve(infos);
+        });
+      };
+
+  if (browserDetails.version < 41) {
+    // Work around http://bugzil.la/1169665
+    var orgEnumerateDevices =
+        navigator.mediaDevices.enumerateDevices.bind(navigator.mediaDevices);
+    navigator.mediaDevices.enumerateDevices = function() {
+      return orgEnumerateDevices().then(undefined, function(e) {
+        if (e.name === 'NotFoundError') {
+          return [];
+        }
+        throw e;
+      });
+    };
+  }
+  if (browserDetails.version < 49) {
+    var origGetUserMedia = navigator.mediaDevices.getUserMedia.
+        bind(navigator.mediaDevices);
+    navigator.mediaDevices.getUserMedia = function(c) {
+      return origGetUserMedia(c).catch(function(e) {
+        return Promise.reject(shimError_(e));
+      });
+    };
+  }
+};
+
+},{"../utils":49}],67:[function(require,module,exports){
  /* eslint-env node */
 'use strict';
 
@@ -12381,6 +12381,212 @@ module.exports = SDPUtils;
 
 },{}],68:[function(require,module,exports){
 /**
+ * lodash 3.0.1 (Custom Build) <https://lodash.com/>
+ * Build: `lodash modern modularize exports="npm" -o ./`
+ * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <https://lodash.com/license>
+ */
+
+/**
+ * A specialized version of `baseCallback` which only supports `this` binding
+ * and specifying the number of arguments to provide to `func`.
+ *
+ * @private
+ * @param {Function} func The function to bind.
+ * @param {*} thisArg The `this` binding of `func`.
+ * @param {number} [argCount] The number of arguments to provide to `func`.
+ * @returns {Function} Returns the callback.
+ */
+function bindCallback(func, thisArg, argCount) {
+  if (typeof func != 'function') {
+    return identity;
+  }
+  if (thisArg === undefined) {
+    return func;
+  }
+  switch (argCount) {
+    case 1: return function(value) {
+      return func.call(thisArg, value);
+    };
+    case 3: return function(value, index, collection) {
+      return func.call(thisArg, value, index, collection);
+    };
+    case 4: return function(accumulator, value, index, collection) {
+      return func.call(thisArg, accumulator, value, index, collection);
+    };
+    case 5: return function(value, other, key, object, source) {
+      return func.call(thisArg, value, other, key, object, source);
+    };
+  }
+  return function() {
+    return func.apply(thisArg, arguments);
+  };
+}
+
+/**
+ * This method returns the first argument provided to it.
+ *
+ * @static
+ * @memberOf _
+ * @category Utility
+ * @param {*} value Any value.
+ * @returns {*} Returns `value`.
+ * @example
+ *
+ * var object = { 'user': 'fred' };
+ *
+ * _.identity(object) === object;
+ * // => true
+ */
+function identity(value) {
+  return value;
+}
+
+module.exports = bindCallback;
+
+},{}],69:[function(require,module,exports){
+/**
+ * lodash 3.9.1 (Custom Build) <https://lodash.com/>
+ * Build: `lodash modern modularize exports="npm" -o ./`
+ * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <https://lodash.com/license>
+ */
+
+/** `Object#toString` result references. */
+var funcTag = '[object Function]';
+
+/** Used to detect host constructors (Safari > 5). */
+var reIsHostCtor = /^\[object .+?Constructor\]$/;
+
+/**
+ * Checks if `value` is object-like.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+ */
+function isObjectLike(value) {
+  return !!value && typeof value == 'object';
+}
+
+/** Used for native method references. */
+var objectProto = Object.prototype;
+
+/** Used to resolve the decompiled source of functions. */
+var fnToString = Function.prototype.toString;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty = objectProto.hasOwnProperty;
+
+/**
+ * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var objToString = objectProto.toString;
+
+/** Used to detect if a method is native. */
+var reIsNative = RegExp('^' +
+  fnToString.call(hasOwnProperty).replace(/[\\^$.*+?()[\]{}|]/g, '\\$&')
+  .replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
+);
+
+/**
+ * Gets the native function at `key` of `object`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @param {string} key The key of the method to get.
+ * @returns {*} Returns the function if it's native, else `undefined`.
+ */
+function getNative(object, key) {
+  var value = object == null ? undefined : object[key];
+  return isNative(value) ? value : undefined;
+}
+
+/**
+ * Checks if `value` is classified as a `Function` object.
+ *
+ * @static
+ * @memberOf _
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
+ * @example
+ *
+ * _.isFunction(_);
+ * // => true
+ *
+ * _.isFunction(/abc/);
+ * // => false
+ */
+function isFunction(value) {
+  // The use of `Object#toString` avoids issues with the `typeof` operator
+  // in older versions of Chrome and Safari which return 'function' for regexes
+  // and Safari 8 equivalents which return 'object' for typed array constructors.
+  return isObject(value) && objToString.call(value) == funcTag;
+}
+
+/**
+ * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
+ * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+ *
+ * @static
+ * @memberOf _
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+ * @example
+ *
+ * _.isObject({});
+ * // => true
+ *
+ * _.isObject([1, 2, 3]);
+ * // => true
+ *
+ * _.isObject(1);
+ * // => false
+ */
+function isObject(value) {
+  // Avoid a V8 JIT bug in Chrome 19-20.
+  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
+  var type = typeof value;
+  return !!value && (type == 'object' || type == 'function');
+}
+
+/**
+ * Checks if `value` is a native function.
+ *
+ * @static
+ * @memberOf _
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a native function, else `false`.
+ * @example
+ *
+ * _.isNative(Array.prototype.push);
+ * // => true
+ *
+ * _.isNative(_);
+ * // => false
+ */
+function isNative(value) {
+  if (value == null) {
+    return false;
+  }
+  if (isFunction(value)) {
+    return reIsNative.test(fnToString.call(value));
+  }
+  return isObjectLike(value) && reIsHostCtor.test(value);
+}
+
+module.exports = getNative;
+
+},{}],70:[function(require,module,exports){
+/**
  * lodash 3.0.8 (Custom Build) <https://lodash.com/>
  * Build: `lodash modularize exports="npm" -o ./`
  * Copyright 2012-2016 The Dojo Foundation <http://dojofoundation.org/>
@@ -12624,88 +12830,158 @@ function isObjectLike(value) {
 
 module.exports = isArguments;
 
-},{}],69:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 /**
- * lodash 3.9.1 (Custom Build) <https://lodash.com/>
+ * lodash 3.0.4 (Custom Build) <https://lodash.com/>
  * Build: `lodash modern modularize exports="npm" -o ./`
  * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
  * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
  * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
  * Available under MIT license <https://lodash.com/license>
  */
-
-/** `Object#toString` result references. */
-var funcTag = '[object Function]';
-
-/** Used to detect host constructors (Safari > 5). */
-var reIsHostCtor = /^\[object .+?Constructor\]$/;
+var keys = require('lodash.keys');
 
 /**
- * Checks if `value` is object-like.
+ * Used as the [maximum length](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-number.max_safe_integer)
+ * of an array-like value.
+ */
+var MAX_SAFE_INTEGER = 9007199254740991;
+
+/**
+ * The base implementation of `_.forEach` without support for callback
+ * shorthands and `this` binding.
  *
  * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+ * @param {Array|Object|string} collection The collection to iterate over.
+ * @param {Function} iteratee The function invoked per iteration.
+ * @returns {Array|Object|string} Returns `collection`.
  */
-function isObjectLike(value) {
-  return !!value && typeof value == 'object';
+var baseEach = createBaseEach(baseForOwn);
+
+/**
+ * The base implementation of `baseForIn` and `baseForOwn` which iterates
+ * over `object` properties returned by `keysFunc` invoking `iteratee` for
+ * each property. Iteratee functions may exit iteration early by explicitly
+ * returning `false`.
+ *
+ * @private
+ * @param {Object} object The object to iterate over.
+ * @param {Function} iteratee The function invoked per iteration.
+ * @param {Function} keysFunc The function to get the keys of `object`.
+ * @returns {Object} Returns `object`.
+ */
+var baseFor = createBaseFor();
+
+/**
+ * The base implementation of `_.forOwn` without support for callback
+ * shorthands and `this` binding.
+ *
+ * @private
+ * @param {Object} object The object to iterate over.
+ * @param {Function} iteratee The function invoked per iteration.
+ * @returns {Object} Returns `object`.
+ */
+function baseForOwn(object, iteratee) {
+  return baseFor(object, iteratee, keys);
 }
 
-/** Used for native method references. */
-var objectProto = Object.prototype;
-
-/** Used to resolve the decompiled source of functions. */
-var fnToString = Function.prototype.toString;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
-
 /**
- * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
- * of values.
+ * The base implementation of `_.property` without support for deep paths.
+ *
+ * @private
+ * @param {string} key The key of the property to get.
+ * @returns {Function} Returns the new function.
  */
-var objToString = objectProto.toString;
-
-/** Used to detect if a method is native. */
-var reIsNative = RegExp('^' +
-  fnToString.call(hasOwnProperty).replace(/[\\^$.*+?()[\]{}|]/g, '\\$&')
-  .replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
-);
+function baseProperty(key) {
+  return function(object) {
+    return object == null ? undefined : object[key];
+  };
+}
 
 /**
- * Gets the native function at `key` of `object`.
+ * Creates a `baseEach` or `baseEachRight` function.
+ *
+ * @private
+ * @param {Function} eachFunc The function to iterate over a collection.
+ * @param {boolean} [fromRight] Specify iterating from right to left.
+ * @returns {Function} Returns the new base function.
+ */
+function createBaseEach(eachFunc, fromRight) {
+  return function(collection, iteratee) {
+    var length = collection ? getLength(collection) : 0;
+    if (!isLength(length)) {
+      return eachFunc(collection, iteratee);
+    }
+    var index = fromRight ? length : -1,
+        iterable = toObject(collection);
+
+    while ((fromRight ? index-- : ++index < length)) {
+      if (iteratee(iterable[index], index, iterable) === false) {
+        break;
+      }
+    }
+    return collection;
+  };
+}
+
+/**
+ * Creates a base function for `_.forIn` or `_.forInRight`.
+ *
+ * @private
+ * @param {boolean} [fromRight] Specify iterating from right to left.
+ * @returns {Function} Returns the new base function.
+ */
+function createBaseFor(fromRight) {
+  return function(object, iteratee, keysFunc) {
+    var iterable = toObject(object),
+        props = keysFunc(object),
+        length = props.length,
+        index = fromRight ? length : -1;
+
+    while ((fromRight ? index-- : ++index < length)) {
+      var key = props[index];
+      if (iteratee(iterable[key], key, iterable) === false) {
+        break;
+      }
+    }
+    return object;
+  };
+}
+
+/**
+ * Gets the "length" property value of `object`.
+ *
+ * **Note:** This function is used to avoid a [JIT bug](https://bugs.webkit.org/show_bug.cgi?id=142792)
+ * that affects Safari on at least iOS 8.1-8.3 ARM64.
  *
  * @private
  * @param {Object} object The object to query.
- * @param {string} key The key of the method to get.
- * @returns {*} Returns the function if it's native, else `undefined`.
+ * @returns {*} Returns the "length" value.
  */
-function getNative(object, key) {
-  var value = object == null ? undefined : object[key];
-  return isNative(value) ? value : undefined;
+var getLength = baseProperty('length');
+
+/**
+ * Checks if `value` is a valid array-like length.
+ *
+ * **Note:** This function is based on [`ToLength`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-tolength).
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
+ */
+function isLength(value) {
+  return typeof value == 'number' && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
 }
 
 /**
- * Checks if `value` is classified as a `Function` object.
+ * Converts `value` to an object if it's not one.
  *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
- * @example
- *
- * _.isFunction(_);
- * // => true
- *
- * _.isFunction(/abc/);
- * // => false
+ * @private
+ * @param {*} value The value to process.
+ * @returns {Object} Returns the object.
  */
-function isFunction(value) {
-  // The use of `Object#toString` avoids issues with the `typeof` operator
-  // in older versions of Chrome and Safari which return 'function' for regexes
-  // and Safari 8 equivalents which return 'object' for typed array constructors.
-  return isObject(value) && objToString.call(value) == funcTag;
+function toObject(value) {
+  return isObject(value) ? value : Object(value);
 }
 
 /**
@@ -12735,35 +13011,9 @@ function isObject(value) {
   return !!value && (type == 'object' || type == 'function');
 }
 
-/**
- * Checks if `value` is a native function.
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a native function, else `false`.
- * @example
- *
- * _.isNative(Array.prototype.push);
- * // => true
- *
- * _.isNative(_);
- * // => false
- */
-function isNative(value) {
-  if (value == null) {
-    return false;
-  }
-  if (isFunction(value)) {
-    return reIsNative.test(fnToString.call(value));
-  }
-  return isObjectLike(value) && reIsHostCtor.test(value);
-}
+module.exports = baseEach;
 
-module.exports = getNative;
-
-},{}],51:[function(require,module,exports){
+},{"lodash.keys":71}],53:[function(require,module,exports){
 /*
  *  Copyright (c) 2016 The WebRTC project authors. All Rights Reserved.
  *
@@ -13767,257 +14017,7 @@ module.exports = {
   reattachMediaStream: edgeShim.reattachMediaStream
 };
 
-},{"../utils":49,"./getusermedia":63,"sdp":70}],71:[function(require,module,exports){
-/**
- * lodash 3.0.1 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-
-/**
- * A specialized version of `baseCallback` which only supports `this` binding
- * and specifying the number of arguments to provide to `func`.
- *
- * @private
- * @param {Function} func The function to bind.
- * @param {*} thisArg The `this` binding of `func`.
- * @param {number} [argCount] The number of arguments to provide to `func`.
- * @returns {Function} Returns the callback.
- */
-function bindCallback(func, thisArg, argCount) {
-  if (typeof func != 'function') {
-    return identity;
-  }
-  if (thisArg === undefined) {
-    return func;
-  }
-  switch (argCount) {
-    case 1: return function(value) {
-      return func.call(thisArg, value);
-    };
-    case 3: return function(value, index, collection) {
-      return func.call(thisArg, value, index, collection);
-    };
-    case 4: return function(accumulator, value, index, collection) {
-      return func.call(thisArg, accumulator, value, index, collection);
-    };
-    case 5: return function(value, other, key, object, source) {
-      return func.call(thisArg, value, other, key, object, source);
-    };
-  }
-  return function() {
-    return func.apply(thisArg, arguments);
-  };
-}
-
-/**
- * This method returns the first argument provided to it.
- *
- * @static
- * @memberOf _
- * @category Utility
- * @param {*} value Any value.
- * @returns {*} Returns `value`.
- * @example
- *
- * var object = { 'user': 'fred' };
- *
- * _.identity(object) === object;
- * // => true
- */
-function identity(value) {
-  return value;
-}
-
-module.exports = bindCallback;
-
-},{}],66:[function(require,module,exports){
-/**
- * lodash 3.0.4 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-var keys = require('lodash.keys');
-
-/**
- * Used as the [maximum length](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-number.max_safe_integer)
- * of an array-like value.
- */
-var MAX_SAFE_INTEGER = 9007199254740991;
-
-/**
- * The base implementation of `_.forEach` without support for callback
- * shorthands and `this` binding.
- *
- * @private
- * @param {Array|Object|string} collection The collection to iterate over.
- * @param {Function} iteratee The function invoked per iteration.
- * @returns {Array|Object|string} Returns `collection`.
- */
-var baseEach = createBaseEach(baseForOwn);
-
-/**
- * The base implementation of `baseForIn` and `baseForOwn` which iterates
- * over `object` properties returned by `keysFunc` invoking `iteratee` for
- * each property. Iteratee functions may exit iteration early by explicitly
- * returning `false`.
- *
- * @private
- * @param {Object} object The object to iterate over.
- * @param {Function} iteratee The function invoked per iteration.
- * @param {Function} keysFunc The function to get the keys of `object`.
- * @returns {Object} Returns `object`.
- */
-var baseFor = createBaseFor();
-
-/**
- * The base implementation of `_.forOwn` without support for callback
- * shorthands and `this` binding.
- *
- * @private
- * @param {Object} object The object to iterate over.
- * @param {Function} iteratee The function invoked per iteration.
- * @returns {Object} Returns `object`.
- */
-function baseForOwn(object, iteratee) {
-  return baseFor(object, iteratee, keys);
-}
-
-/**
- * The base implementation of `_.property` without support for deep paths.
- *
- * @private
- * @param {string} key The key of the property to get.
- * @returns {Function} Returns the new function.
- */
-function baseProperty(key) {
-  return function(object) {
-    return object == null ? undefined : object[key];
-  };
-}
-
-/**
- * Creates a `baseEach` or `baseEachRight` function.
- *
- * @private
- * @param {Function} eachFunc The function to iterate over a collection.
- * @param {boolean} [fromRight] Specify iterating from right to left.
- * @returns {Function} Returns the new base function.
- */
-function createBaseEach(eachFunc, fromRight) {
-  return function(collection, iteratee) {
-    var length = collection ? getLength(collection) : 0;
-    if (!isLength(length)) {
-      return eachFunc(collection, iteratee);
-    }
-    var index = fromRight ? length : -1,
-        iterable = toObject(collection);
-
-    while ((fromRight ? index-- : ++index < length)) {
-      if (iteratee(iterable[index], index, iterable) === false) {
-        break;
-      }
-    }
-    return collection;
-  };
-}
-
-/**
- * Creates a base function for `_.forIn` or `_.forInRight`.
- *
- * @private
- * @param {boolean} [fromRight] Specify iterating from right to left.
- * @returns {Function} Returns the new base function.
- */
-function createBaseFor(fromRight) {
-  return function(object, iteratee, keysFunc) {
-    var iterable = toObject(object),
-        props = keysFunc(object),
-        length = props.length,
-        index = fromRight ? length : -1;
-
-    while ((fromRight ? index-- : ++index < length)) {
-      var key = props[index];
-      if (iteratee(iterable[key], key, iterable) === false) {
-        break;
-      }
-    }
-    return object;
-  };
-}
-
-/**
- * Gets the "length" property value of `object`.
- *
- * **Note:** This function is used to avoid a [JIT bug](https://bugs.webkit.org/show_bug.cgi?id=142792)
- * that affects Safari on at least iOS 8.1-8.3 ARM64.
- *
- * @private
- * @param {Object} object The object to query.
- * @returns {*} Returns the "length" value.
- */
-var getLength = baseProperty('length');
-
-/**
- * Checks if `value` is a valid array-like length.
- *
- * **Note:** This function is based on [`ToLength`](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-tolength).
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
- */
-function isLength(value) {
-  return typeof value == 'number' && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
-}
-
-/**
- * Converts `value` to an object if it's not one.
- *
- * @private
- * @param {*} value The value to process.
- * @returns {Object} Returns the object.
- */
-function toObject(value) {
-  return isObject(value) ? value : Object(value);
-}
-
-/**
- * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
- * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(1);
- * // => false
- */
-function isObject(value) {
-  // Avoid a V8 JIT bug in Chrome 19-20.
-  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
-  var type = typeof value;
-  return !!value && (type == 'object' || type == 'function');
-}
-
-module.exports = baseEach;
-
-},{"lodash.keys":72}],70:[function(require,module,exports){
+},{"../utils":49,"./getusermedia":63,"sdp":72}],72:[function(require,module,exports){
  /* eslint-env node */
 'use strict';
 
@@ -14748,7 +14748,7 @@ function keysIn(object) {
 
 module.exports = keys;
 
-},{"lodash._getnative":69,"lodash.isarguments":68,"lodash.isarray":43}],65:[function(require,module,exports){
+},{"lodash._getnative":69,"lodash.isarguments":70,"lodash.isarray":43}],65:[function(require,module,exports){
 /**
  * lodash 3.3.1 (Custom Build) <https://lodash.com/>
  * Build: `lodash modern modularize exports="npm" -o ./`
@@ -15172,7 +15172,7 @@ function property(path) {
 
 module.exports = baseCallback;
 
-},{"lodash._baseisequal":73,"lodash._bindcallback":71,"lodash.isarray":48,"lodash.pairs":74}],75:[function(require,module,exports){
+},{"lodash._baseisequal":74,"lodash._bindcallback":68,"lodash.isarray":47,"lodash.pairs":73}],75:[function(require,module,exports){
 /**
  * lodash 3.0.6 (Custom Build) <https://lodash.com/>
  * Build: `lodash modularize exports="npm" -o ./`
@@ -15706,7 +15706,7 @@ function isNative(value) {
 
 module.exports = getNative;
 
-},{}],74:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 /**
  * lodash 3.0.1 (Custom Build) <https://lodash.com/>
  * Build: `lodash modern modularize exports="npm" -o ./`
@@ -15786,7 +15786,245 @@ function pairs(object) {
 
 module.exports = pairs;
 
-},{"lodash.keys":72}],73:[function(require,module,exports){
+},{"lodash.keys":71}],71:[function(require,module,exports){
+/**
+ * lodash 3.1.2 (Custom Build) <https://lodash.com/>
+ * Build: `lodash modern modularize exports="npm" -o ./`
+ * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <https://lodash.com/license>
+ */
+var getNative = require('lodash._getnative'),
+    isArguments = require('lodash.isarguments'),
+    isArray = require('lodash.isarray');
+
+/** Used to detect unsigned integer values. */
+var reIsUint = /^\d+$/;
+
+/** Used for native method references. */
+var objectProto = Object.prototype;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty = objectProto.hasOwnProperty;
+
+/* Native method references for those with the same name as other `lodash` methods. */
+var nativeKeys = getNative(Object, 'keys');
+
+/**
+ * Used as the [maximum length](http://ecma-international.org/ecma-262/6.0/#sec-number.max_safe_integer)
+ * of an array-like value.
+ */
+var MAX_SAFE_INTEGER = 9007199254740991;
+
+/**
+ * The base implementation of `_.property` without support for deep paths.
+ *
+ * @private
+ * @param {string} key The key of the property to get.
+ * @returns {Function} Returns the new function.
+ */
+function baseProperty(key) {
+  return function(object) {
+    return object == null ? undefined : object[key];
+  };
+}
+
+/**
+ * Gets the "length" property value of `object`.
+ *
+ * **Note:** This function is used to avoid a [JIT bug](https://bugs.webkit.org/show_bug.cgi?id=142792)
+ * that affects Safari on at least iOS 8.1-8.3 ARM64.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @returns {*} Returns the "length" value.
+ */
+var getLength = baseProperty('length');
+
+/**
+ * Checks if `value` is array-like.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
+ */
+function isArrayLike(value) {
+  return value != null && isLength(getLength(value));
+}
+
+/**
+ * Checks if `value` is a valid array-like index.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @param {number} [length=MAX_SAFE_INTEGER] The upper bounds of a valid index.
+ * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
+ */
+function isIndex(value, length) {
+  value = (typeof value == 'number' || reIsUint.test(value)) ? +value : -1;
+  length = length == null ? MAX_SAFE_INTEGER : length;
+  return value > -1 && value % 1 == 0 && value < length;
+}
+
+/**
+ * Checks if `value` is a valid array-like length.
+ *
+ * **Note:** This function is based on [`ToLength`](http://ecma-international.org/ecma-262/6.0/#sec-tolength).
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
+ */
+function isLength(value) {
+  return typeof value == 'number' && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
+}
+
+/**
+ * A fallback implementation of `Object.keys` which creates an array of the
+ * own enumerable property names of `object`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @returns {Array} Returns the array of property names.
+ */
+function shimKeys(object) {
+  var props = keysIn(object),
+      propsLength = props.length,
+      length = propsLength && object.length;
+
+  var allowIndexes = !!length && isLength(length) &&
+    (isArray(object) || isArguments(object));
+
+  var index = -1,
+      result = [];
+
+  while (++index < propsLength) {
+    var key = props[index];
+    if ((allowIndexes && isIndex(key, length)) || hasOwnProperty.call(object, key)) {
+      result.push(key);
+    }
+  }
+  return result;
+}
+
+/**
+ * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
+ * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+ *
+ * @static
+ * @memberOf _
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+ * @example
+ *
+ * _.isObject({});
+ * // => true
+ *
+ * _.isObject([1, 2, 3]);
+ * // => true
+ *
+ * _.isObject(1);
+ * // => false
+ */
+function isObject(value) {
+  // Avoid a V8 JIT bug in Chrome 19-20.
+  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
+  var type = typeof value;
+  return !!value && (type == 'object' || type == 'function');
+}
+
+/**
+ * Creates an array of the own enumerable property names of `object`.
+ *
+ * **Note:** Non-object values are coerced to objects. See the
+ * [ES spec](http://ecma-international.org/ecma-262/6.0/#sec-object.keys)
+ * for more details.
+ *
+ * @static
+ * @memberOf _
+ * @category Object
+ * @param {Object} object The object to query.
+ * @returns {Array} Returns the array of property names.
+ * @example
+ *
+ * function Foo() {
+ *   this.a = 1;
+ *   this.b = 2;
+ * }
+ *
+ * Foo.prototype.c = 3;
+ *
+ * _.keys(new Foo);
+ * // => ['a', 'b'] (iteration order is not guaranteed)
+ *
+ * _.keys('hi');
+ * // => ['0', '1']
+ */
+var keys = !nativeKeys ? shimKeys : function(object) {
+  var Ctor = object == null ? undefined : object.constructor;
+  if ((typeof Ctor == 'function' && Ctor.prototype === object) ||
+      (typeof object != 'function' && isArrayLike(object))) {
+    return shimKeys(object);
+  }
+  return isObject(object) ? nativeKeys(object) : [];
+};
+
+/**
+ * Creates an array of the own and inherited enumerable property names of `object`.
+ *
+ * **Note:** Non-object values are coerced to objects.
+ *
+ * @static
+ * @memberOf _
+ * @category Object
+ * @param {Object} object The object to query.
+ * @returns {Array} Returns the array of property names.
+ * @example
+ *
+ * function Foo() {
+ *   this.a = 1;
+ *   this.b = 2;
+ * }
+ *
+ * Foo.prototype.c = 3;
+ *
+ * _.keysIn(new Foo);
+ * // => ['a', 'b', 'c'] (iteration order is not guaranteed)
+ */
+function keysIn(object) {
+  if (object == null) {
+    return [];
+  }
+  if (!isObject(object)) {
+    object = Object(object);
+  }
+  var length = object.length;
+  length = (length && isLength(length) &&
+    (isArray(object) || isArguments(object)) && length) || 0;
+
+  var Ctor = object.constructor,
+      index = -1,
+      isProto = typeof Ctor == 'function' && Ctor.prototype === object,
+      result = Array(length),
+      skipIndexes = length > 0;
+
+  while (++index < length) {
+    result[index] = (index + '');
+  }
+  for (var key in object) {
+    if (!(skipIndexes && isIndex(key, length)) &&
+        !(key == 'constructor' && (isProto || !hasOwnProperty.call(object, key)))) {
+      result.push(key);
+    }
+  }
+  return result;
+}
+
+module.exports = keys;
+
+},{"lodash._getnative":77,"lodash.isarguments":76,"lodash.isarray":47}],74:[function(require,module,exports){
 /**
  * lodash 3.0.7 (Custom Build) <https://lodash.com/>
  * Build: `lodash modern modularize exports="npm" -o ./`
@@ -16130,244 +16368,6 @@ function isObject(value) {
 
 module.exports = baseIsEqual;
 
-},{"lodash.isarray":48,"lodash.istypedarray":75,"lodash.keys":72}],72:[function(require,module,exports){
-/**
- * lodash 3.1.2 (Custom Build) <https://lodash.com/>
- * Build: `lodash modern modularize exports="npm" -o ./`
- * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-var getNative = require('lodash._getnative'),
-    isArguments = require('lodash.isarguments'),
-    isArray = require('lodash.isarray');
-
-/** Used to detect unsigned integer values. */
-var reIsUint = /^\d+$/;
-
-/** Used for native method references. */
-var objectProto = Object.prototype;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
-
-/* Native method references for those with the same name as other `lodash` methods. */
-var nativeKeys = getNative(Object, 'keys');
-
-/**
- * Used as the [maximum length](http://ecma-international.org/ecma-262/6.0/#sec-number.max_safe_integer)
- * of an array-like value.
- */
-var MAX_SAFE_INTEGER = 9007199254740991;
-
-/**
- * The base implementation of `_.property` without support for deep paths.
- *
- * @private
- * @param {string} key The key of the property to get.
- * @returns {Function} Returns the new function.
- */
-function baseProperty(key) {
-  return function(object) {
-    return object == null ? undefined : object[key];
-  };
-}
-
-/**
- * Gets the "length" property value of `object`.
- *
- * **Note:** This function is used to avoid a [JIT bug](https://bugs.webkit.org/show_bug.cgi?id=142792)
- * that affects Safari on at least iOS 8.1-8.3 ARM64.
- *
- * @private
- * @param {Object} object The object to query.
- * @returns {*} Returns the "length" value.
- */
-var getLength = baseProperty('length');
-
-/**
- * Checks if `value` is array-like.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
- */
-function isArrayLike(value) {
-  return value != null && isLength(getLength(value));
-}
-
-/**
- * Checks if `value` is a valid array-like index.
- *
- * @private
- * @param {*} value The value to check.
- * @param {number} [length=MAX_SAFE_INTEGER] The upper bounds of a valid index.
- * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
- */
-function isIndex(value, length) {
-  value = (typeof value == 'number' || reIsUint.test(value)) ? +value : -1;
-  length = length == null ? MAX_SAFE_INTEGER : length;
-  return value > -1 && value % 1 == 0 && value < length;
-}
-
-/**
- * Checks if `value` is a valid array-like length.
- *
- * **Note:** This function is based on [`ToLength`](http://ecma-international.org/ecma-262/6.0/#sec-tolength).
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
- */
-function isLength(value) {
-  return typeof value == 'number' && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
-}
-
-/**
- * A fallback implementation of `Object.keys` which creates an array of the
- * own enumerable property names of `object`.
- *
- * @private
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of property names.
- */
-function shimKeys(object) {
-  var props = keysIn(object),
-      propsLength = props.length,
-      length = propsLength && object.length;
-
-  var allowIndexes = !!length && isLength(length) &&
-    (isArray(object) || isArguments(object));
-
-  var index = -1,
-      result = [];
-
-  while (++index < propsLength) {
-    var key = props[index];
-    if ((allowIndexes && isIndex(key, length)) || hasOwnProperty.call(object, key)) {
-      result.push(key);
-    }
-  }
-  return result;
-}
-
-/**
- * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
- * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(1);
- * // => false
- */
-function isObject(value) {
-  // Avoid a V8 JIT bug in Chrome 19-20.
-  // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
-  var type = typeof value;
-  return !!value && (type == 'object' || type == 'function');
-}
-
-/**
- * Creates an array of the own enumerable property names of `object`.
- *
- * **Note:** Non-object values are coerced to objects. See the
- * [ES spec](http://ecma-international.org/ecma-262/6.0/#sec-object.keys)
- * for more details.
- *
- * @static
- * @memberOf _
- * @category Object
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of property names.
- * @example
- *
- * function Foo() {
- *   this.a = 1;
- *   this.b = 2;
- * }
- *
- * Foo.prototype.c = 3;
- *
- * _.keys(new Foo);
- * // => ['a', 'b'] (iteration order is not guaranteed)
- *
- * _.keys('hi');
- * // => ['0', '1']
- */
-var keys = !nativeKeys ? shimKeys : function(object) {
-  var Ctor = object == null ? undefined : object.constructor;
-  if ((typeof Ctor == 'function' && Ctor.prototype === object) ||
-      (typeof object != 'function' && isArrayLike(object))) {
-    return shimKeys(object);
-  }
-  return isObject(object) ? nativeKeys(object) : [];
-};
-
-/**
- * Creates an array of the own and inherited enumerable property names of `object`.
- *
- * **Note:** Non-object values are coerced to objects.
- *
- * @static
- * @memberOf _
- * @category Object
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of property names.
- * @example
- *
- * function Foo() {
- *   this.a = 1;
- *   this.b = 2;
- * }
- *
- * Foo.prototype.c = 3;
- *
- * _.keysIn(new Foo);
- * // => ['a', 'b', 'c'] (iteration order is not guaranteed)
- */
-function keysIn(object) {
-  if (object == null) {
-    return [];
-  }
-  if (!isObject(object)) {
-    object = Object(object);
-  }
-  var length = object.length;
-  length = (length && isLength(length) &&
-    (isArray(object) || isArguments(object)) && length) || 0;
-
-  var Ctor = object.constructor,
-      index = -1,
-      isProto = typeof Ctor == 'function' && Ctor.prototype === object,
-      result = Array(length),
-      skipIndexes = length > 0;
-
-  while (++index < length) {
-    result[index] = (index + '');
-  }
-  for (var key in object) {
-    if (!(skipIndexes && isIndex(key, length)) &&
-        !(key == 'constructor' && (isProto || !hasOwnProperty.call(object, key)))) {
-      result.push(key);
-    }
-  }
-  return result;
-}
-
-module.exports = keys;
-
-},{"lodash._getnative":77,"lodash.isarguments":76,"lodash.isarray":48}]},{},[1])(1)
+},{"lodash.isarray":47,"lodash.istypedarray":75,"lodash.keys":71}]},{},[1])(1)
 });
 ;
