@@ -12,29 +12,47 @@
   "github:rubycon/isaac.js@master": {},
   "github:buu700/microlight@master": {},
   "github:morr/jquery.appear@0.3.6": {},
-  "npm:nanoscroller@0.8.7": {
-    "css": "npm:css",
-    "jquery": "npm:jquery"
-  },
   "npm:regenerator-runtime@0.9.5": {
     "path": "github:jspm/nodelibs-path@^0.1.0",
     "process": "github:jspm/nodelibs-process@^0.1.0"
   },
-  "github:davidchambers/base64.js@0.3.0": {},
   "github:braintree/braintree-web@2.24.1": {},
+  "github:davidchambers/base64.js@0.3.0": {},
   "npm:symbol-observable@0.2.4": {},
   "github:julianlam/tabIndent.js@master": {},
   "github:aws/aws-sdk-js@2.3.19": {},
-  "github:markdown-it/markdown-it-sup@1.0.0": {},
   "github:angular/bower-angular-aria@1.5.6": {
     "angular": "jspm:angular@^1.3.0"
   },
+  "github:markdown-it/markdown-it-sup@1.0.0": {},
   "npm:babel-polyfill@6.9.1": {
     "core-js": "npm:core-js@^2.4.0",
     "babel-runtime": "npm:babel-runtime@^6.9.1",
     "regenerator-runtime": "npm:regenerator-runtime@^0.9.5",
     "process": "github:jspm/nodelibs-process@^0.1.0"
   },
+  "github:angular/bower-angular-animate@1.5.6": {
+    "angular": "jspm:angular@^1.3.0"
+  },
+  "github:jspm/nodelibs-process@0.1.2": {
+    "process": "npm:process@^0.11.0"
+  },
+  "github:jspm/nodelibs-path@0.1.0": {
+    "path-browserify": "npm:path-browserify@0.0.0"
+  },
+  "npm:path-browserify@0.0.0": {
+    "process": "github:jspm/nodelibs-process@^0.1.0"
+  },
+  "npm:nanoscroller@0.8.7": {
+    "css": "npm:css",
+    "jquery": "npm:jquery"
+  },
+  "github:cyph/supersphincs.js@master": {},
+  "npm:process@0.11.4": {
+    "assert": "github:jspm/nodelibs-assert@^0.1.0"
+  },
+  "github:matthieua/wow@1.1.2": {},
+  "github:systemjs/plugin-css@0.1.23": {},
   "npm:inherits@2.0.1": {
     "util": "github:jspm/nodelibs-util@^0.1.0"
   },
@@ -49,30 +67,21 @@
     "fs": "github:jspm/nodelibs-fs@^0.1.0",
     "path": "github:jspm/nodelibs-path@^0.1.0"
   },
+  "github:andyet/simplewebrtc@2.1.0": {},
+  "github:markdown-it/markdown-it-emoji@1.2.0": {},
   "npm:amdefine@1.0.0": {
     "path": "github:jspm/nodelibs-path@^0.1.0",
     "process": "github:jspm/nodelibs-process@^0.1.0",
     "module": "github:jspm/nodelibs-module@^0.1.0",
     "fs": "github:jspm/nodelibs-fs@^0.1.0"
   },
-  "github:angular/bower-angular-animate@1.5.6": {
-    "angular": "jspm:angular@^1.3.0"
-  },
   "npm:atob@1.1.3": {
     "process": "github:jspm/nodelibs-process@^0.1.0",
     "buffer": "github:jspm/nodelibs-buffer@^0.1.0"
   },
-  "github:jspm/nodelibs-process@0.1.2": {
-    "process": "npm:process@^0.11.0"
-  },
-  "npm:source-map-url@0.3.0": {},
-  "github:jspm/nodelibs-path@0.1.0": {
-    "path-browserify": "npm:path-browserify@0.0.0"
-  },
   "npm:resolve-url@0.2.1": {},
-  "npm:path-browserify@0.0.0": {
-    "process": "github:jspm/nodelibs-process@^0.1.0"
-  },
+  "npm:source-map-url@0.3.0": {},
+  "github:cyph/ntru.js@master": {},
   "npm:source-map-resolve@0.3.1": {
     "source-map-url": "npm:source-map-url@~0.3.0",
     "atob": "npm:atob@~1.1.0",
@@ -81,20 +90,6 @@
     "fs": "github:jspm/nodelibs-fs@^0.1.0",
     "url": "github:jspm/nodelibs-url@^0.1.0"
   },
-  "npm:process@0.11.4": {
-    "assert": "github:jspm/nodelibs-assert@^0.1.0"
-  },
-  "github:systemjs/plugin-css@0.1.23": {},
-  "github:cyph/supersphincs.js@master": {},
-  "github:matthieua/wow@1.1.2": {},
-  "github:jspm/nodelibs-util@0.1.0": {
-    "util": "npm:util@^0.10.3"
-  },
-  "github:andyet/simplewebrtc@2.1.0": {},
-  "github:jspm/nodelibs-module@0.1.0": {},
-  "github:markdown-it/markdown-it-emoji@1.2.0": {},
-  "github:jspm/nodelibs-fs@0.1.2": {},
-  "github:cyph/ntru.js@master": {},
   "npm:dompurify@0.8.2": {
     "fs": "github:jspm/nodelibs-fs@^0.1.0",
     "http": "github:jspm/nodelibs-http@^1.7.0",
@@ -107,54 +102,39 @@
     "process": "github:jspm/nodelibs-process@^0.1.0",
     "buffer": "github:jspm/nodelibs-buffer@^0.1.0"
   },
-  "github:jspm/nodelibs-buffer@0.1.0": {
-    "buffer": "npm:buffer@^3.0.1"
-  },
   "github:jspm/nodelibs-assert@0.1.0": {
     "assert": "npm:assert@^1.3.0"
   },
-  "npm:util@0.10.3": {
-    "inherits": "npm:inherits@2.0.1",
-    "process": "github:jspm/nodelibs-process@^0.1.0"
+  "github:jspm/nodelibs-util@0.1.0": {
+    "util": "npm:util@^0.10.3"
   },
-  "npm:ieee754@1.1.6": {},
-  "npm:source-map@0.1.43": {
-    "amdefine": "npm:amdefine",
-    "process": "github:jspm/nodelibs-process@^0.1.0",
-    "path": "github:jspm/nodelibs-path@^0.1.0",
-    "fs": "github:jspm/nodelibs-fs@^0.1.0"
+  "github:jspm/nodelibs-module@0.1.0": {},
+  "github:jspm/nodelibs-fs@0.1.2": {},
+  "github:jspm/nodelibs-buffer@0.1.0": {
+    "buffer": "npm:buffer@^3.0.1"
   },
-  "npm:isarray@1.0.0": {},
-  "npm:base64-js@0.0.8": {},
+  "github:jspm/nodelibs-domain@0.1.0": {
+    "domain-browser": "npm:domain-browser@^1.1.3"
+  },
+  "github:jspm/nodelibs-url@0.1.0": {
+    "url": "npm:url@^0.10.1"
+  },
   "npm:assert@1.4.1": {
     "util": "npm:util@0.10.3",
-    "assert": "github:jspm/nodelibs-assert@^0.1.0",
     "buffer": "github:jspm/nodelibs-buffer@^0.1.0",
+    "assert": "github:jspm/nodelibs-assert@^0.1.0",
     "process": "github:jspm/nodelibs-process@^0.1.0"
   },
   "npm:magnific-popup@1.1.0": {
     "process": "github:jspm/nodelibs-process@^0.1.0"
   },
-  "github:jspm/nodelibs-url@0.1.0": {
-    "url": "npm:url@^0.10.1"
-  },
-  "github:jspm/nodelibs-domain@0.1.0": {
-    "domain-browser": "npm:domain-browser@^1.1.3"
-  },
-  "npm:url@0.10.3": {
-    "punycode": "npm:punycode@1.3.2",
-    "querystring": "npm:querystring@0.2.0",
-    "assert": "github:jspm/nodelibs-assert@^0.1.0",
-    "util": "github:jspm/nodelibs-util@^0.1.0"
+  "npm:domain-browser@1.1.7": {
+    "events": "github:jspm/nodelibs-events@^0.1.1"
   },
   "npm:punycode@1.3.2": {
     "process": "github:jspm/nodelibs-process@^0.1.0"
   },
-  "npm:domain-browser@1.1.7": {
-    "events": "github:jspm/nodelibs-events@^0.1.1"
-  },
   "npm:Base64@0.2.1": {},
-  "github:angular/bower-angular@1.5.6": {},
   "github:jspm/nodelibs-http@1.7.1": {
     "Base64": "npm:Base64@~0.2.0",
     "inherits": "npm:inherits@~2.0.1",
@@ -163,6 +143,35 @@
     "events": "github:jspm/nodelibs-events@^0.1.1",
     "url": "github:jspm/nodelibs-url@^0.1.0"
   },
+  "npm:url@0.10.3": {
+    "punycode": "npm:punycode@1.3.2",
+    "querystring": "npm:querystring@0.2.0",
+    "assert": "github:jspm/nodelibs-assert@^0.1.0",
+    "util": "github:jspm/nodelibs-util@^0.1.0"
+  },
+  "github:angular/bower-angular@1.5.6": {},
+  "npm:ieee754@1.1.6": {},
+  "npm:isarray@1.0.0": {},
+  "npm:source-map@0.1.43": {
+    "amdefine": "npm:amdefine",
+    "process": "github:jspm/nodelibs-process@^0.1.0",
+    "path": "github:jspm/nodelibs-path@^0.1.0",
+    "fs": "github:jspm/nodelibs-fs@^0.1.0"
+  },
+  "npm:base64-js@0.0.8": {},
+  "npm:util@0.10.3": {
+    "inherits": "npm:inherits@2.0.1",
+    "process": "github:jspm/nodelibs-process@^0.1.0"
+  },
+  "npm:querystring@0.2.0": {},
+  "npm:reflect-metadata@0.1.2": {
+    "process": "github:jspm/nodelibs-process@^0.1.0",
+    "assert": "github:jspm/nodelibs-assert@^0.1.0"
+  },
+  "github:jspm/nodelibs-events@0.1.1": {
+    "events": "npm:events@1.0.2"
+  },
+  "npm:animate.css@3.5.1": {},
   "npm:buffer@3.6.0": {
     "base64-js": "npm:base64-js@0.0.8",
     "ieee754": "npm:ieee754@^1.1.4",
@@ -171,36 +180,27 @@
     "child_process": "github:jspm/nodelibs-child_process@^0.1.0",
     "process": "github:jspm/nodelibs-process@^0.1.0"
   },
-  "npm:reflect-metadata@0.1.2": {
-    "process": "github:jspm/nodelibs-process@^0.1.0",
-    "assert": "github:jspm/nodelibs-assert@^0.1.0"
-  },
-  "npm:querystring@0.2.0": {},
-  "npm:animate.css@3.5.1": {},
-  "github:jspm/nodelibs-events@0.1.1": {
-    "events": "npm:events@1.0.2"
-  },
-  "github:jspm/nodelibs-child_process@0.1.0": {},
   "github:jspm/nodelibs-stream@0.1.0": {
     "stream-browserify": "npm:stream-browserify@^1.0.0"
   },
+  "npm:events@1.0.2": {},
   "npm:stream-browserify@1.0.0": {
     "inherits": "npm:inherits@~2.0.1",
     "readable-stream": "npm:readable-stream@^1.0.27-1",
     "events": "github:jspm/nodelibs-events@^0.1.1"
   },
+  "github:sytelus/cryptojs@3.1.2": {},
   "npm:unsemantic@1.1.3": {
     "process": "github:jspm/nodelibs-process@^0.1.0"
   },
-  "github:sytelus/cryptojs@3.1.2": {},
   "npm:isarray@0.0.1": {},
-  "npm:events@1.0.2": {},
   "npm:string_decoder@0.10.31": {
     "buffer": "github:jspm/nodelibs-buffer@^0.1.0"
   },
   "npm:core-util-is@1.0.2": {
     "buffer": "github:jspm/nodelibs-buffer@^0.1.0"
   },
+  "github:jspm/nodelibs-child_process@0.1.0": {},
   "npm:readable-stream@1.1.14": {
     "core-util-is": "npm:core-util-is@~1.0.0",
     "inherits": "npm:inherits@~2.0.1",
