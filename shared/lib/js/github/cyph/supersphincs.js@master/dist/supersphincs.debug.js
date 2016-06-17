@@ -9,6 +9,7 @@ var superSphincs = (function () {
 if (isNode) {
 	self	= this;
 }
+
 var sphincs = (function () { 
 
 // The Module object: Our interface to the outside world. We import
@@ -1162,8 +1163,8 @@ function enlargeMemory() {
 }
 
 
-var TOTAL_STACK = Module['TOTAL_STACK'] || 5242880;
-var TOTAL_MEMORY = Module['TOTAL_MEMORY'] || 1049000;
+var TOTAL_STACK = Module['TOTAL_STACK'] || 13107200;
+var TOTAL_MEMORY = Module['TOTAL_MEMORY'] || 26214400;
 
 var totalMemory = 64*1024;
 while (totalMemory < TOTAL_MEMORY || totalMemory < 2*TOTAL_STACK) {
@@ -19470,13 +19471,13 @@ Module._randombytes_stir();
 
 
 var sphincs	= {
-	publicKeyLength: Module._sphincsjs_public_key_bytes(),
-	privateKeyLength: Module._sphincsjs_secret_key_bytes(),
-	signatureLength: Module._sphincsjs_signature_bytes(),
+	publicKeyBytes: Module._sphincsjs_public_key_bytes(),
+	privateKeyBytes: Module._sphincsjs_secret_key_bytes(),
+	bytes: Module._sphincsjs_signature_bytes(),
 
 	keyPair: function () {
-		var publicKeyBuffer		= Module._malloc(sphincs.publicKeyLength);
-		var privateKeyBuffer	= Module._malloc(sphincs.privateKeyLength);
+		var publicKeyBuffer		= Module._malloc(sphincs.publicKeyBytes);
+		var privateKeyBuffer	= Module._malloc(sphincs.privateKeyBytes);
 
 		try {
 			var returnValue	= Module._crypto_sign_sphincs_keypair(
@@ -19485,8 +19486,8 @@ var sphincs	= {
 			);
 
 			return dataReturn(returnValue, {
-				publicKey: dataResult(publicKeyBuffer, sphincs.publicKeyLength),
-				privateKey: dataResult(privateKeyBuffer, sphincs.privateKeyLength)
+				publicKey: dataResult(publicKeyBuffer, sphincs.publicKeyBytes),
+				privateKey: dataResult(privateKeyBuffer, sphincs.privateKeyBytes)
 			});
 		}
 		finally {
@@ -19496,11 +19497,11 @@ var sphincs	= {
 	},
 
 	sign: function (message, privateKey) {
-		var signedLength		= message.length + sphincs.signatureLength;
+		var signedBytes		= message.length + sphincs.bytes;
 
-		var signedBuffer		= Module._malloc(signedLength);
+		var signedBuffer		= Module._malloc(signedBytes);
 		var messageBuffer		= Module._malloc(message.length);
-		var privateKeyBuffer	= Module._malloc(sphincs.privateKeyLength);
+		var privateKeyBuffer	= Module._malloc(sphincs.privateKeyBytes);
 
 		Module.writeArrayToMemory(message, messageBuffer);
 		Module.writeArrayToMemory(privateKey, privateKeyBuffer);
@@ -19514,7 +19515,7 @@ var sphincs	= {
 				privateKeyBuffer
 			);
 
-			return dataReturn(returnValue, dataResult(signedBuffer, signedLength));
+			return dataReturn(returnValue, dataResult(signedBuffer, signedBytes));
 		}
 		finally {
 			dataFree(signedBuffer);
@@ -19527,16 +19528,16 @@ var sphincs	= {
 		return new Uint8Array(
 			sphincs.sign(message, privateKey).buffer,
 			0,
-			sphincs.signatureLength
+			sphincs.bytes
 		);
 	},
 
 	open: function (signed, publicKey) {
-		var openedLength	= signed.length - sphincs.signatureLength;
+		var openedBytes	= signed.length - sphincs.bytes;
 
-		var openedBuffer	= Module._malloc(openedLength);
+		var openedBuffer	= Module._malloc(openedBytes);
 		var signedBuffer	= Module._malloc(signed.length);
-		var publicKeyBuffer	= Module._malloc(sphincs.publicKeyLength);
+		var publicKeyBuffer	= Module._malloc(sphincs.publicKeyBytes);
 
 		Module.writeArrayToMemory(signed, signedBuffer);
 		Module.writeArrayToMemory(publicKey, publicKeyBuffer);
@@ -19550,7 +19551,7 @@ var sphincs	= {
 				publicKeyBuffer
 			);
 
-			return dataReturn(returnValue, dataResult(openedBuffer, openedLength));
+			return dataReturn(returnValue, dataResult(openedBuffer, openedBytes));
 		}
 		finally {
 			dataFree(openedBuffer);
@@ -19560,9 +19561,9 @@ var sphincs	= {
 	},
 
 	verifyDetached: function (signature, message, publicKey) {
-		var signed	= new Uint8Array(sphincs.signatureLength + message.length);
+		var signed	= new Uint8Array(sphincs.bytes + message.length);
 		signed.set(signature);
-		signed.set(message, sphincs.signatureLength);
+		signed.set(message, sphincs.bytes);
 
 		try {
 			sphincs.open(signed, publicKey);
@@ -19586,6 +19587,7 @@ return sphincs;
 self.sphincs	= sphincs;
 
 //# sourceMappingURL=sphincs.debug.js.map;
+
 (function(K,sa){var ka="undefined"!="undefined";ka&&(K=global);var a="0123456789abcdef".split(""),ra=[-2147483648,8388608,32768,128],ea=[24,16,8,0],da=[1116352408,3609767458,1899447441,602891725,3049323471,3964484399,3921009573,2173295548,961987163,4081628472,1508970993,3053834265,2453635748,2937671579,2870763221,3664609560,3624381080,2734883394,310598401,1164996542,607225278,1323610764,1426881987,3590304994,1925078388,4068182383,2162078206,991336113,2614888103,633803317,3248222580,3479774868,3835390401,
 2666613458,4022224774,944711139,264347078,2341262773,604807628,2007800933,770255983,1495990901,1249150122,1856431235,1555081692,3175218132,1996064986,2198950837,2554220882,3999719339,2821834349,766784016,2952996808,2566594879,3210313671,3203337956,3336571891,1034457026,3584528711,2466948901,113926993,3758326383,338241895,168717936,666307205,1188179964,773529912,1546045734,1294757372,1522805485,1396182291,2643833823,1695183700,2343527390,1986661051,1014477480,2177026350,1206759142,2456956037,344077627,
 2730485921,1290863460,2820302411,3158454273,3259730800,3505952657,3345764771,106217008,3516065817,3606008344,3600352804,1432725776,4094571909,1467031594,275423344,851169720,430227734,3100823752,506948616,1363258195,659060556,3750685593,883997877,3785050280,958139571,3318307427,1322822218,3812723403,1537002063,2003034995,1747873779,3602036899,1955562222,1575990012,2024104815,1125592928,2227730452,2716904306,2361852424,442776044,2428436474,593698344,2756734187,3733110249,3204031479,2999351573,3329325298,
@@ -19608,6 +19610,8 @@ d=(q&65535)+(O&65535);b=(q>>>16)+(O>>>16)+(d>>>16);c=(n&65535)+(N&65535)+(b>>>16
 15]+a[t&15]+a[u>>28&15]+a[u>>24&15]+a[u>>20&15]+a[u>>16&15]+a[u>>12&15]+a[u>>8&15]+a[u>>4&15]+a[u&15]+a[v>>28&15]+a[v>>24&15]+a[v>>20&15]+a[v>>16&15]+a[v>>12&15]+a[v>>8&15]+a[v>>4&15]+a[v&15]+a[w>>28&15]+a[w>>24&15]+a[w>>20&15]+a[w>>16&15]+a[w>>12&15]+a[w>>8&15]+a[w>>4&15]+a[w&15];256<=K&&(n+=a[x>>28&15]+a[x>>24&15]+a[x>>20&15]+a[x>>16&15]+a[x>>12&15]+a[x>>8&15]+a[x>>4&15]+a[x&15]);384<=K&&(n+=a[y>>28&15]+a[y>>24&15]+a[y>>20&15]+a[y>>16&15]+a[y>>12&15]+a[y>>8&15]+a[y>>4&15]+a[y&15]+a[z>>28&15]+a[z>>
 24&15]+a[z>>20&15]+a[z>>16&15]+a[z>>12&15]+a[z>>8&15]+a[z>>4&15]+a[z&15]+a[A>>28&15]+a[A>>24&15]+a[A>>20&15]+a[A>>16&15]+a[A>>12&15]+a[A>>8&15]+a[A>>4&15]+a[A&15]+a[B>>28&15]+a[B>>24&15]+a[B>>20&15]+a[B>>16&15]+a[B>>12&15]+a[B>>8&15]+a[B>>4&15]+a[B&15]);512==K&&(n+=a[C>>28&15]+a[C>>24&15]+a[C>>20&15]+a[C>>16&15]+a[C>>12&15]+a[C>>8&15]+a[C>>4&15]+a[C&15]+a[D>>28&15]+a[D>>24&15]+a[D>>20&15]+a[D>>16&15]+a[D>>12&15]+a[D>>8&15]+a[D>>4&15]+a[D&15]+a[E>>28&15]+a[E>>24&15]+a[E>>20&15]+a[E>>16&15]+a[E>>12&
 15]+a[E>>8&15]+a[E>>4&15]+a[E&15]+a[F>>28&15]+a[F>>24&15]+a[F>>20&15]+a[F>>16&15]+a[F>>12&15]+a[F>>8&15]+a[F>>4&15]+a[F&15]);return n};!K.JS_SHA512_TEST&&ka?(Z.sha512=Z,Z.sha384=oa,Z.sha512_256=pa,Z.sha512_224=qa,module.exports=Z):K&&(K.sha512=Z,K.sha384=oa,K.sha512_256=pa,K.sha512_224=qa)})(this);
+
+!function(t){function e(){}function n(t,e){return function(){t.apply(e,arguments)}}function o(t){if("object"!=typeof this)throw new TypeError("Promises must be constructed via new");if("function"!=typeof t)throw new TypeError("not a function");this._state=0,this._handled=!1,this._value=void 0,this._deferreds=[],s(t,this)}function r(t,e){for(;3===t._state;)t=t._value;return 0===t._state?void t._deferreds.push(e):(t._handled=!0,void a(function(){var n=1===t._state?e.onFulfilled:e.onRejected;if(null===n)return void(1===t._state?i:f)(e.promise,t._value);var o;try{o=n(t._value)}catch(r){return void f(e.promise,r)}i(e.promise,o)}))}function i(t,e){try{if(e===t)throw new TypeError("A promise cannot be resolved with itself.");if(e&&("object"==typeof e||"function"==typeof e)){var r=e.then;if(e instanceof o)return t._state=3,t._value=e,void u(t);if("function"==typeof r)return void s(n(r,e),t)}t._state=1,t._value=e,u(t)}catch(i){f(t,i)}}function f(t,e){t._state=2,t._value=e,u(t)}function u(t){2===t._state&&0===t._deferreds.length&&a(function(){t._handled||d(t._value)});for(var e=0,n=t._deferreds.length;n>e;e++)r(t,t._deferreds[e]);t._deferreds=null}function c(t,e,n){this.onFulfilled="function"==typeof t?t:null,this.onRejected="function"==typeof e?e:null,this.promise=n}function s(t,e){var n=!1;try{t(function(t){n||(n=!0,i(e,t))},function(t){n||(n=!0,f(e,t))})}catch(o){if(n)return;n=!0,f(e,o)}}var l=setTimeout,a="function"==typeof setImmediate&&setImmediate||function(t){l(t,0)},d=function(t){"undefined"!=typeof console&&console&&console.warn("Possible Unhandled Promise Rejection:",t)};o.prototype["catch"]=function(t){return this.then(null,t)},o.prototype.then=function(t,n){var o=new this.constructor(e);return r(this,new c(t,n,o)),o},o.all=function(t){var e=Array.prototype.slice.call(t);return new o(function(t,n){function o(i,f){try{if(f&&("object"==typeof f||"function"==typeof f)){var u=f.then;if("function"==typeof u)return void u.call(f,function(t){o(i,t)},n)}e[i]=f,0===--r&&t(e)}catch(c){n(c)}}if(0===e.length)return t([]);for(var r=e.length,i=0;i<e.length;i++)o(i,e[i])})},o.resolve=function(t){return t&&"object"==typeof t&&t.constructor===o?t:new o(function(e){e(t)})},o.reject=function(t){return new o(function(e,n){n(t)})},o.race=function(t){return new o(function(e,n){for(var o=0,r=t.length;r>o;o++)t[o].then(e,n)})},o._setImmediateFn=function(t){a=t},o._setUnhandledRejectionFn=function(t){d=t},"undefined"!="undefined"&&module.exports?module.exports=o:t.Promise||(t.Promise=o)}(this);
 
 
         function from_string(str) {
@@ -19763,7 +19767,9 @@ d=(q&65535)+(O&65535);b=(q>>>16)+(O>>>16)+(d>>>16);c=(n&65535)+(N&65535)+(b>>>16
         }
 
         //---------------------------------------------------------------------------
-        // ;
+        // 
+function memzero(bytes) { if (! bytes instanceof Uint8Array) { throw new TypeError("Only Uint8Array instances can be wiped"); } for (var i = 0 | 0, j = bytes.length; i < j; i++) { bytes[i] = 0; } }
+;
 
 var rsaKeygen, pemJwk;
 if (isNode) {
@@ -19772,51 +19778,48 @@ if (isNode) {
 }
 
 
-function importJWK (key, purpose, callback) {
-	var jwk	= JSON.parse(to_string(new Uint8Array(key.buffer, 0, key.indexOf(0))));
+function importJWK (key, purpose) {
+	return Promise.resolve().then(function () {
+		var jwk	= JSON.parse(to_string(new Uint8Array(key.buffer, 0, key.indexOf(0))));
 
-	if (isNode) {
-		callback(pemJwk.jwk2pem(jwk));
-	}
-	else {
-		crypto.subtle.importKey(
-			'jwk',
-			jwk,
-			rsa.algorithm,
-			false,
-			[purpose]
-		).then(function (key) {
-			try {
-				callback(key);
-			}
-			catch (_) {}
-		}).catch(function () {
-			callback(null, 'Failed to import key.');
-		});
-	}
+		if (isNode) {
+			return pemJwk.jwk2pem(jwk);
+		}
+		else {
+			return crypto.subtle.importKey(
+				'jwk',
+				jwk,
+				rsa.algorithm,
+				false,
+				[purpose]
+			);
+		}
+	});
 }
 	
-function exportJWK (key, callback) {
-	function returnJWK (jwk) {
-		callback(from_string(JSON.stringify(jwk)));
-	}
+function exportJWK (key) {
+	return Promise.resolve().then(function () {
+		if (isNode) {
+			return pemJwk.pem2jwk(key);
+		}
+		else {
+			return crypto.subtle.exportKey(
+				'jwk',
+				key,
+				rsa.algorithm.name
+			);
+		}
+	}).then(function (jwk) {
+		return from_string(JSON.stringify(jwk));
+	});
+}
 
-	if (isNode) {
-		returnJWK(pemJwk.pem2jwk(key));
+function clearMemory (data) {
+	if (data instanceof Uint8Array) {
+		memzero(data);
 	}
-	else {
-		crypto.subtle.exportKey(
-			'jwk',
-			key,
-			rsa.algorithm.name
-		).then(function (jwk) {
-			try {
-				returnJWK(jwk);
-			}
-			catch (_) {}
-		}).catch(function () {
-			callback(null, 'Failed to export key.');
-		});
+	else if (isNode && data instanceof Buffer) {
+		data.fill(0);
 	}
 }
 
@@ -19848,35 +19851,39 @@ function encodeString (message) {
 	;
 }
 
-function hashMessage (message) {
-	var hex	= sha512(encodeString(message));
-	return {bytes: from_hex(hex), hex: hex};
-}
-
-function deriveEncryptionKey (password, salt, callback) {
+function deriveEncryptionKey (password, salt) {
 	if (isNode) {
-		crypto.pbkdf2(
-			new Buffer(password),
-			new Buffer(salt),
-			aes.keyDerivation.iterations,
-			aes.keyLength,
-			aes.keyDerivation.hashFunction,
-			function (err, key) {
-				callback(key, err);
-			}
-		);
+		return new Promise(function (resolve, reject) {
+			crypto.pbkdf2(
+				new Buffer(password),
+				new Buffer(salt),
+				aes.keyDerivation.iterations,
+				aes.keyBytes,
+				aes.keyDerivation.hashFunction,
+				function (err, key) {
+					if (err) {
+						reject(err);
+					}
+					else {
+						resolve(key);
+					}
+				}
+			);
+		});
 	}
 	else {
-		crypto.subtle.importKey(
-			'raw',
-			decodeString(password),
-			{
-				name: aes.keyDerivation.algorithm,
-			},
-			false,
-			['deriveKey']
-		).then(function (keyOrigin) {
-			crypto.subtle.deriveKey(
+		return Promise.resolve().then(function () {	
+			return crypto.subtle.importKey(
+				'raw',
+				decodeString(password),
+				{
+					name: aes.keyDerivation.algorithm,
+				},
+				false,
+				['deriveKey']
+			);
+		}).then(function (keyOrigin) {
+			return crypto.subtle.deriveKey(
 				{
 					name: aes.keyDerivation.algorithm,
 					salt: salt,
@@ -19888,178 +19895,180 @@ function deriveEncryptionKey (password, salt, callback) {
 				keyOrigin,
 				{
 					name: aes.algorithm,
-					length: aes.bitLength
+					length: aes.keyBits
 				},
 				false,
 				['encrypt', 'decrypt']
-			).then(function (key) {
-				try {
-					callback(key);
-				}
-				catch (_) {}
-			}).catch(function (err) {
-				callback(null, err);
-			});
-		})
-		.catch(function (err) {
-			callback(null, err);
+			);
 		});
 	}
 }
 
-function encrypt (plaintext, password, callback) {
-	var iv		= isNode ?
-		crypto.randomBytes(aes.ivLength) :
-		crypto.getRandomValues(new Uint8Array(aes.ivLength))
-	;
+function encrypt (plaintext, password) {
+	var setup	= Promise.resolve().then(function () {
+		var iv		= isNode ?
+			crypto.randomBytes(aes.ivBytes) :
+			crypto.getRandomValues(new Uint8Array(aes.ivBytes))
+		;
 
-	var salt	= isNode ?
-		crypto.randomBytes(aes.keyDerivation.saltLength) :
-		crypto.getRandomValues(new Uint8Array(aes.keyDerivation.saltLength))
-	;
+		var salt	= isNode ?
+			crypto.randomBytes(aes.keyDerivation.saltBytes) :
+			crypto.getRandomValues(new Uint8Array(aes.keyDerivation.saltBytes))
+		;
 
-	deriveEncryptionKey(password, salt, function (key, err) {
-		if (err) {
-			callback(null, err);
-			return;
-		}
+		return Promise.all([iv, salt, deriveEncryptionKey(password, salt)]);
+	}).then(function (results) {
+		return {
+			iv: results[0],
+			salt: results[1],
+			key: results[2]
+		};
+	});
 
-		if (isNode) {
-			try {
-				var cipher	= crypto.createCipheriv(aes.algorithm, key, iv);
-				var buf1	= cipher.update(new Buffer(plaintext));
-				var buf2	= cipher.final();
-				var buf3	= cipher.getAuthTag();
+	if (isNode) {
+		return setup.then(function (o) {
+			var cipher	= crypto.createCipheriv(aes.algorithm, o.key, o.iv);
+			var buf1	= cipher.update(new Buffer(plaintext));
+			var buf2	= cipher.final();
+			var buf3	= cipher.getAuthTag();
 
-				callback(new Uint8Array(Buffer.concat([iv, salt, buf1, buf2, buf3])));
-			}
-			catch (err) {
-				callback(null, err);
-			}
-		}
-		else {
-			crypto.subtle.encrypt(
+			var cyphertext	= new Uint8Array(Buffer.concat([o.iv, o.salt, buf1, buf2, buf3]));
+
+			clearMemory(o.iv);
+			clearMemory(o.salt);
+			clearMemory(o.key);
+			clearMemory(buf1);
+			clearMemory(buf2);
+			clearMemory(buf3);
+
+			return cyphertext;
+		});
+	}
+	else {
+		return setup.then(function (o) {
+			return Promise.all([o, crypto.subtle.encrypt(
 				{
 					name: aes.algorithm,
-					iv: iv,
-					tagLength: aes.tagLengthBytes
+					iv: o.iv,
+					tagLength: aes.tagBits
 				},
-				key,
+				o.key,
 				plaintext
-			).then(function (encrypted) {
-				try {
-					encrypted		= new Uint8Array(encrypted);
+			)]);
+		}).then(function (results) {
+			var o			= results[0];
+			var encrypted	= new Uint8Array(results[1]);
 
-					var cyphertext	= new Uint8Array(
-						aes.ivLength + aes.keyDerivation.saltLength + encrypted.length
-					);
+			var cyphertext	= new Uint8Array(
+				aes.ivBytes + aes.keyDerivation.saltBytes + encrypted.length
+			);
 
-					cyphertext.set(iv);
-					cyphertext.set(salt, aes.ivLength);
-					cyphertext.set(encrypted, aes.ivLength + aes.keyDerivation.saltLength);
+			cyphertext.set(o.iv);
+			cyphertext.set(o.salt, aes.ivBytes);
+			cyphertext.set(encrypted, aes.ivBytes + aes.keyDerivation.saltBytes);
 
-					callback(cyphertext);
-				}
-				catch (_) {}
-			}).catch(function (err) {
-				callback(null, err);
-			});
-		}
-	});
+			clearMemory(o.iv);
+			clearMemory(o.salt);
+			clearMemory(o.key);
+			clearMemory(encrypted);
+
+			return cyphertext;
+		});
+	}
 }
 
-function decrypt (cyphertext, password, callback) {
-	var iv			= new Uint8Array(cyphertext.buffer, 0, aes.ivLength);
+function decrypt (cyphertext, password) {
+	return Promise.resolve().then(function () {
+		var iv		= new Uint8Array(cyphertext.buffer, 0, aes.ivBytes);
 
-	var salt		= new Uint8Array(
-		cyphertext.buffer,
-		aes.ivLength,
-		aes.keyDerivation.saltLength
-	);
+		var salt	= new Uint8Array(
+			cyphertext.buffer,
+			aes.ivBytes,
+			aes.keyDerivation.saltBytes
+		);
 
-	deriveEncryptionKey(password, salt, function (key, err) {
-		if (err) {
-			callback(null, err);
-			return;
-		}
+		return Promise.all([iv, deriveEncryptionKey(password, salt)]);
+	}).then(function (results) {
+		var iv	= results[0];
+		var key	= results[1];
+
+		var decrypted;
 
 		if (isNode) {
-			try {
-				var encrypted	= new Uint8Array(
-					cyphertext.buffer,
-					aes.ivLength + aes.keyDerivation.saltLength,
-					cyphertext.length -
-						aes.ivLength -
-						aes.keyDerivation.saltLength -
-						aes.tagLength
-				);
+			var encrypted	= new Uint8Array(
+				cyphertext.buffer,
+				aes.ivBytes + aes.keyDerivation.saltBytes,
+				cyphertext.length -
+					aes.ivBytes -
+					aes.keyDerivation.saltBytes -
+					aes.tagBytes
+			);
 
-				var authTag		= new Uint8Array(
-					cyphertext.buffer,
-					cyphertext.length - aes.tagLength
-				);
+			var authTag		= new Uint8Array(
+				cyphertext.buffer,
+				cyphertext.length - aes.tagBytes
+			);
 
-				var decipher	= crypto.createDecipheriv(
-					aes.algorithm,
-					new Buffer(key),
-					new Buffer(iv)
-				);
+			var decipher	= crypto.createDecipheriv(
+				aes.algorithm,
+				new Buffer(key),
+				new Buffer(iv)
+			);
 
-				decipher.setAuthTag(new Buffer(authTag));
+			decipher.setAuthTag(new Buffer(authTag));
 
-				var buf1	= decipher.update(new Buffer(encrypted));
-				var buf2	= decipher.final();
+			var buf1	= decipher.update(new Buffer(encrypted));
+			var buf2	= decipher.final();
 
-				callback(new Uint8Array(Buffer.concat([buf1, buf2])));
-			}
-			catch (err) {
-				callback(null, err);
-			}
+			decrypted	= Buffer.concat([buf1, buf2]);;
+
+			clearMemory(buf1);
+			clearMemory(buf2);
 		}
 		else {
 			var encrypted	= new Uint8Array(
 				cyphertext.buffer,
-				aes.ivLength + aes.keyDerivation.saltLength
+				aes.ivBytes + aes.keyDerivation.saltBytes
 			);
 
-			crypto.subtle.decrypt(
+			decrypted	= crypto.subtle.decrypt(
 				{
 					name: aes.algorithm,
 					iv: iv,
-					tagLength: aes.tagLengthBytes
+					tagLength: aes.tagBits
 				},
 				key,
 				encrypted
-			).then(function (decrypted) {
-				try {
-					callback(new Uint8Array(decrypted));
-				}
-				catch (_) {}
-			}).catch(function (err) {
-				callback(null, err);
-			});
+			);
 		}
+
+		return Promise.all([key, decrypted]);
+	}).then(function (results) {
+		var key			= results[0];
+		var decrypted	= results[1];
+
+		clearMemory(key);
+
+		return new Uint8Array(decrypted);
 	});
 }
 
 
 var aes	= {
 	algorithm: isNode ? 'aes-256-gcm' : 'AES-GCM',
-	ivLength: 12,
-	keyLength: 32,
-	bitLength: 256,
-	tagLength: 16,
-	tagLengthBytes: null,
+	ivBytes: 12,
+	keyBytes: 32,
+	keyBits: 256,
+	tagBytes: 16,
+	tagBits: 128,
 
 	keyDerivation: {
 		algorithm: 'PBKDF2',
 		hashFunction: isNode ? 'sha512' : 'SHA-512',
 		iterations: 1000000,
-		saltLength: 32
+		saltBytes: 32
 	}
 };
-
-aes.tagLengthBytes	= aes.tagLength * 8;
 
 
 var rsa	= {
@@ -20075,581 +20084,582 @@ var rsa	= {
 		}
 	,
 
-	publicKeyLength: 450,
-	privateKeyLength: 1700,
-	signatureLength: 256,
+	publicKeyBytes: 450,
+	privateKeyBytes: 1700,
+	bytes: 256,
 
-	errorMessages: {
-		keyPair: 'Failed to generate RSA key pair.',
-		signDetached: 'Failed to generate RSA signature.',
-		verifyDetached: 'Failed to attempt to verify RSA signature.'
-	},
-
-	keyPair: function (callback) {
-		function returnKeyPair (kp) {
-			var keyPair = {};
-
-			exportJWK(kp.publicKey, function (publicKey) {
-				keyPair.publicKey = publicKey;
-
-				exportJWK(kp.privateKey, function (privateKey) {
-					keyPair.privateKey = privateKey;
-
-					callback(keyPair);
-				});
-			});
-		}
-
-		try {
+	keyPair: function () {
+		return Promise.resolve().then(function () {
 			if (isNode) {
-				var kp	= rsaKeygen.generate();
+				var keyPair	= rsaKeygen.generate();
 
-				returnKeyPair({
-					publicKey: kp.public_key,
-					privateKey: kp.private_key
-				});
+				return {
+					publicKey: keyPair.public_key,
+					privateKey: keyPair.private_key
+				};
 			}
 			else {
-				crypto.subtle.generateKey(
+				return crypto.subtle.generateKey(
 					rsa.algorithm,
 					true,
 					['sign', 'verify']
-				).then(function (kp) {
-					try {
-						returnKeyPair(kp);
-					}
-					catch (_) {}
-				}).catch(function () {
-					callback(null, rsa.errorMessages.keyPair);
-				});
+				);
 			}
-		}
-		catch (_) {
-			callback(null, rsa.errorMessages.keyPair);
-		}
+		}).then(function (keyPair) {
+			return Promise.all([
+				exportJWK(keyPair.publicKey),
+				exportJWK(keyPair.privateKey)
+			]);
+		}).then(function (results) {
+			return {
+				publicKey: results[0],
+				privateKey: results[1]
+			};
+		});
 	},
 
-	signDetached: function (message, privateKey, callback) {
-		try {
-			importJWK(privateKey, 'sign', function (sk) {
-				if (isNode) {
-					var signer	= crypto.createSign(rsa.algorithm);
-					signer.write(new Buffer(message));
-					signer.end();
-					callback(new Uint8Array(signer.sign(sk)));
-				}
-				else {
-					crypto.subtle.sign(rsa.algorithm, sk, message).
-						then(function (signature) {
-							try {
-								callback(new Uint8Array(signature));
-							}
-							catch (_) {}
-						}).catch(function () {
-							callback(null, rsa.errorMessages.signDetached);
-						})
-					;
-				}
-			});
-		}
-		catch (_) {
-			callback(null, rsa.errorMessages.signDetached);
-		}
+	signDetached: function (message, privateKey) {
+		return importJWK(privateKey, 'sign').then(function (sk) {
+			var signature;
+
+			if (isNode) {
+				var messageBuffer	= new Buffer(message);
+				var signer			= crypto.createSign(rsa.algorithm);
+				signer.write(messageBuffer);
+				signer.end();
+
+				signature	= signer.sign(sk);
+
+				clearMemory(messageBuffer);
+			}
+			else {
+				signature	= crypto.subtle.sign(rsa.algorithm, sk, message);
+			}
+
+			return Promise.all([sk, signature]);
+		}).then(function (results) {
+			var sk			= results[0];
+			var signature	= results[1];
+
+			clearMemory(sk);
+
+			return new Uint8Array(signature);
+		});
 	},
 
-	verifyDetached: function (signature, message, publicKey, callback) {
-		try {
-			importJWK(publicKey, 'verify', function (pk) {
-				if (isNode) {
-					var verifier	= crypto.createVerify(rsa.algorithm);
-					verifier.update(new Buffer(message));
-					callback(verifier.sign(pk, signature));
-				}
-				else {
-					crypto.subtle.verify(rsa.algorithm, pk, signature, message).
-						then(function (isValid) {
-							try {
-								callback(isValid);
-							}
-							catch (_) {}
-						}).catch(function () {
-							callback(null, rsa.errorMessages.verifyDetached);
-						})
-					;
-				}
-			});
-		}
-		catch (_) {
-			callback(null, rsa.errorMessages.verifyDetached);
-		}
+	verifyDetached: function (signature, message, publicKey) {
+		return importJWK(publicKey, 'verify').then(function (pk) {
+			var isValid;
+
+			if (isNode) {
+				var verifier	= crypto.createVerify(rsa.algorithm);
+				verifier.update(new Buffer(message));
+
+				isValid	= verifier.verify(pk, signature);
+			}
+			else {
+				isValid	= crypto.subtle.verify(rsa.algorithm, pk, signature, message);
+			}
+
+			return Promise.all([pk, isValid]);
+		}).then(function (results) {
+			var pk		= results[0];
+			var isValid	= results[1];
+
+			clearMemory(pk);
+
+			return isValid;
+		});
 	}
 };
 
 
 var superSphincs	= {
-	publicKeyLength: rsa.publicKeyLength + sphincs.publicKeyLength,
-	privateKeyLength: rsa.privateKeyLength + sphincs.privateKeyLength,
-	signatureLength: rsa.signatureLength + sphincs.signatureLength,
-	hashLength: 64,
+	publicKeyBytes: rsa.publicKeyBytes + sphincs.publicKeyBytes,
+	privateKeyBytes: rsa.privateKeyBytes + sphincs.privateKeyBytes,
+	bytes: rsa.bytes + sphincs.bytes,
+	hashBytes: 64,
 
-	errorMessages: {
-		keyPair: 'Failed to generate SuperSPHINCS key pair.',
-		sign: 'Failed to generate SuperSPHINCS signature.',
-		open: 'Failed to open SuperSPHINCS signed message.',
-		verify: 'Failed to attempt to verify SuperSPHINCS signature.'
-	},
+	hash: function (message) {
+		var messageBinary;
+		var shouldClearMessageBinary	= typeof message === 'string';
 
-	hash: hashMessage,
+		return Promise.resolve().then(function () {
+			messageBinary	= decodeString(message);
 
-	keyPair: function (callback) {
-		var sphincsKeyPair;
+			if (isNode) {
+				var hasher	= crypto.createHash('sha512');
+				hasher.update(new Buffer(messageBinary));
 
-		try {
-			sphincsKeyPair	= sphincs.keyPair();
-		}
-		catch (_) {
-			callback(null, superSphincs.errorMessages.keyPair);
-		}
-
-		rsa.keyPair(function (rsaKeyPair, err) {
-			if (err) {
-				callback(null, superSphincs.errorMessages.keyPair);
-				return;
+				return hasher.digest();
+			}
+			else {
+				return crypto.subtle.digest(
+					{
+						name: 'SHA-512'
+					},
+					messageBinary
+				);
+			}
+		}).then(function (hash) {
+			if (shouldClearMessageBinary) {
+				clearMemory(messageBinary);
 			}
 
+			var binary	= new Uint8Array(hash);
+			return {binary: binary, hex: to_hex(binary)};
+		}).catch(function () {
+			if (shouldClearMessageBinary) {
+				clearMemory(messageBinary);
+			}
+
+			var hex	= sha512(encodeString(message));
+			return {binary: from_hex(hex), hex: hex};
+		});
+	},
+
+	keyPair: function () {
+		return rsa.keyPair().then(function (rsaKeyPair) {
+			var sphincsKeyPair	= sphincs.keyPair();
+
 			var keyPair	= {
-				publicKey: new Uint8Array(superSphincs.publicKeyLength),
-				privateKey: new Uint8Array(superSphincs.privateKeyLength)
+				keyType: 'supersphincs',
+				publicKey: new Uint8Array(superSphincs.publicKeyBytes),
+				privateKey: new Uint8Array(superSphincs.privateKeyBytes)
 			};
 
 			keyPair.publicKey.set(rsaKeyPair.publicKey);
 			keyPair.privateKey.set(rsaKeyPair.privateKey);
-			keyPair.publicKey.set(sphincsKeyPair.publicKey, rsa.publicKeyLength);
-			keyPair.privateKey.set(sphincsKeyPair.privateKey, rsa.privateKeyLength);
+			keyPair.publicKey.set(sphincsKeyPair.publicKey, rsa.publicKeyBytes);
+			keyPair.privateKey.set(sphincsKeyPair.privateKey, rsa.privateKeyBytes);
 
-			callback(keyPair);
+			clearMemory(sphincsKeyPair.privateKey);
+			clearMemory(rsaKeyPair.privateKey);
+			clearMemory(sphincsKeyPair.publicKey);
+			clearMemory(rsaKeyPair.publicKey);
+
+			return keyPair;
 		});
 	},
 
-	sign: function (message, privateKey, callback) {
-		superSphincs.signDetached(
-			message,
-			privateKey,
-			function (signature, hash, err) {
-				if (signature) {
-					message		= decodeString(message);
+	sign: function (message, privateKey, getHash) {
+		var shouldClearMessage	= typeof message === 'string';
 
-					var signed	= new Uint8Array(
-						superSphincs.signatureLength + message.length
-					);
+		return superSphincs.signDetached(message, privateKey, true, true).then(function (o) {
+			message		= decodeString(message);
 
-					signed.set(signature);
-					signed.set(message, superSphincs.signatureLength);
+			var signed	= new Uint8Array(
+				superSphincs.bytes + message.length
+			);
 
-					callback(encodeBase64(signed), hash.hex);
-				}
-				else {
-					callback(null, null, err);
-				}
-			},
-			true
-		);
+			signed.set(o.signature);
+			signed.set(message, superSphincs.bytes);
+
+			var result	= {
+				signed: encodeBase64(signed),
+				hash: o.hash.hex
+			};
+
+			if (shouldClearMessage) {
+				clearMemory(message);
+			}
+
+			clearMemory(signed);
+			clearMemory(o.signature);
+			clearMemory(o.hash.binary);
+
+			if (getHash) {
+				return result;
+			}
+			else {
+				return result.signed;
+			}
+		}).catch(function (err) {
+			if (shouldClearMessage) {
+				clearMemory(message);
+			}
+
+			throw err;
+		});
 	},
 
-	signDetached: function (message, privateKey, callback, noEncode) {
-		try {
-			var hash	= hashMessage(message);
+	signDetached: function (message, privateKey, getHash, noEncode) {
+		return superSphincs.hash(message).then(function (hash) {
+			return Promise.all([hash, rsa.signDetached(
+				hash.binary,
+				new Uint8Array(privateKey.buffer, 0, rsa.privateKeyBytes)
+			)]);
+		}).then(function (results) {
+			var hash			= results[0];
+			var rsaSignature	= results[1];
 
 			var sphincsSignature	= sphincs.signDetached(
-				hash.bytes,
-				new Uint8Array(privateKey.buffer, rsa.privateKeyLength)
+				hash.binary,
+				new Uint8Array(privateKey.buffer, rsa.privateKeyBytes)
 			);
 
-			rsa.signDetached(
-				hash.bytes,
-				new Uint8Array(privateKey.buffer, 0, rsa.privateKeyLength),
-				function (rsaSignature, err) {
-					if (err) {
-						callback(null, null, superSphincs.errorMessages.sign);
-						return;
-					}
+			var signature	= new Uint8Array(superSphincs.bytes);
 
-					var signature	= new Uint8Array(superSphincs.signatureLength);
+			signature.set(rsaSignature);
+			signature.set(sphincsSignature, rsa.bytes);
 
-					signature.set(rsaSignature);
-					signature.set(sphincsSignature, rsa.signatureLength);
+			var result	= noEncode ?
+				{signature: signature, hash: hash} :
+				{signature: encodeBase64(signature), hash: hash.hex}
+			;
 
-					if (noEncode) {
-						callback(signature, hash);
-					}
-					else {
-						callback(encodeBase64(signature), hash.hex);
-					}
-				}
-			);
-		}
-		catch (_) {
-			callback(null, null, superSphincs.errorMessages.sign);
-		}
+			if (!noEncode) {
+				clearMemory(signature);
+				clearMemory(hash.binary);
+			}
+
+			clearMemory(sphincsSignature);
+			clearMemory(rsaSignature);
+
+			if (getHash) {
+				return result;
+			}
+			else {
+				return result.signature;
+			}
+		});
 	},
 
-	open: function (signed, publicKey, callback) {
-		try {
+	open: function (signed, publicKey, getHash) {
+		var shouldClearSigned	= typeof signed === 'string';
+
+		return Promise.resolve().then(function () {
 			signed	= decodeBase64(signed);
 
 			var signature	= new Uint8Array(
 				signed.buffer,
 				0,
-				superSphincs.signatureLength
+				superSphincs.bytes
 			);
 
 			var message		= encodeString(
-				new Uint8Array(signed.buffer, superSphincs.signatureLength)
+				new Uint8Array(signed.buffer, superSphincs.bytes)
 			);
 
-			superSphincs.verifyDetached(
+			return Promise.all([message, superSphincs.verifyDetached(
 				signature,
 				message,
 				publicKey,
-				function (isValid, messageHash) {
-					if (isValid) {
-						callback(message, messageHash);
-					}
-					else {
-						callback(null, null, superSphincs.errorMessages.open);
-					}
+				true
+			)]);
+		}).then(function (results) {
+			var message	= results[0];
+			var o		= results[1];
+
+			if (shouldClearSigned) {
+				clearMemory(signed);
+			}
+
+			if (o.isValid) {
+				var result	= {verified: message, hash: o.hash};
+
+				if (getHash) {
+					return result;
 				}
-			);
-		}
-		catch (_) {
-			callback(null, null, superSphincs.errorMessages.open);
-		}
+				else {
+					return result.verified;
+				}
+			}
+			else {
+				throw 'Failed to open SuperSPHINCS signed message.';
+			}
+		}).catch(function (err) {
+			if (shouldClearSigned) {
+				clearMemory(signed);
+			}
+
+			throw err;
+		});
 	},
 
-	verifyDetached: function (signature, message, publicKey, callback) {
-		try {
+	verifyDetached: function (signature, message, publicKey, getHash) {
+		var shouldClearSignature	= typeof signature === 'string';
+
+		return superSphincs.hash(message).then(function (hash) {
 			signature	= decodeBase64(signature);
 
-			var hash	= hashMessage(message);
+			return Promise.all([
+				hash,
+				rsa.verifyDetached(
+					new Uint8Array(signature.buffer, 0, rsa.bytes),
+					hash.binary,
+					new Uint8Array(publicKey.buffer, 0, rsa.publicKeyBytes)
+				).catch(function () {
+					return true;
+				})
+			]);
+		}).then(function (results) {
+			var hash		= results[0];
+			var rsaIsValid	= results[1];
 
 			var sphincsIsValid	= sphincs.verifyDetached(
 				new Uint8Array(
 					signature.buffer,
-					rsa.signatureLength,
-					sphincs.signatureLength
+					rsa.bytes,
+					sphincs.bytes
 				),
-				hash.bytes,
-				new Uint8Array(publicKey.buffer, rsa.publicKeyLength)
+				hash.binary,
+				new Uint8Array(publicKey.buffer, rsa.publicKeyBytes)
 			);
 
-			rsa.verifyDetached(
-				new Uint8Array(signature.buffer, 0, rsa.signatureLength),
-				hash.bytes,
-				new Uint8Array(publicKey.buffer, 0, rsa.publicKeyLength),
-				function (rsaIsValid, err) {
-					if (err) {
-						rsaIsValid	= true;
-					}
+			var result	= {
+				isValid: rsaIsValid && sphincsIsValid,
+				hash: hash.hex
+			};
 
-					callback(rsaIsValid && sphincsIsValid, hash.hex);
-				}
-			);
-		}
-		catch (_) {
-			callback(null, null, superSphincs.errorMessages.verify);
-		}
+			if (shouldClearSignature) {
+				clearMemory(signature);
+			}
+
+			clearMemory(hash.binary);
+
+			if (getHash) {
+				return result;
+			}
+			else {
+				return result.isValid;
+			}
+		}).catch(function (err) {
+			if (shouldClearSignature) {
+				clearMemory(signature);
+			}
+
+			throw err;
+		});;
 	},
 
-	exportKeys: function (keyPair, password, callback) {
-		if (typeof callback === 'undefined') {
-			callback	= password;
-			password	= null;
-		}
-
-		var keyData	= {
-			public: {
-				rsa: null,
-				sphincs: null,
-				superSphincs: null
-			},
-			private: {
-				rsa: null,
-				sphincs: null,
-				superSphincs: null
+	exportKeys: function (keyPair, password) {
+		return Promise.resolve().then(function () {
+			if (!keyPair.privateKey) {
+				return null;
 			}
-		};
 
-		if (keyPair.publicKey) {
-			keyData.public.rsa			= encodeBase64(new Uint8Array(
-				keyPair.publicKey.buffer,
-				0,
-				rsa.publicKeyLength
-			));
-
-			keyData.public.sphincs		= encodeBase64(new Uint8Array(
-				keyPair.publicKey.buffer,
-				rsa.publicKeyLength
-			));
-
-			keyData.public.superSphincs	= encodeBase64(keyPair.publicKey);
-		}
-
-		if (keyPair.privateKey) {
 			var rsaPrivateKey			= new Uint8Array(
-				rsa.publicKeyLength +
-				rsa.privateKeyLength
+				rsa.publicKeyBytes +
+				rsa.privateKeyBytes
 			);
 
 			var sphincsPrivateKey		= new Uint8Array(
-				sphincs.publicKeyLength +
-				sphincs.privateKeyLength
+				sphincs.publicKeyBytes +
+				sphincs.privateKeyBytes
 			);
 
 			var superSphincsPrivateKey	= new Uint8Array(
-				superSphincs.publicKeyLength +
-				superSphincs.privateKeyLength
+				superSphincs.publicKeyBytes +
+				superSphincs.privateKeyBytes
 			);
 
 			rsaPrivateKey.set(new Uint8Array(
 				keyPair.publicKey.buffer,
 				0,
-				rsa.publicKeyLength
+				rsa.publicKeyBytes
 			));
 			rsaPrivateKey.set(
 				new Uint8Array(
 					keyPair.privateKey.buffer,
 					0,
-					rsa.privateKeyLength
+					rsa.privateKeyBytes
 				),
-				rsa.publicKeyLength
+				rsa.publicKeyBytes
 			);
 
 			sphincsPrivateKey.set(new Uint8Array(
 				keyPair.publicKey.buffer,
-				rsa.publicKeyLength
+				rsa.publicKeyBytes
 			));
 			sphincsPrivateKey.set(
 				new Uint8Array(
 					keyPair.privateKey.buffer,
-					rsa.privateKeyLength
+					rsa.privateKeyBytes
 				),
-				sphincs.publicKeyLength
+				sphincs.publicKeyBytes
 			);
 
 			superSphincsPrivateKey.set(keyPair.publicKey);
-			superSphincsPrivateKey.set(keyPair.privateKey, superSphincs.publicKeyLength);
+			superSphincsPrivateKey.set(keyPair.privateKey, superSphincs.publicKeyBytes);
 
 			if (password) {
-				encrypt(rsaPrivateKey, password, function (encrypted, err) {
-					if (err) {
-						callback(null, err);
-						return;
-					}
+				return Promise.all([
+					encrypt(rsaPrivateKey, password),
+					encrypt(sphincsPrivateKey, password),
+					encrypt(superSphincsPrivateKey, password)
+				]).then(function (results) {
+					clearMemory(superSphincsPrivateKey);
+					clearMemory(sphincsPrivateKey);
+					clearMemory(rsaPrivateKey);
 
-					keyData.private.rsa	= encodeBase64(encrypted);
-
-					encrypt(sphincsPrivateKey, password, function (encrypted, err) {
-						if (err) {
-							callback(null, err);
-							return;
-						}
-
-						keyData.private.sphincs	= encodeBase64(encrypted);
-
-						encrypt(superSphincsPrivateKey, password, function (encrypted, err) {
-							if (err) {
-								callback(null, err);
-								return;
-							}
-
-							keyData.private.superSphincs	= encodeBase64(encrypted);
-
-							callback(keyData);
-						});
-					});
+					return results;
 				});
-
-				return;
+			}
+			else {
+				return [
+					rsaPrivateKey,
+					sphincsPrivateKey,
+					superSphincsPrivateKey
+				];
+			}
+		}).then(function (results) {
+			if (!results) {
+				return {
+					rsa: null,
+					sphincs: null,
+					superSphincs: null
+				};
 			}
 
-			keyData.private.rsa				= encodeBase64(rsaPrivateKey);
-			keyData.private.sphincs			= encodeBase64(sphincsPrivateKey);
-			keyData.private.superSphincs	= encodeBase64(superSphincsPrivateKey);
-		}
+			var rsaPrivateKey			= results[0];
+			var sphincsPrivateKey		= results[1];
+			var superSphincsPrivateKey	= results[2];
 
-		callback(keyData);
+			var privateKeyData	= {
+				rsa: encodeBase64(rsaPrivateKey),
+				sphincs: encodeBase64(sphincsPrivateKey),
+				superSphincs: encodeBase64(superSphincsPrivateKey)
+			};
+
+			clearMemory(superSphincsPrivateKey);
+			clearMemory(sphincsPrivateKey);
+			clearMemory(rsaPrivateKey);
+
+			return privateKeyData;
+		}).then(function (privateKeyData) {
+			return {
+				private: privateKeyData,
+				public: {
+					rsa: encodeBase64(new Uint8Array(
+						keyPair.publicKey.buffer,
+						0,
+						rsa.publicKeyBytes
+					)),
+					sphincs: encodeBase64(new Uint8Array(
+						keyPair.publicKey.buffer,
+						rsa.publicKeyBytes
+					)),
+					superSphincs: encodeBase64(keyPair.publicKey)
+				}
+			};
+		});
 	},
 
-	importKeys: function (keyData, password, callback) {
-		if (typeof callback === 'undefined') {
-			callback	= password;
-			password	= null;
-		}
+	importKeys: function (keyData, password) {
+		return Promise.resolve().then(function () {
+			if (!keyData.private) {
+				return null;
+			}
 
-		var keyPair	= {
-			publicKey: null,
-			privateKey: null
-		};
-
-		if (keyData.private) {
 			if (keyData.private.superSphincs) {
 				var superSphincsPrivateKey	= decodeBase64(keyData.private.superSphincs);
 
 				if (password) {
-					decrypt(
-						superSphincsPrivateKey,
-						password,
-						function (decrypted, err) {
-							if (err) {
-								callback(null, err);
-								return;
-							}
-
-							keyPair.publicKey	= new Uint8Array(
-								new Uint8Array(
-									decrypted.buffer,
-									0,
-									superSphincs.publicKeyLength
-								)
-							);
-
-							keyPair.privateKey	= new Uint8Array(
-								new Uint8Array(
-									decrypted.buffer,
-									superSphincs.publicKeyLength
-								)
-							);
-
-							callback(keyPair);
-						}
-					);
-
-					return;
+					return Promise.all([decrypt(superSphincsPrivateKey, password)]);
 				}
-
-				keyPair.publicKey	= new Uint8Array(
-					new Uint8Array(
-						superSphincsPrivateKey.buffer,
-						0,
-						superSphincs.publicKeyLength
-					)
-				);
-
-				keyPair.privateKey	= new Uint8Array(
-					new Uint8Array(
-						superSphincsPrivateKey.buffer,
-						superSphincs.publicKeyLength
-					)
-				);
+				else {
+					return [superSphincsPrivateKey];
+				}
 			}
-			else if (keyData.private.rsa && keyData.private.sphincs) {
-				keyPair.publicKey	= new Uint8Array(superSphincs.publicKeyLength);
-				keyPair.privateKey	= new Uint8Array(superSphincs.privateKeyLength);
-
+			else {
 				var rsaPrivateKey		= decodeBase64(keyData.private.rsa);
 				var sphincsPrivateKey	= decodeBase64(keyData.private.sphincs);
 
 				if (password) {
-					decrypt(
-						rsaPrivateKey,
-						typeof password === 'string' ? password : password.rsa,
-						function (decrypted, err) {
-							if (err) {
-								callback(null, err);
-								return;
-							}
-
-							keyPair.publicKey.set(new Uint8Array(
-								decrypted.buffer,
-								0,
-								rsa.publicKeyLength
-							));
-
-							keyPair.privateKey.set(new Uint8Array(
-								decrypted.buffer,
-								rsa.publicKeyLength
-							));
-
-							decrypt(
-								sphincsPrivateKey,
-								typeof password === 'string' ? password : password.sphincs,
-								function (decrypted, err) {
-									if (err) {
-										callback(null, err);
-										return;
-									}
-
-									keyPair.publicKey.set(
-										new Uint8Array(
-											decrypted.buffer,
-											0,
-											sphincs.publicKeyLength
-										),
-										rsa.publicKeyLength
-									);
-
-									keyPair.privateKey.set(
-										new Uint8Array(
-											decrypted.buffer,
-											sphincs.publicKeyLength
-										),
-										rsa.privateKeyLength
-									);
-
-									callback(keyPair);
-								}
-							);
-						}
-					);
-
-					return;
+					return Promise.all([
+						decrypt(
+							rsaPrivateKey,
+							typeof password === 'string' ? password : password.rsa
+						),
+						decrypt(
+							sphincsPrivateKey,
+							typeof password === 'string' ? password : password.sphincs
+						)
+					]);
 				}
+				else {
+					return [rsaPrivateKey, sphincsPrivateKey];
+				}
+			}
+		}).then(function (results) {
+			var keyPair	= {
+				publicKey: new Uint8Array(superSphincs.publicKeyBytes),
+				privateKey: null
+			};
+
+			if (!results) {
+				return keyPair;
+			}
+
+			keyPair.privateKey	= new Uint8Array(superSphincs.privateKeyBytes);
+
+			if (results.length === 1) {
+				var superSphincsPrivateKey	= results[0];
 
 				keyPair.publicKey.set(new Uint8Array(
-					rsaPrivateKey.buffer,
+					superSphincsPrivateKey.buffer,
 					0,
-					rsa.publicKeyLength
+					superSphincs.publicKeyBytes
 				));
 
 				keyPair.privateKey.set(new Uint8Array(
-					rsaPrivateKey.buffer,
-					rsa.publicKeyLength
+					superSphincsPrivateKey.buffer,
+					superSphincs.publicKeyBytes
 				));
+			}
+			else {
+				var rsaPrivateKey		= results[0];
+				var sphincsPrivateKey	= results[1];
 
+				keyPair.publicKey.set(
+					new Uint8Array(
+						rsaPrivateKey.buffer,
+						0,
+						rsa.publicKeyBytes
+					)
+				);
 				keyPair.publicKey.set(
 					new Uint8Array(
 						sphincsPrivateKey.buffer,
 						0,
-						sphincs.publicKeyLength
+						sphincs.publicKeyBytes
 					),
-					rsa.publicKeyLength
+					rsa.publicKeyBytes
 				);
 
 				keyPair.privateKey.set(
 					new Uint8Array(
+						rsaPrivateKey.buffer,
+						rsa.publicKeyBytes
+					)
+				);
+				keyPair.privateKey.set(
+					new Uint8Array(
 						sphincsPrivateKey.buffer,
-						sphincs.publicKeyLength
+						sphincs.publicKeyBytes
 					),
-					rsa.privateKeyLength
+					rsa.privateKeyBytes
 				);
 			}
-		}
-		else if (keyData.public) {
-			if (keyData.public.superSphincs) {
-				keyPair.publicKey	= decodeBase64(keyData.public.superSphincs);
-			}
-			else if (keyData.public.rsa && keyData.public.sphincs) {
-				keyPair.publicKey	= new Uint8Array(superSphincs.publicKeyLength);
 
-				keyPair.publicKey.set(decodeBase64(keyData.public.rsa));
-				keyPair.publicKey.set(
-					decodeBase64(keyData.public.sphincs),
-					rsa.publicKeyLength
-				);
+			return keyPair;
+		}).then(function (keyPair) {
+			if (!keyPair.privateKey) {
+				if (keyData.public.superSphincs) {
+					keyPair.publicKey.set(decodeBase64(keyData.public.superSphincs));
+				}
+				else if (keyData.public.rsa && keyData.public.sphincs) {
+					keyPair.publicKey.set(decodeBase64(keyData.public.rsa));
+					keyPair.publicKey.set(
+						decodeBase64(keyData.public.sphincs),
+						rsa.publicKeyBytes
+					);
+				}
 			}
-		}
 
-		callback(keyPair);
+			return keyPair;
+		});
 	}
 };
 
