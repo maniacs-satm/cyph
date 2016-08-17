@@ -1,1 +1,0 @@
-module.exports = require("github:sytelus/cryptojs@3.1.2/core.js");
