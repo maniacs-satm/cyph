@@ -119,7 +119,8 @@
             return new TextDecoder("utf-8", {fatal: true}).decode(bytes);
         }
 
-        var numChunks = Math.ceil(bytes.length / toStringChunkSize);
+        var toStringChunkSize = 8192,
+            numChunks = Math.ceil(bytes.length / toStringChunkSize);
         if (numChunks <= 1) {
             try {
                 return decodeURIComponent(escape(String.fromCharCode.apply(null, bytes)));
@@ -286,7 +287,7 @@
             if (selectedOutputFormat === "uint8array") {
                 return output.to_Uint8Array();
             } else if (selectedOutputFormat === "text") {
-                return libsodium.Pointer_stringify(output.address, output.length);
+                return to_string(output.to_Uint8Array());
             } else if (selectedOutputFormat === "hex") {
                 return to_hex(output.to_Uint8Array());
             } else if (selectedOutputFormat === "base64") {

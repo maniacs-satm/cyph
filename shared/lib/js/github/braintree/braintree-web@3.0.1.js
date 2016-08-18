@@ -1,0 +1,1 @@
+module.exports = require("github:braintree/braintree-web@3.0.1/src/index.js");

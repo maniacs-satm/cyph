@@ -1,1 +1,1 @@
-../github/davidchambers/base64.js@0.3.0
+../github/davidchambers/base64.js@1.0.0
