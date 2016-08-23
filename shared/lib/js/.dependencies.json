@@ -251,5 +251,6 @@
   },
   "npm:mutationobserver-shim@0.3.1": {},
   "github:cyph/mceliece.js@master": {},
-  "github:cyph/sidh.js@master": {}
+  "github:cyph/sidh.js@master": {},
+  "github:cyph/rlwe.js@master": {}
 }
