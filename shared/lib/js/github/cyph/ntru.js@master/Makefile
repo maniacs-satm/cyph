@@ -10,7 +10,7 @@ all:
 	bash -c ' \
 		args="$$(echo " \
 			--memory-init-file 0 \
-			-DPARAMS=NTRU_EES439EP1 \
+			-DPARAMS=NTRU_EES743EP1 \
 			-s TOTAL_MEMORY=104900000 -s TOTAL_STACK=52443072 \
 			-s NO_DYNAMIC_EXECUTION=1 -s RUNNING_JS_OPTS=1 -s ASSERTIONS=0 \
 			-s AGGRESSIVE_VARIABLE_ELIMINATION=1 -s ALIASING_FUNCTION_POINTERS=1 \
@@ -27,7 +27,7 @@ all:
 				'"'"'_ntrujs_encrypt'"'"', \
 				'"'"'_ntrujs_decrypt'"'"', \
 				'"'"'_ntrujs_public_key_bytes'"'"', \
-				'"'"'_ntrujs_secret_key_bytes'"'"', \
+				'"'"'_ntrujs_private_key_bytes'"'"', \
 				'"'"'_ntrujs_encrypted_bytes'"'"', \
 				'"'"'_ntrujs_decrypted_bytes'"'"' \
 			]\" \

@@ -1,1 +1,0 @@
-module.exports = require("github:davidchambers/base64.js@0.3.0/base64.js");

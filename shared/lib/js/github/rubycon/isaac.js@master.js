@@ -1,1 +1,0 @@
-module.exports = require("github:rubycon/isaac.js@master/isaac");

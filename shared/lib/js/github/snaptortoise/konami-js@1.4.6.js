@@ -1,0 +1,1 @@
+module.exports = require("github:snaptortoise/konami-js@1.4.6/konami.js");
