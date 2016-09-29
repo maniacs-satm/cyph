@@ -25,7 +25,7 @@ Supported browsers/JS engines:
 
 ## Installation
 
-Ready-to-use files based on libsodium 1.0.10 can be directly copied to your
+Ready-to-use files based on libsodium 1.0.11 can be directly copied to your
 project.
 
 ### Usage with global definitions, for web browsers
@@ -79,17 +79,17 @@ console.log(sodium.to_hex(sodium.crypto_generichash(64, 'test')));
 * [`crypto_aead`](https://download.libsodium.org/doc/secret-key_cryptography/aead.html) (ChaCha20-Poly1305)
 * [`crypto_auth`](https://download.libsodium.org/doc/secret-key_cryptography/secret-key_authentication.html) (HMAC-SHA-512-256)
 * [`crypto_box`](https://doc.libsodium.org/public-key_cryptography/authenticated_encryption.html)
-* [`crypto_box_seal`](https://doc.libsodium.org/public-key_cryptography/sealed_boxes.html)
-* [`crypto_generichash`](https://doc.libsodium.org/hashing/generic_hashing.html) (Blake2b)
-* [`crypto_hash`](https://doc.libsodium.org/advanced/sha-2_hash_function.html) (SHA-512-256)
-* [`crypto_onetimeauth`](https://doc.libsodium.org/advanced/poly1305.html) (Poly1305)
-* [`crypto_pwhash`](https://download.libsodium.org/doc/password_hashing/index.html) (Argon2)
-* [`crypto_scalarmult`](https://doc.libsodium.org/advanced/scalar_multiplication.html) (Curve25519)
-* [`crypto_secretbox`](https://doc.libsodium.org/secret-key_cryptography/authenticated_encryption.html)
-* [`crypto_shorthash`](https://doc.libsodium.org/hashing/short-input_hashing.html) (SipHash)
-* [`crypto_sign`](https://doc.libsodium.org/public-key_cryptography/public-key_signatures.html) (Ed25519)
-* [Ed25519->Curve25519 conversion](https://doc.libsodium.org/advanced/ed25519-curve25519.html)
-* [`randombytes`](https://doc.libsodium.org/generating_random_data/README.html)
+* [`crypto_box_seal`](https://download.libsodium.org/libsodium/content/public-key_cryptography/sealed_boxes.html)
+* [`crypto_generichash`](https://download.libsodium.org/libsodium/content/hashing/generic_hashing.html) (Blake2b)
+* [`crypto_hash`](https://download.libsodium.org/libsodium/content/advanced/sha-2_hash_function.html) (SHA-512-256)
+* [`crypto_onetimeauth`](https://download.libsodium.org/libsodium/content/secret-key_cryptography/chacha20-poly1305.html) (Poly1305)
+* [`crypto_pwhash`](https://download.libsodium.org/libsodium/content/password_hashing/) (Argon2)
+* [`crypto_scalarmult`](https://download.libsodium.org/libsodium/content/advanced/scalar_multiplication.html) (Curve25519)
+* [`crypto_secretbox`](https://download.libsodium.org/libsodium/content/secret-key_cryptography/authenticated_encryption.html)
+* [`crypto_shorthash`](https://download.libsodium.org/libsodium/content/hashing/short-input_hashing.html) (SipHash)
+* [`crypto_sign`](https://download.libsodium.org/libsodium/content/public-key_cryptography/public-key_signatures.html) (Ed25519)
+* [Ed25519->Curve25519 conversion](https://download.libsodium.org/libsodium/content/advanced/ed25519-curve25519.html)
+* [`randombytes`](https://download.libsodium.org/libsodium/content/generating_random_data/)
 
 ## Additional helpers
 
@@ -128,10 +128,37 @@ However, an extra parameter can be given to all wrapped functions, in
 order to specify what format the output should be in. Valid options
 are `uint8array' (default), 'text' and 'hex'.
 
-Example:
+Example (shorthash):
+
 ```javascript
 var key = sodium.randombytes_buf(sodium.crypto_shorthash_KEYBYTES),
     hash_hex = sodium.crypto_shorthash('test', key, 'hex');
+```
+
+Example (secretbox):
+
+```javascript
+// Load your secret key from a safe place and reuse it across multiple
+// secretbox calls. (Obviously don't use this example key for anything
+// real.)
+//
+var secret = Buffer.from('724b092810ec86d7e35c9d067702b31ef90bc43a7b598626749914d6a3e033ed', 'hex');
+
+// Given a message as a string, return a Buffer containing the
+// nonce (in the first 24 bytes) and the encrypted content.
+var encrypt = function(message) {
+    // You must use a different nonce for each message you encrypt.
+    var nonce = Buffer.from(sodium.randombytes_buf(sodium.crypto_box_NONCEBYTES));
+    var buf = Buffer.from(message);
+    return Buffer.concat([nonce, Buffer.from(sodium.crypto_secretbox_easy(buf, nonce, secret))]);
+},
+
+// Decrypt takes a Buffer and returns the decrypted message as plain text.
+var decrypt = function(encryptedBuffer) {
+    var nonce = encryptedBuffer.slice(0, sodium.crypto_box_NONCEBYTES);
+    var encryptedMessage = encryptedBuffer.slice(sodium.crypto_box_NONCEBYTES);
+    return sodium.crypto_secretbox_open_easy(encryptedMessage, nonce, secret, 'text');
+}
 ```
 
 In addition, the `from_hex`, `to_hex`, `from_string`, and `to_string`
@@ -196,7 +223,7 @@ make libsodium/configure
 
 # Modify the emscripten.sh
 # Specifically, add the name of the missing functions and constants in the "EXPORTED_FUNCTIONS" array.
-# Ensure that the name begins with an underscore and that it is between double quotes. 
+# Ensure that the name begins with an underscore and that it is between double quotes.
 nano libsodium/dist-build/emscripten.sh
 
 # Build libsodium, and then libsodium.js with your chosen functions

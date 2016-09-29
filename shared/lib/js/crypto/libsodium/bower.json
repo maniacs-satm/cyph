@@ -1,6 +1,6 @@
 {
   "name": "libsodium.js",
-  "version": "0.3.1",
+  "version": "0.4.5",
   "homepage": "https://github.com/jedisct1/libsodium.js",
   "authors": [
     "Ahmad Ben Mrad (@BatikhSouri)",
@@ -37,9 +37,15 @@
     "README.md",
     "bower_components",
     "dist/browsers/combined/sodium.js",
+    "dist/browsers-sumo/combined/sodium.js",
+    "dist/modules-sumo/libsodium.js",
+    "dist/modules-sumo/libsodium-wrappers.js",
     "libsodium",
     "node_modules",
     "package-libsodium.json",
+    "package-libsodium-sumo.json",
+    "package-libsodium-wrappers.json",
+    "package-libsodium-wrappers-sumo.json",
     "package.json",
     "test",
     "wrapper"
