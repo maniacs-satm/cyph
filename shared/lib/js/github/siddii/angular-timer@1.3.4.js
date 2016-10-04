@@ -1,0 +1,1 @@
+module.exports = require("github:siddii/angular-timer@1.3.4/dist/angular-timer");

@@ -1,0 +1,1 @@
+module.exports = require("npm:humanize-duration@3.9.1/humanize-duration.js");

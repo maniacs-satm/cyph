@@ -1,0 +1,1 @@
+module.exports = require("github:EvanHahn/HumanizeDuration.js@3.9.1/humanize-duration");

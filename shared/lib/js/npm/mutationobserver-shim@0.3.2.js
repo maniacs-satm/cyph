@@ -1,0 +1,1 @@
+module.exports = require("npm:mutationobserver-shim@0.3.2/dist/mutationobserver.min.js");
