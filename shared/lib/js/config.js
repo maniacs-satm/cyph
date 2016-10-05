@@ -3,8 +3,8 @@ System.config({
   defaultJSExtensions: true,
   transpiler: "typescript",
   paths: {
-    "github:*": "../lib/js/github/*",
-    "npm:*": "../lib/js/npm/*"
+    "github:*": "./github/*",
+    "npm:*": "./npm/*"
   },
 
   map: {

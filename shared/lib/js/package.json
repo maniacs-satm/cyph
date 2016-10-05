@@ -1,7 +1,7 @@
 {
   "jspm": {
     "directories": {
-      "packages": "../lib/js"
+      "packages": "./"
     },
     "dependencies": {
       "@angular/common": "npm:@angular/common@^2.0.1",
