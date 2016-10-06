@@ -1,1 +1,0 @@
-module.exports = require("npm:@angular/http@2.0.1/bundles/http.umd.js");
